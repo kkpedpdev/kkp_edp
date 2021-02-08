@@ -1,0 +1,33 @@
+{
+	"name": "bin_vm_ds",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "linkedService2",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"P_PATH": {
+				"type": "string"
+			},
+			"P_FILENAME": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "Binary",
+		"typeProperties": {
+			"location": {
+				"type": "FileServerLocation",
+				"fileName": {
+					"value": "@dataset().P_FILENAME",
+					"type": "Expression"
+				},
+				"folderPath": {
+					"value": "@dataset().P_PATH",
+					"type": "Expression"
+				}
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

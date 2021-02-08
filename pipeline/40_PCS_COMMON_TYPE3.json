@@ -1,0 +1,53 @@
+{
+	"name": "40_PCS_COMMON_TYPE3",
+	"properties": {
+		"activities": [
+			{
+				"name": "Notebook1",
+				"type": "DatabricksNotebook",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": {
+						"value": "@pipeline().parameters.P_PRCS_OBJ.ADB_NM",
+						"type": "Expression"
+					},
+					"baseParameters": {
+						"PARAMS": {
+							"value": "@pipeline().parameters.P_PRCS_OBJ.ADB_PARM",
+							"type": "Expression"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "link_dbw_edp",
+					"type": "LinkedServiceReference"
+				}
+			}
+		],
+		"parameters": {
+			"P_LD_ID": {
+				"type": "string"
+			},
+			"P_PRCS_NM": {
+				"type": "string"
+			},
+			"P_PRCS_OBJ": {
+				"type": "object"
+			}
+		},
+		"folder": {
+			"name": "COMMON JOB"
+		},
+		"annotations": [],
+		"lastPublishTime": "2021-02-06T18:32:10Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

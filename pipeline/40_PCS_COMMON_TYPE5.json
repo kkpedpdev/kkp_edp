@@ -1,0 +1,83 @@
+{
+	"name": "40_PCS_COMMON_TYPE5",
+	"properties": {
+		"activities": [
+			{
+				"name": "EDW UPDATE COUNT TARGET",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[CNTL].[COMMOM_SNAPSHOT_PROCESS]",
+					"storedProcedureParameters": {
+						"P_AS_AT_DT": {
+							"value": {
+								"value": "@pipeline().parameters.P_PRCS_OBJ.asat_dt",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"P_PCS_ID": {
+							"value": {
+								"value": "@pipeline().parameters.P_PRCS_OBJ.pcs_id",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"P_PCS_NM": {
+							"value": {
+								"value": "@pipeline().parameters.P_PRCS_NM",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"P_TABLE_NM": {
+							"value": {
+								"value": "@pipeline().parameters.P_PRCS_OBJ.table_name",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"P_TXN_V_NM": {
+							"value": {
+								"value": "@pipeline().parameters.P_PRCS_OBJ.view_name",
+								"type": "Expression"
+							},
+							"type": "String"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "link_syn_kkpb_edp",
+					"type": "LinkedServiceReference"
+				}
+			}
+		],
+		"parameters": {
+			"P_LD_ID": {
+				"type": "string",
+				"defaultValue": "-999"
+			},
+			"P_PRCS_NM": {
+				"type": "string",
+				"defaultValue": "GET_LOCATION_FACE_RECOGNITION_CustGeoInfo"
+			},
+			"P_PRCS_OBJ": {
+				"type": "object"
+			}
+		},
+		"folder": {
+			"name": "COMMON JOB"
+		},
+		"annotations": [],
+		"lastPublishTime": "2021-02-06T18:37:49Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

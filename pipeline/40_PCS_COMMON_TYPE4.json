@@ -1,0 +1,183 @@
+{
+	"name": "40_PCS_COMMON_TYPE4",
+	"properties": {
+		"activities": [
+			{
+				"name": "Notebook1",
+				"type": "DatabricksNotebook",
+				"dependsOn": [
+					{
+						"activity": "Copy Raw",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": {
+						"value": "@pipeline().parameters.P_PRCS_OBJ.ADB_NM",
+						"type": "Expression"
+					},
+					"baseParameters": {
+						"PARAMS": {
+							"value": "@pipeline().parameters.P_PRCS_OBJ.ADB_PARM",
+							"type": "Expression"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "link_dbw_edp",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "Copy Raw",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "Lookup1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "BinarySource",
+						"storeSettings": {
+							"type": "FileServerReadSettings",
+							"recursive": true
+						},
+						"formatSettings": {
+							"type": "BinaryReadSettings"
+						}
+					},
+					"sink": {
+						"type": "BinarySink",
+						"storeSettings": {
+							"type": "AzureBlobStorageWriteSettings"
+						}
+					},
+					"enableStaging": false
+				},
+				"inputs": [
+					{
+						"referenceName": "bin_onprim_ds",
+						"type": "DatasetReference",
+						"parameters": {
+							"P_PATH": {
+								"value": "@concat(pipeline().parameters.P_PRCS_OBJ.PTH, '/', pipeline().parameters.P_PRCS_OBJ.CALC_ASAT_DT)",
+								"type": "Expression"
+							},
+							"P_FILENAME": {
+								"value": "@activity('Lookup1').output.firstrow.FILE_NM",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "bin_blob_ds",
+						"type": "DatasetReference",
+						"parameters": {
+							"P_CONTAINER": {
+								"value": "@pipeline().parameters.P_PRCS_OBJ.CNTNR",
+								"type": "Expression"
+							},
+							"P_PATH": {
+								"value": "@concat(pipeline().parameters.P_PRCS_OBJ.PTH, '/', pipeline().parameters.P_PRCS_OBJ.CALC_ASAT_DT)",
+								"type": "Expression"
+							},
+							"P_FILENAME": {
+								"value": "@activity('Lookup1').output.firstrow.FI_NM",
+								"type": "Expression"
+							}
+						}
+					}
+				]
+			},
+			{
+				"name": "Lookup1",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "SqlServerSource",
+						"sqlReaderStoredProcedureName": "[CNTL].[PROC_GET_FI]",
+						"storedProcedureParameters": {
+							"P_ASAT_DT": {
+								"type": "String",
+								"value": {
+									"value": "@pipeline().parameters.P_PRCS_OBJ.CALC_ASAT_DT",
+									"type": "Expression"
+								}
+							},
+							"P_FI_ID": {
+								"type": "Int32",
+								"value": {
+									"value": "@pipeline().parameters.P_PRCS_OBJ.FI_ID",
+									"type": "Expression"
+								}
+							},
+							"P_PRCS_NM": {
+								"type": "String",
+								"value": {
+									"value": "pipeline().parameters.P_PRCS_NM",
+									"type": "Expression"
+								}
+							}
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "mssql_cntl_ds",
+						"type": "DatasetReference"
+					}
+				}
+			}
+		],
+		"parameters": {
+			"P_LD_ID": {
+				"type": "string"
+			},
+			"P_PRCS_NM": {
+				"type": "string"
+			},
+			"P_PRCS_OBJ": {
+				"type": "object"
+			}
+		},
+		"folder": {
+			"name": "COMMON JOB"
+		},
+		"annotations": [],
+		"lastPublishTime": "2021-02-06T18:36:03Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

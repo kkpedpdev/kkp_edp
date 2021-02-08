@@ -86,7 +86,7 @@
 								"type": "Expression"
 							},
 							"P_FILENAME": {
-								"value": "@activity('Lookup1').output.firstrow.FILE_NM",
+								"value": "@activity('Lookup1').output.firstrow.FI_NM",
 								"type": "Expression"
 							}
 						}

@@ -662,7 +662,7 @@
 			},
 			{
 				"name": "UPDATE SUCCESS",
-				"description": "   ",
+				"description": "",
 				"type": "SqlServerStoredProcedure",
 				"dependsOn": [
 					{
@@ -1060,9 +1060,18 @@
 										},
 										"waitOnCompletion": true,
 										"parameters": {
-											"P_LD_ID": "@pipeline().parameters.P_LD_ID",
-											"P_PRCS_NM": "@pipeline().parameters.P_PRCS_NM",
-											"P_PRCS_OBJ": "@activity('GET PROCESS INFORMATION').output.FIRSTROW"
+											"P_LD_ID": {
+												"value": "@pipeline().parameters.P_LD_ID",
+												"type": "Expression"
+											},
+											"P_PRCS_NM": {
+												"value": "@pipeline().parameters.P_PRCS_NM",
+												"type": "Expression"
+											},
+											"P_PRCS_OBJ": {
+												"value": "@activity('GET PROCESS INFORMATION').output.FIRSTROW",
+												"type": "Expression"
+											}
 										}
 									}
 								}

@@ -1,0 +1,34 @@
+{
+	"name": "Test DBW",
+	"properties": {
+		"activities": [
+			{
+				"name": "Notebook1",
+				"type": "DatabricksNotebook",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": "/Users/pran@inteltion.com/pran@inteltion.com/Kafka Test",
+					"baseParameters": {
+						"Date": "20210115",
+						"Source": "kkp-kkpmobile-tracking-request"
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "link_dbw_edp",
+					"type": "LinkedServiceReference"
+				}
+			}
+		],
+		"annotations": [],
+		"lastPublishTime": "2021-01-19T06:39:51Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

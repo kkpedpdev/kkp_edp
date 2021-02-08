@@ -1,0 +1,11 @@
+{
+	"name": "link_kv_edp",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "AzureKeyVault",
+		"typeProperties": {
+			"baseUrl": "https://kv-kkpb-dev-edp.vault.azure.net/"
+		}
+	}
+}

@@ -1,0 +1,40 @@
+{
+	"name": "bin_adls_ds",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "link_st_kkpb_edp",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"P_CONTAINER": {
+				"type": "string"
+			},
+			"P_PATH": {
+				"type": "string"
+			},
+			"P_FILENAME": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "Binary",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": {
+					"value": "@dataset().P_FILENAME",
+					"type": "Expression"
+				},
+				"folderPath": {
+					"value": "@dataset().P_PATH",
+					"type": "Expression"
+				},
+				"fileSystem": {
+					"value": "@dataset().P_CONTAINER",
+					"type": "Expression"
+				}
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

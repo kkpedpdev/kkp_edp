@@ -1,0 +1,38 @@
+{
+	"name": "dl_parquet_ds",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "link_st_kkpb_edp",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"P_CONTAINER": {
+				"type": "string"
+			},
+			"P_PATH": {
+				"type": "string"
+			},
+			"P_FILENAME": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"folderPath": {
+					"value": "@dataset().P_PATH",
+					"type": "Expression"
+				},
+				"fileSystem": {
+					"value": "@dataset().P_CONTAINER",
+					"type": "Expression"
+				}
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

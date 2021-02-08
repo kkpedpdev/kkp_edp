@@ -1,0 +1,40 @@
+{
+	"name": "bin_blob_ds",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "link_blob_test_edp",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"P_CONTAINER": {
+				"type": "string"
+			},
+			"P_PATH": {
+				"type": "string"
+			},
+			"P_FILENAME": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "Binary",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": {
+					"value": "@dataset().P_FILENAME",
+					"type": "Expression"
+				},
+				"folderPath": {
+					"value": "@dataset().P_PATH",
+					"type": "Expression"
+				},
+				"container": {
+					"value": "@dataset().P_CONTAINER",
+					"type": "Expression"
+				}
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

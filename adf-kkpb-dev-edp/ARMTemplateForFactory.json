@@ -5764,7 +5764,7 @@
 								}
 							},
 							"dataset": {
-								"referenceName": "Json1",
+								"referenceName": "dl_json_ds",
 								"type": "DatasetReference",
 								"parameters": {
 									"P_FILENAME": {
@@ -5803,7 +5803,7 @@
 				"[concat(variables('factoryId'), '/datasets/dl_csv_ds')]",
 				"[concat(variables('factoryId'), '/datasets/dl_parquet_ds')]",
 				"[concat(variables('factoryId'), '/linkedServices/link_sqldb_kkpb_edp')]",
-				"[concat(variables('factoryId'), '/datasets/Json1')]"
+				"[concat(variables('factoryId'), '/datasets/dl_json_ds')]"
 			]
 		},
 		{
@@ -6180,7 +6180,7 @@
 								}
 							},
 							"dataset": {
-								"referenceName": "Json1",
+								"referenceName": "dl_json_ds",
 								"type": "DatasetReference",
 								"parameters": {
 									"P_FILENAME": {
@@ -6219,7 +6219,7 @@
 				"[concat(variables('factoryId'), '/datasets/dl_csv_ds')]",
 				"[concat(variables('factoryId'), '/datasets/dl_parquet_ds')]",
 				"[concat(variables('factoryId'), '/linkedServices/link_sqldb_kkpb_edp')]",
-				"[concat(variables('factoryId'), '/datasets/Json1')]"
+				"[concat(variables('factoryId'), '/datasets/dl_json_ds')]"
 			]
 		},
 		{
@@ -7382,7 +7382,7 @@
 								}
 							},
 							"dataset": {
-								"referenceName": "Json1",
+								"referenceName": "dl_json_ds",
 								"type": "DatasetReference",
 								"parameters": {
 									"P_FILENAME": {
@@ -7421,7 +7421,7 @@
 				"[concat(variables('factoryId'), '/datasets/dl_csv_ds')]",
 				"[concat(variables('factoryId'), '/datasets/dl_parquet_ds')]",
 				"[concat(variables('factoryId'), '/linkedServices/link_sqldb_kkpb_edp')]",
-				"[concat(variables('factoryId'), '/datasets/Json1')]"
+				"[concat(variables('factoryId'), '/datasets/dl_json_ds')]"
 			]
 		},
 		{
@@ -7809,73 +7809,6 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/Json1')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "link_st_kkpb_edp",
-					"type": "LinkedServiceReference"
-				},
-				"parameters": {
-					"P_FILENAME": {
-						"type": "string"
-					}
-				},
-				"annotations": [],
-				"type": "Json",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobFSLocation",
-						"fileName": {
-							"value": "@dataset().P_FILENAME",
-							"type": "Expression"
-						},
-						"folderPath": "CONFIG",
-						"fileSystem": "working"
-					}
-				},
-				"schema": {
-					"type": "object",
-					"properties": {
-						"type": {
-							"type": "string"
-						},
-						"mappings": {
-							"type": "array",
-							"items": {
-								"type": "object",
-								"properties": {
-									"source": {
-										"type": "object",
-										"properties": {
-											"name": {
-												"type": "string"
-											},
-											"type": {
-												"type": "string"
-											}
-										}
-									},
-									"sink": {
-										"type": "object",
-										"properties": {
-											"path": {
-												"type": "string"
-											}
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/link_st_kkpb_edp')]"
-			]
-		},
-		{
 			"name": "[concat(parameters('factoryName'), '/adls_csv_ds')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -8193,6 +8126,73 @@
 					"quoteChar": "\""
 				},
 				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/link_st_kkpb_edp')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/dl_json_ds')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "link_st_kkpb_edp",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"P_FILENAME": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "Json",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": {
+							"value": "@dataset().P_FILENAME",
+							"type": "Expression"
+						},
+						"folderPath": "CONFIG",
+						"fileSystem": "working"
+					}
+				},
+				"schema": {
+					"type": "object",
+					"properties": {
+						"type": {
+							"type": "string"
+						},
+						"mappings": {
+							"type": "array",
+							"items": {
+								"type": "object",
+								"properties": {
+									"source": {
+										"type": "object",
+										"properties": {
+											"name": {
+												"type": "string"
+											},
+											"type": {
+												"type": "string"
+											}
+										}
+									},
+									"sink": {
+										"type": "object",
+										"properties": {
+											"path": {
+												"type": "string"
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/link_st_kkpb_edp')]"

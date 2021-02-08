@@ -5,12 +5,6 @@
 		"factoryName": {
 			"value": "adf-kkpb-dev-edp"
 		},
-		"AzureBlobStorage1_connectionString": {
-			"value": ""
-		},
-		"AzureBlobStorage2_connectionString": {
-			"value": ""
-		},
 		"link_blob_test_edp_connectionString": {
 			"value": ""
 		},
@@ -32,14 +26,8 @@
 		"link_syn_kkpb_edp_connectionString": {
 			"value": ""
 		},
-		"linkedService1_accountKey": {
-			"value": ""
-		},
 		"linkedService2_password": {
 			"value": ""
-		},
-		"AzureDataLakeStorage1_properties_typeProperties_url": {
-			"value": "https://stkkpbdevedp.dfs.core.windows.net/"
 		},
 		"link_fs_kkpb_dev_edp_properties_typeProperties_host": {
 			"value": "E:\\Landing"
@@ -54,12 +42,6 @@
 			"value": "https://kv-kkpb-dev-edp.vault.azure.net/"
 		},
 		"link_st_kkpb_edp_properties_typeProperties_url": {
-			"value": "https://stkkpbdevedp.dfs.core.windows.net"
-		},
-		"link_st_kkpb_edp_2_properties_typeProperties_url": {
-			"value": "https://stkkpbdevedp.dfs.core.windows.net/"
-		},
-		"linkedService1_properties_typeProperties_url": {
 			"value": "https://stkkpbdevedp.dfs.core.windows.net"
 		},
 		"linkedService2_properties_typeProperties_host": {

@@ -7,14 +7,6 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "adf-kkpb-dev-edp"
 		},
-		"AzureBlobStorage1_connectionString": {
-			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'AzureBlobStorage1'"
-		},
-		"AzureBlobStorage2_connectionString": {
-			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'AzureBlobStorage2'"
-		},
 		"link_blob_test_edp_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'link_blob_test_edp'"
@@ -43,17 +35,9 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'link_syn_kkpb_edp'"
 		},
-		"linkedService1_accountKey": {
-			"type": "secureString",
-			"metadata": "Secure string for 'accountKey' of 'linkedService1'"
-		},
 		"linkedService2_password": {
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'linkedService2'"
-		},
-		"AzureDataLakeStorage1_properties_typeProperties_url": {
-			"type": "string",
-			"defaultValue": "https://stkkpbdevedp.dfs.core.windows.net/"
 		},
 		"link_fs_kkpb_dev_edp_properties_typeProperties_host": {
 			"type": "string",
@@ -72,14 +56,6 @@
 			"defaultValue": "https://kv-kkpb-dev-edp.vault.azure.net/"
 		},
 		"link_st_kkpb_edp_properties_typeProperties_url": {
-			"type": "string",
-			"defaultValue": "https://stkkpbdevedp.dfs.core.windows.net"
-		},
-		"link_st_kkpb_edp_2_properties_typeProperties_url": {
-			"type": "string",
-			"defaultValue": "https://stkkpbdevedp.dfs.core.windows.net/"
-		},
-		"linkedService1_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://stkkpbdevedp.dfs.core.windows.net"
 		},
@@ -7959,43 +7935,6 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/bin_vm_ds')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "linkedService2",
-					"type": "LinkedServiceReference"
-				},
-				"parameters": {
-					"P_PATH": {
-						"type": "string"
-					},
-					"P_FILENAME": {
-						"type": "string"
-					}
-				},
-				"annotations": [],
-				"type": "Binary",
-				"typeProperties": {
-					"location": {
-						"type": "FileServerLocation",
-						"fileName": {
-							"value": "@dataset().P_FILENAME",
-							"type": "Expression"
-						},
-						"folderPath": {
-							"value": "@dataset().P_PATH",
-							"type": "Expression"
-						}
-					}
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/linkedService2')]"
-			]
-		},
-		{
 			"name": "[concat(parameters('factoryName'), '/dl_csv_ds')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -8345,63 +8284,6 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/AzureBlobStorage1')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureBlobStorage",
-				"typeProperties": {
-					"connectionString": "[parameters('AzureBlobStorage1_connectionString')]"
-				},
-				"connectVia": {
-					"referenceName": "shir-onprim-kkbp-edp",
-					"type": "IntegrationRuntimeReference"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/integrationRuntimes/shir-onprim-kkbp-edp')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/AzureBlobStorage2')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureBlobStorage",
-				"typeProperties": {
-					"connectionString": "[parameters('AzureBlobStorage2_connectionString')]"
-				},
-				"connectVia": {
-					"referenceName": "shir-onprim-kkbp-edp",
-					"type": "IntegrationRuntimeReference"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/integrationRuntimes/shir-onprim-kkbp-edp')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/AzureDataLakeStorage1')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureBlobFS",
-				"typeProperties": {
-					"url": "[parameters('AzureDataLakeStorage1_properties_typeProperties_url')]"
-				},
-				"connectVia": {
-					"referenceName": "shir-onprim-kkbp-edp",
-					"type": "IntegrationRuntimeReference"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/integrationRuntimes/shir-onprim-kkbp-edp')]"
-			]
-		},
-		{
 			"name": "[concat(parameters('factoryName'), '/link_blob_test_edp')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
@@ -8535,25 +8417,6 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/link_st_kkpb_edp_2')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureBlobFS",
-				"typeProperties": {
-					"url": "[parameters('link_st_kkpb_edp_2_properties_typeProperties_url')]"
-				},
-				"connectVia": {
-					"referenceName": "shir-kkpb-edp",
-					"type": "IntegrationRuntimeReference"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/integrationRuntimes/shir-kkpb-edp')]"
-			]
-		},
-		{
 			"name": "[concat(parameters('factoryName'), '/link_syn_kkpb_edp')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
@@ -8571,23 +8434,6 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/integrationRuntimes/shir-kkpb-edp')]"
 			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/linkedService1')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureBlobFS",
-				"typeProperties": {
-					"url": "[parameters('linkedService1_properties_typeProperties_url')]",
-					"accountKey": {
-						"type": "SecureString",
-						"value": "[parameters('linkedService1_accountKey')]"
-					}
-				}
-			},
-			"dependsOn": []
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/linkedService2')]",

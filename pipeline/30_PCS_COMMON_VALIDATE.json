@@ -662,6 +662,7 @@
 			},
 			{
 				"name": "UPDATE SUCCESS",
+				"description": "   ",
 				"type": "SqlServerStoredProcedure",
 				"dependsOn": [
 					{

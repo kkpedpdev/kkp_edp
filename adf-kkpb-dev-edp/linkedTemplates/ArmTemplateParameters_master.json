@@ -1,0 +1,78 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"value": "adf-kkpb-dev-edp"
+		},
+		"AzureBlobStorage1_connectionString": {
+			"value": ""
+		},
+		"AzureBlobStorage2_connectionString": {
+			"value": ""
+		},
+		"link_blob_test_edp_connectionString": {
+			"value": ""
+		},
+		"link_dbw_edp_accessToken": {
+			"value": ""
+		},
+		"link_fs_kkpb_dev_edp_password": {
+			"value": ""
+		},
+		"link_func_edp_functionKey": {
+			"value": ""
+		},
+		"link_sqldb_kkpb_edp_connectionString": {
+			"value": ""
+		},
+		"link_st_kkpb_edp_accountKey": {
+			"value": ""
+		},
+		"link_syn_kkpb_edp_connectionString": {
+			"value": ""
+		},
+		"linkedService1_accountKey": {
+			"value": ""
+		},
+		"linkedService2_password": {
+			"value": ""
+		},
+		"AzureDataLakeStorage1_properties_typeProperties_url": {
+			"value": "https://stkkpbdevedp.dfs.core.windows.net/"
+		},
+		"link_fs_kkpb_dev_edp_properties_typeProperties_host": {
+			"value": "E:\\Landing"
+		},
+		"link_fs_kkpb_dev_edp_properties_typeProperties_userId": {
+			"value": "administrator"
+		},
+		"link_func_edp_properties_typeProperties_functionAppUrl": {
+			"value": "https://func-kkpb-test-edp.azurewebsites.net"
+		},
+		"link_kv_edp_properties_typeProperties_baseUrl": {
+			"value": "https://kv-kkpb-dev-edp.vault.azure.net/"
+		},
+		"link_st_kkpb_edp_properties_typeProperties_url": {
+			"value": "https://stkkpbdevedp.dfs.core.windows.net"
+		},
+		"link_st_kkpb_edp_2_properties_typeProperties_url": {
+			"value": "https://stkkpbdevedp.dfs.core.windows.net/"
+		},
+		"linkedService1_properties_typeProperties_url": {
+			"value": "https://stkkpbdevedp.dfs.core.windows.net"
+		},
+		"linkedService2_properties_typeProperties_host": {
+			"value": "D:Landing"
+		},
+		"linkedService2_properties_typeProperties_userId": {
+			"value": "kkpbvmshiredpadm"
+		},
+		"containerUri": {
+			"value": ""
+		},
+		"containerSasToken": {
+			"value": ""
+		}
+	}
+}

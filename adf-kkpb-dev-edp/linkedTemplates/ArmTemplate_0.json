@@ -1,0 +1,702 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "adf-kkpb-dev-edp"
+		},
+		"link_dbw_edp_accessToken": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accessToken' of 'link_dbw_edp'"
+		},
+		"link_func_edp_functionKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'functionKey' of 'link_func_edp'"
+		},
+		"linkedService1_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'linkedService1'"
+		},
+		"AzureBlobStorage1_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'AzureBlobStorage1'"
+		},
+		"AzureBlobStorage2_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'AzureBlobStorage2'"
+		},
+		"link_blob_test_edp_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'link_blob_test_edp'"
+		},
+		"link_fs_kkpb_dev_edp_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'link_fs_kkpb_dev_edp'"
+		},
+		"link_sqldb_kkpb_edp_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'link_sqldb_kkpb_edp'"
+		},
+		"link_st_kkpb_edp_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'link_st_kkpb_edp'"
+		},
+		"link_func_edp_properties_typeProperties_functionAppUrl": {
+			"type": "string",
+			"defaultValue": "https://func-kkpb-test-edp.azurewebsites.net"
+		},
+		"link_kv_edp_properties_typeProperties_baseUrl": {
+			"type": "string",
+			"defaultValue": "https://kv-kkpb-dev-edp.vault.azure.net/"
+		},
+		"linkedService1_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://stkkpbdevedp.dfs.core.windows.net"
+		},
+		"AzureDataLakeStorage1_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://stkkpbdevedp.dfs.core.windows.net/"
+		},
+		"link_fs_kkpb_dev_edp_properties_typeProperties_host": {
+			"type": "string",
+			"defaultValue": "E:\\Landing"
+		},
+		"link_fs_kkpb_dev_edp_properties_typeProperties_userId": {
+			"type": "string",
+			"defaultValue": "administrator"
+		},
+		"link_st_kkpb_edp_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://stkkpbdevedp.dfs.core.windows.net"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/link_dbw_edp')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureDatabricks",
+				"typeProperties": {
+					"domain": "https://adb-4668344029063629.9.azuredatabricks.net",
+					"accessToken": {
+						"type": "SecureString",
+						"value": "[parameters('link_dbw_edp_accessToken')]"
+					},
+					"existingClusterId": "0112-023856-dare238"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/link_func_edp')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureFunction",
+				"typeProperties": {
+					"functionAppUrl": "[parameters('link_func_edp_properties_typeProperties_functionAppUrl')]",
+					"functionKey": {
+						"type": "SecureString",
+						"value": "[parameters('link_func_edp_functionKey')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/link_kv_edp')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureKeyVault",
+				"typeProperties": {
+					"baseUrl": "[parameters('link_kv_edp_properties_typeProperties_baseUrl')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/linkedService1')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('linkedService1_properties_typeProperties_url')]",
+					"accountKey": {
+						"type": "SecureString",
+						"value": "[parameters('linkedService1_accountKey')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/shir-kkpb-edp')]",
+			"type": "Microsoft.DataFactory/factories/integrationRuntimes",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "SelfHosted",
+				"typeProperties": {}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/shir-onprim-kkbp-edp')]",
+			"type": "Microsoft.DataFactory/factories/integrationRuntimes",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "SelfHosted",
+				"typeProperties": {}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/40_PCS_COMMON_TYPE3')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Notebook1",
+						"type": "DatabricksNotebook",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": {
+								"value": "@pipeline().parameters.P_PRCS_OBJ.ADB_NM",
+								"type": "Expression"
+							},
+							"baseParameters": {
+								"PARAMS": {
+									"value": "@pipeline().parameters.P_PRCS_OBJ.ADB_PARM",
+									"type": "Expression"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "link_dbw_edp",
+							"type": "LinkedServiceReference"
+						}
+					}
+				],
+				"parameters": {
+					"P_LD_ID": {
+						"type": "string"
+					},
+					"P_PRCS_NM": {
+						"type": "string"
+					},
+					"P_PRCS_OBJ": {
+						"type": "object"
+					}
+				},
+				"folder": {
+					"name": "COMMON JOB"
+				},
+				"annotations": [],
+				"lastPublishTime": "2021-02-06T18:32:10Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/link_dbw_edp')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/40_PCS_COMMON_TYPE3_copy1')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Notebook1",
+						"type": "DatabricksNotebook",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": {
+								"value": "@pipeline().parameters.P_PCS_OBJ.ADB_NM",
+								"type": "Expression"
+							},
+							"baseParameters": {
+								"PARAMS": {
+									"value": "@pipeline().parameters.P_PCS_OBJ.ADB_PARAMS",
+									"type": "Expression"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "link_dbw_edp",
+							"type": "LinkedServiceReference"
+						}
+					}
+				],
+				"parameters": {
+					"P_LOAD_ID": {
+						"type": "string"
+					},
+					"P_PCS_NM": {
+						"type": "string"
+					},
+					"P_PCS_OBJ": {
+						"type": "object"
+					}
+				},
+				"folder": {
+					"name": "BK"
+				},
+				"annotations": [],
+				"lastPublishTime": "2021-02-06T18:20:10Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/link_dbw_edp')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/40_PCS_COMMON_TYPE4_bk')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Notebook1",
+						"type": "DatabricksNotebook",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": {
+								"value": "@pipeline().parameters.P_PCS_OBJ.ADB_NM",
+								"type": "Expression"
+							},
+							"baseParameters": {
+								"PARAMS": {
+									"value": "@pipeline().parameters.P_PCS_OBJ.ADB_PARAMS",
+									"type": "Expression"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "link_dbw_edp",
+							"type": "LinkedServiceReference"
+						}
+					}
+				],
+				"parameters": {
+					"P_LOAD_ID": {
+						"type": "string"
+					},
+					"P_PCS_NM": {
+						"type": "string"
+					},
+					"P_PCS_OBJ": {
+						"type": "object"
+					}
+				},
+				"folder": {
+					"name": "BK"
+				},
+				"annotations": [],
+				"lastPublishTime": "2021-02-06T18:31:07Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/link_dbw_edp')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/40_PCS_COMMON_TYPE6')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Web1",
+						"type": "WebActivity",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"url": "https://management.azure.com/subscriptions/39f31ac1-7170-4ce0-9582-ca6a8312bb55/resourceGroups/rg-kkpb-test-edp/providers/Microsoft.DataFactory/factories/adf-kkpb-dev-edp/pipelines/RIB_EXT_TABLE/createRun?api-version=2018-06-01",
+							"connectVia": {
+								"referenceName": "shir-kkpb-edp",
+								"type": "IntegrationRuntimeReference"
+							},
+							"method": "POST",
+							"headers": {},
+							"body": {
+								"lastUpdatedAfter": "2018-06-16T00:36:44.3345758Z",
+								"lastUpdatedBefore": "2018-06-16T00:49:48.3686473Z"
+							},
+							"authentication": {
+								"type": "MSI",
+								"resource": "https://management.azure.com"
+							}
+						}
+					}
+				],
+				"parameters": {
+					"P_LOAD_ID": {
+						"type": "string",
+						"defaultValue": "-999"
+					},
+					"P_PCS_NM": {
+						"type": "string",
+						"defaultValue": "GET_LOCATION_FACE_RECOGNITION_CustGeoInfo"
+					},
+					"P_PCS_OBJ": {
+						"type": "object"
+					}
+				},
+				"folder": {
+					"name": "COMMON JOB"
+				},
+				"annotations": [],
+				"lastPublishTime": "2021-01-28T06:20:49Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/shir-kkpb-edp')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/40_PCS_COMMON_TYPE6_copy1')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Web1",
+						"type": "WebActivity",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"url": "https://management.azure.com/subscriptions/39f31ac1-7170-4ce0-9582-ca6a8312bb55/resourceGroups/rg-kkpb-test-edp/providers/Microsoft.DataFactory/factories/adf-kkpb-dev-edp/pipelines/RIB_EXT_TABLE/createRun?api-version=2018-06-01",
+							"connectVia": {
+								"referenceName": "shir-kkpb-edp",
+								"type": "IntegrationRuntimeReference"
+							},
+							"method": "POST",
+							"headers": {},
+							"body": {
+								"lastUpdatedAfter": "2018-06-16T00:36:44.3345758Z",
+								"lastUpdatedBefore": "2018-06-16T00:49:48.3686473Z"
+							},
+							"authentication": {
+								"type": "MSI",
+								"resource": "https://management.azure.com"
+							}
+						}
+					}
+				],
+				"parameters": {
+					"P_LOAD_ID": {
+						"type": "string",
+						"defaultValue": "-999"
+					},
+					"P_PCS_NM": {
+						"type": "string",
+						"defaultValue": "GET_LOCATION_FACE_RECOGNITION_CustGeoInfo"
+					},
+					"P_PCS_OBJ": {
+						"type": "object"
+					}
+				},
+				"folder": {
+					"name": "BK"
+				},
+				"annotations": [],
+				"lastPublishTime": "2021-02-06T18:20:10Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/shir-kkpb-edp')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Oak_test2')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Web1",
+						"type": "WebActivity",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"url": "https://management.azure.com/subscriptions/39f31ac1-7170-4ce0-9582-ca6a8312bb55/resourceGroups/rg-kkpb-test-edp/providers/Microsoft.DataFactory/factories/adf-kkpb-dev-edp/pipelines/Oak_test/createRun?api-version=2018-06-01",
+							"connectVia": {
+								"referenceName": "shir-kkpb-edp",
+								"type": "IntegrationRuntimeReference"
+							},
+							"method": "POST",
+							"headers": {},
+							"body": {
+								"lastUpdatedAfter": "2018-06-16T00:36:44.3345758Z",
+								"lastUpdatedBefore": "2018-06-16T00:49:48.3686473Z"
+							},
+							"authentication": {
+								"type": "MSI",
+								"resource": "https://management.azure.com"
+							}
+						}
+					}
+				],
+				"variables": {
+					"subscriptionId": {
+						"type": "String",
+						"defaultValue": "39f31ac1-7170-4ce0-9582-ca6a8312bb55"
+					},
+					"resourceGroupName": {
+						"type": "String",
+						"defaultValue": "rg-kkpb-test-edp"
+					},
+					"factoryName": {
+						"type": "String",
+						"defaultValue": "adf-kkpb-dev-edp"
+					},
+					"pipelineName": {
+						"type": "String",
+						"defaultValue": "Oak_test"
+					},
+					"apiVersion": {
+						"type": "String",
+						"defaultValue": "2018-06-01"
+					}
+				},
+				"annotations": [],
+				"lastPublishTime": "2021-01-27T09:07:56Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/shir-kkpb-edp')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Test DBW')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Notebook1",
+						"type": "DatabricksNotebook",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": "/Users/pran@inteltion.com/pran@inteltion.com/Kafka Test",
+							"baseParameters": {
+								"Date": "20210115",
+								"Source": "kkp-kkpmobile-tracking-request"
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "link_dbw_edp",
+							"type": "LinkedServiceReference"
+						}
+					}
+				],
+				"annotations": [],
+				"lastPublishTime": "2021-01-19T06:39:51Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/link_dbw_edp')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureBlobStorage1')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobStorage",
+				"typeProperties": {
+					"connectionString": "[parameters('AzureBlobStorage1_connectionString')]"
+				},
+				"connectVia": {
+					"referenceName": "shir-onprim-kkbp-edp",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/shir-onprim-kkbp-edp')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureBlobStorage2')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobStorage",
+				"typeProperties": {
+					"connectionString": "[parameters('AzureBlobStorage2_connectionString')]"
+				},
+				"connectVia": {
+					"referenceName": "shir-onprim-kkbp-edp",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/shir-onprim-kkbp-edp')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureDataLakeStorage1')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('AzureDataLakeStorage1_properties_typeProperties_url')]"
+				},
+				"connectVia": {
+					"referenceName": "shir-onprim-kkbp-edp",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/shir-onprim-kkbp-edp')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/link_blob_test_edp')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobStorage",
+				"typeProperties": {
+					"connectionString": "[parameters('link_blob_test_edp_connectionString')]"
+				},
+				"connectVia": {
+					"referenceName": "shir-onprim-kkbp-edp",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/shir-onprim-kkbp-edp')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/link_fs_kkpb_dev_edp')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "FileServer",
+				"typeProperties": {
+					"host": "[parameters('link_fs_kkpb_dev_edp_properties_typeProperties_host')]",
+					"userId": "[parameters('link_fs_kkpb_dev_edp_properties_typeProperties_userId')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('link_fs_kkpb_dev_edp_password')]"
+					}
+				},
+				"connectVia": {
+					"referenceName": "shir-onprim-kkbp-edp",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/shir-onprim-kkbp-edp')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/link_sqldb_kkpb_edp')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"connectionString": "[parameters('link_sqldb_kkpb_edp_connectionString')]"
+				},
+				"connectVia": {
+					"referenceName": "shir-kkpb-edp",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/shir-kkpb-edp')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/link_st_kkpb_edp')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('link_st_kkpb_edp_properties_typeProperties_url')]",
+					"accountKey": {
+						"type": "SecureString",
+						"value": "[parameters('link_st_kkpb_edp_accountKey')]"
+					}
+				},
+				"connectVia": {
+					"referenceName": "shir-kkpb-edp",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/shir-kkpb-edp')]"
+			]
+		}
+	]
+}

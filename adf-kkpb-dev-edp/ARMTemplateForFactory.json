@@ -8112,67 +8112,6 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/fs_csv_ds')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "link_fs_kkpb_dev_edp",
-					"type": "LinkedServiceReference"
-				},
-				"parameters": {
-					"P_PATH": {
-						"type": "string"
-					},
-					"P_FILENAME": {
-						"type": "string"
-					},
-					"P_DELIMITER": {
-						"type": "string"
-					},
-					"P_ENCODING": {
-						"type": "string"
-					},
-					"P_FIRSTROW_HDR": {
-						"type": "string"
-					}
-				},
-				"annotations": [],
-				"type": "DelimitedText",
-				"typeProperties": {
-					"location": {
-						"type": "FileServerLocation",
-						"fileName": {
-							"value": "@dataset().P_FILENAME",
-							"type": "Expression"
-						},
-						"folderPath": {
-							"value": "@dataset().P_PATH",
-							"type": "Expression"
-						}
-					},
-					"columnDelimiter": {
-						"value": "@dataset().P_DELIMITER",
-						"type": "Expression"
-					},
-					"encodingName": {
-						"value": "@dataset().P_ENCODING",
-						"type": "Expression"
-					},
-					"escapeChar": "\\",
-					"firstRowAsHeader": {
-						"value": "@if(EQUALS(dataset().P_FIRSTROW_HDR,'Y'),TRUE,FALSE)",
-						"type": "Expression"
-					},
-					"quoteChar": "\""
-				},
-				"schema": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/link_fs_kkpb_dev_edp')]"
-			]
-		},
-		{
 			"name": "[concat(parameters('factoryName'), '/mssql_cntl_ds')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",

@@ -165,6 +165,9 @@
 					},
 					"link_st_kkpb_edp_properties_typeProperties_url": {
 						"value": "[parameters('link_st_kkpb_edp_properties_typeProperties_url')]"
+					},
+					"link_st_kkpb_edp_2_properties_typeProperties_url": {
+						"value": "[parameters('link_st_kkpb_edp_2_properties_typeProperties_url')]"
 					}
 				}
 			},
@@ -189,9 +192,6 @@
 					},
 					"linkedService2_password": {
 						"value": "[parameters('linkedService2_password')]"
-					},
-					"link_st_kkpb_edp_2_properties_typeProperties_url": {
-						"value": "[parameters('link_st_kkpb_edp_2_properties_typeProperties_url')]"
 					},
 					"linkedService2_properties_typeProperties_host": {
 						"value": "[parameters('linkedService2_properties_typeProperties_host')]"

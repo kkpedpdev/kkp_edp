@@ -70,6 +70,10 @@
 		"link_st_kkpb_edp_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://stkkpbdevedp.dfs.core.windows.net"
+		},
+		"link_st_kkpb_edp_2_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://stkkpbdevedp.dfs.core.windows.net/"
 		}
 	},
 	"variables": {
@@ -330,66 +334,6 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/link_dbw_edp')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/40_PCS_COMMON_TYPE6')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Web1",
-						"type": "WebActivity",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"url": "https://management.azure.com/subscriptions/39f31ac1-7170-4ce0-9582-ca6a8312bb55/resourceGroups/rg-kkpb-test-edp/providers/Microsoft.DataFactory/factories/adf-kkpb-dev-edp/pipelines/RIB_EXT_TABLE/createRun?api-version=2018-06-01",
-							"connectVia": {
-								"referenceName": "shir-kkpb-edp",
-								"type": "IntegrationRuntimeReference"
-							},
-							"method": "POST",
-							"headers": {},
-							"body": {
-								"lastUpdatedAfter": "2018-06-16T00:36:44.3345758Z",
-								"lastUpdatedBefore": "2018-06-16T00:49:48.3686473Z"
-							},
-							"authentication": {
-								"type": "MSI",
-								"resource": "https://management.azure.com"
-							}
-						}
-					}
-				],
-				"parameters": {
-					"P_LOAD_ID": {
-						"type": "string",
-						"defaultValue": "-999"
-					},
-					"P_PCS_NM": {
-						"type": "string",
-						"defaultValue": "GET_LOCATION_FACE_RECOGNITION_CustGeoInfo"
-					},
-					"P_PCS_OBJ": {
-						"type": "object"
-					}
-				},
-				"folder": {
-					"name": "COMMON JOB"
-				},
-				"annotations": [],
-				"lastPublishTime": "2021-01-28T06:20:49Z"
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/integrationRuntimes/shir-kkpb-edp')]"
 			]
 		},
 		{
@@ -688,6 +632,25 @@
 						"type": "SecureString",
 						"value": "[parameters('link_st_kkpb_edp_accountKey')]"
 					}
+				},
+				"connectVia": {
+					"referenceName": "shir-kkpb-edp",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/shir-kkpb-edp')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/link_st_kkpb_edp_2')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('link_st_kkpb_edp_2_properties_typeProperties_url')]"
 				},
 				"connectVia": {
 					"referenceName": "shir-kkpb-edp",

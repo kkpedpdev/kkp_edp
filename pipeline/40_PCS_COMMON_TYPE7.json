@@ -368,7 +368,7 @@
 						}
 					},
 					"dataset": {
-						"referenceName": "Json1",
+						"referenceName": "dl_json_ds",
 						"type": "DatasetReference",
 						"parameters": {
 							"P_FILENAME": {

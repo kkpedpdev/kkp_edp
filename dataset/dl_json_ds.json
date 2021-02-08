@@ -1,5 +1,5 @@
 {
-	"name": "Json1",
+	"name": "dl_json_ds",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "link_st_kkpb_edp",

@@ -6106,7 +6106,7 @@
 						"typeProperties": {
 							"source": {
 								"type": "SqlServerSource",
-								"sqlReaderStoredProcedureName": "[[CNTL].[PROC_FINAL_STREAM]",
+								"sqlReaderStoredProcedureName": "[[CNTL].[PROC_FINL_STREM]",
 								"storedProcedureParameters": {
 									"P_ASAT_DT": {
 										"type": "String",

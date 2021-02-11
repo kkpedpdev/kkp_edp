@@ -46,7 +46,7 @@
 						"type": "DatasetReference",
 						"parameters": {
 							"P_PATH": {
-								"value": "@pipeline().parameters.P_PRCS_OBJ",
+								"value": "@concat(pipeline().parameters.P_PRCS_OBJ.PTH, '/')",
 								"type": "Expression"
 							},
 							"P_FILENAME": {
@@ -236,7 +236,7 @@
 								"type": "Expression"
 							},
 							"P_CONTAINER": {
-								"value": "working",
+								"value": "@activity('Lookup1').output.firstrow.CNTNR",
 								"type": "Expression"
 							}
 						}

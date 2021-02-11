@@ -46,7 +46,7 @@
 						"type": "DatasetReference",
 						"parameters": {
 							"P_PATH": {
-								"value": "pipeline().parameters.P_PRCS_OBJ.PTH",
+								"value": "@pipeline().parameters.P_PRCS_OBJ",
 								"type": "Expression"
 							},
 							"P_FILENAME": {

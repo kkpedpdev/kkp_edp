@@ -62,7 +62,7 @@
 						"type": "DatasetReference",
 						"parameters": {
 							"P_CONTAINER": {
-								"value": "working",
+								"value": "@pipeline().parameters.P_PRCS_OBJ.CNTNR",
 								"type": "Expression"
 							},
 							"P_PATH": {

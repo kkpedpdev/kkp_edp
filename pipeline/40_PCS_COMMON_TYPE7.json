@@ -46,7 +46,7 @@
 						"type": "DatasetReference",
 						"parameters": {
 							"P_PATH": {
-								"value": "@concat(pipeline().parameters.P_PRCS_OBJ.PTH, '/', pipeline().parameters.P_PRCS_OBJ.CALC_ASAT_DT)",
+								"value": "@concat(pipeline().parameters.P_PRCS_OBJ.PTH, '/')",
 								"type": "Expression"
 							},
 							"P_FILENAME": {
@@ -62,7 +62,7 @@
 						"type": "DatasetReference",
 						"parameters": {
 							"P_CONTAINER": {
-								"value": "@pipeline().parameters.P_PRCS_OBJ.CNTNR",
+								"value": "working",
 								"type": "Expression"
 							},
 							"P_PATH": {
@@ -145,7 +145,7 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"notebookPath": "/00_Common/edp/adf/dbn-adf-pre-check",
+					"notebookPath": "/DEV/00_Common/edp/adf/dbn-adf-pre-check",
 					"baseParameters": {
 						"PARAMS": {
 							"value": "@activity('Lookup1').output.firstrow.PARM",
@@ -236,7 +236,7 @@
 								"type": "Expression"
 							},
 							"P_CONTAINER": {
-								"value": "@activity('Lookup1').output.firstrow.CNTNR",
+								"value": "working",
 								"type": "Expression"
 							}
 						}

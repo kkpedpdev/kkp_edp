@@ -42,7 +42,7 @@
 			"value": "https://kv-kkpb-dev-edp.vault.azure.net/"
 		},
 		"link_st_kkpb_edp_properties_typeProperties_url": {
-			"value": "https://stkkpbdevedp.dfs.core.windows.net"
+			"value": "https://stkkpbdevtempedp.dfs.core.windows.net"
 		},
 		"linkedService2_properties_typeProperties_host": {
 			"value": "D:Landing"

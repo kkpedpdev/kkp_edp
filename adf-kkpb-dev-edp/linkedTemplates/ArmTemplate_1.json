@@ -2180,7 +2180,7 @@
 						},
 						"userProperties": [],
 						"typeProperties": {
-							"notebookPath": "/00_Common/edp/adf/dbn-gen-folder-rib"
+							"notebookPath": "/DEV/00_Common/edp/adf/dbn-gen-folder-rib"
 						},
 						"linkedServiceName": {
 							"referenceName": "link_dbw_edp",
@@ -2259,7 +2259,7 @@
 									},
 									"userProperties": [],
 									"typeProperties": {
-										"notebookPath": "/00_Common/edp/adf/dbn-gen-script-rib",
+										"notebookPath": "/DEV/00_Common/edp/adf/dbn-gen-script-rib",
 										"baseParameters": {
 											"PARAMS": {
 												"value": "@concat(item().Prop_0,'^|',item().Prop_1,'^|',item().Prop_2)\n",

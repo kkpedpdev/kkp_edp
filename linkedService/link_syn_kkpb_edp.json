@@ -5,7 +5,7 @@
 		"annotations": [],
 		"type": "AzureSqlDW",
 		"typeProperties": {
-			"connectionString": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=syn-kkpb-test-edp.sql.azuresynapse.net;Initial Catalog=sqlpool1"
+			"connectionString": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=syn-kkpb-temp-edp.sql.azuresynapse.net;Initial Catalog=temp_sqlpool"
 		},
 		"connectVia": {
 			"referenceName": "shir-kkpb-edp",

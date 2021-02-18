@@ -141,6 +141,68 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/40_PCS_COMMON_TYPE3')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Notebook1",
+						"type": "DatabricksNotebook",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": {
+								"value": "@pipeline().parameters.P_PRCS_OBJ.ADB_NM",
+								"type": "Expression"
+							},
+							"baseParameters": {
+								"PARAMS": {
+									"value": "@pipeline().parameters.P_PRCS_OBJ.ADB_PARM",
+									"type": "Expression"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "link_dbw_edp",
+							"type": "LinkedServiceReference"
+						}
+					}
+				],
+				"parameters": {
+					"P_LD_ID": {
+						"type": "string"
+					},
+					"P_PRCS_NM": {
+						"type": "string"
+					},
+					"P_PRCS_OBJ": {
+						"type": "object"
+					}
+				},
+				"variables": {
+					"V_SCRIPT": {
+						"type": "String"
+					}
+				},
+				"folder": {
+					"name": "COMMON JOB"
+				},
+				"annotations": [],
+				"lastPublishTime": "2021-02-06T18:32:10Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/link_dbw_edp')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/40_PCS_COMMON_TYPE3_copy1')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -992,93 +1054,6 @@
 				},
 				"annotations": [],
 				"lastPublishTime": "2021-02-06T18:37:49Z"
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/link_syn_kkpb_edp')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/40_PCS_COMMON_TYPE5_copy1')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "EDW UPDATE COUNT TARGET",
-						"type": "SqlServerStoredProcedure",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"storedProcedureName": "[[CNTL].[COMMOM_SNAPSHOT_PROCESS]",
-							"storedProcedureParameters": {
-								"P_AS_AT_DT": {
-									"value": {
-										"value": "@pipeline().parameters.P_PCS_OBJ.asat_dt",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"P_PCS_ID": {
-									"value": {
-										"value": "@pipeline().parameters.P_PCS_OBJ.pcs_id",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"P_PCS_NM": {
-									"value": {
-										"value": "@pipeline().parameters.P_PCS_NM",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"P_TABLE_NM": {
-									"value": {
-										"value": "@pipeline().parameters.P_PCS_OBJ.table_name",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"P_TXN_V_NM": {
-									"value": {
-										"value": "@pipeline().parameters.P_PCS_OBJ.view_name",
-										"type": "Expression"
-									},
-									"type": "String"
-								}
-							}
-						},
-						"linkedServiceName": {
-							"referenceName": "link_syn_kkpb_edp",
-							"type": "LinkedServiceReference"
-						}
-					}
-				],
-				"parameters": {
-					"P_LOAD_ID": {
-						"type": "string",
-						"defaultValue": "-999"
-					},
-					"P_PCS_NM": {
-						"type": "string",
-						"defaultValue": "GET_LOCATION_FACE_RECOGNITION_CustGeoInfo"
-					},
-					"P_PCS_OBJ": {
-						"type": "object"
-					}
-				},
-				"folder": {
-					"name": "BK"
-				},
-				"annotations": [],
-				"lastPublishTime": "2021-02-06T18:20:11Z"
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/link_syn_kkpb_edp')]"

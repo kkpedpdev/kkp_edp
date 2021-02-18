@@ -6232,118 +6232,6 @@
 							"referenceName": "link_dbw_edp",
 							"type": "LinkedServiceReference"
 						}
-					},
-					{
-						"name": "Lookup1",
-						"type": "Lookup",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "DelimitedTextSource",
-								"storeSettings": {
-									"type": "AzureBlobFSReadSettings",
-									"recursive": true,
-									"enablePartitionDiscovery": false
-								},
-								"formatSettings": {
-									"type": "DelimitedTextReadSettings"
-								}
-							},
-							"dataset": {
-								"referenceName": "dl_work_ds",
-								"type": "DatasetReference",
-								"parameters": {
-									"P_FILEPATH": "TMP/STOREDSCRIPT",
-									"P_FILENAME": "concat(@pipeline().parameters.P_PRCS_NM,'.sql')"
-								}
-							}
-						}
-					},
-					{
-						"name": "Set variable1",
-						"type": "SetVariable",
-						"dependsOn": [
-							{
-								"activity": "Lookup1",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"variableName": "V_SCRIPT",
-							"value": {
-								"value": "@replace(activity('Lookup1').output,'%ASAT_DT%',pipeline().parameters.P_PRCS_OBJ.CALC_ASAT_DT)",
-								"type": "Expression"
-							}
-						}
-					},
-					{
-						"name": "Wait1",
-						"type": "Wait",
-						"dependsOn": [
-							{
-								"activity": "Lookup1",
-								"dependencyConditions": [
-									"Failed"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"waitTimeInSeconds": 1
-						}
-					},
-					{
-						"name": "Stored procedure1",
-						"type": "SqlServerStoredProcedure",
-						"dependsOn": [
-							{
-								"activity": "Notebook1",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							},
-							{
-								"activity": "Set variable1",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"storedProcedureName": "[[dbo].[CREATE_EXTERNAL_TABLE]",
-							"storedProcedureParameters": {
-								"SQL": {
-									"value": {
-										"value": "@variables('V_SCRIPT')",
-										"type": "Expression"
-									},
-									"type": "String"
-								}
-							}
-						},
-						"linkedServiceName": {
-							"referenceName": "link_syn_kkpb_edp",
-							"type": "LinkedServiceReference"
-						}
 					}
 				],
 				"parameters": {
@@ -6369,9 +6257,7 @@
 				"lastPublishTime": "2021-02-06T18:32:10Z"
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/link_dbw_edp')]",
-				"[concat(variables('factoryId'), '/datasets/dl_work_ds')]",
-				"[concat(variables('factoryId'), '/linkedServices/link_syn_kkpb_edp')]"
+				"[concat(variables('factoryId'), '/linkedServices/link_dbw_edp')]"
 			]
 		},
 		{
@@ -7520,6 +7406,205 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/EXT_TABLE')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "ForEach1",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "Get Metadata1",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "Lookup2",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('Get Metadata1').output.childItems",
+								"type": "Expression"
+							},
+							"isSequential": false,
+							"batchCount": 20,
+							"activities": [
+								{
+									"name": "Stored procedure1",
+									"type": "SqlServerStoredProcedure",
+									"dependsOn": [
+										{
+											"activity": "Lookup1",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"storedProcedureName": "[[dbo].[CREATE_EXTERNAL_TABLE]",
+										"storedProcedureParameters": {
+											"SQL": {
+												"value": {
+													"value": "@replace(activity('Lookup1').output.firstrow.prop_0,'%ASAT_DT%',activity('Lookup2').output.firstrow.ASAT_DT)",
+													"type": "Expression"
+												},
+												"type": "String"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "link_syn_kkpb_edp",
+										"type": "LinkedServiceReference"
+									}
+								},
+								{
+									"name": "Lookup1",
+									"type": "Lookup",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "DelimitedTextSource",
+											"storeSettings": {
+												"type": "AzureBlobFSReadSettings",
+												"recursive": true,
+												"enablePartitionDiscovery": false
+											},
+											"formatSettings": {
+												"type": "DelimitedTextReadSettings"
+											}
+										},
+										"dataset": {
+											"referenceName": "dl_sql_ds",
+											"type": "DatasetReference",
+											"parameters": {
+												"P_FILEPATH": {
+													"value": "@concat('TMP/STOREDSCRIPT/',pipeline().parameters.P_STREAM)",
+													"type": "Expression"
+												},
+												"P_FILENAME": {
+													"value": "@item().name",
+													"type": "Expression"
+												}
+											}
+										},
+										"firstRowOnly": true
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "Get Metadata1",
+						"type": "GetMetadata",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataset": {
+								"referenceName": "dl_work_ds",
+								"type": "DatasetReference",
+								"parameters": {
+									"P_FILEPATH": {
+										"value": "@concat('TMP/STOREDSCRIPT/',pipeline().parameters.P_STREAM)",
+										"type": "Expression"
+									},
+									"P_FILENAME": "*.*"
+								}
+							},
+							"fieldList": [
+								"childItems"
+							],
+							"storeSettings": {
+								"type": "AzureBlobFSReadSettings",
+								"recursive": true,
+								"enablePartitionDiscovery": false
+							},
+							"formatSettings": {
+								"type": "DelimitedTextReadSettings"
+							}
+						}
+					},
+					{
+						"name": "Lookup2",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "@concat('SELECT ASAT_DT FROM [CNTL].[CNTL_CFG_STREM] WHERE STREM_NM = ''' , pipeline().parameters.P_STREAM, '''')",
+									"type": "Expression"
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "mssql_cntl_ds",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						}
+					}
+				],
+				"parameters": {
+					"P_STREAM": {
+						"type": "string"
+					}
+				},
+				"variables": {
+					"p_file": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"lastPublishTime": "2021-02-01T06:04:59Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/dl_work_ds')]",
+				"[concat(variables('factoryId'), '/datasets/mssql_cntl_ds')]",
+				"[concat(variables('factoryId'), '/linkedServices/link_syn_kkpb_edp')]",
+				"[concat(variables('factoryId'), '/datasets/dl_sql_ds')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/Oak_test2')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -8188,6 +8273,49 @@
 						}
 					},
 					"compressionCodec": "snappy"
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/link_st_kkpb_edp')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/dl_sql_ds')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "link_st_kkpb_edp",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"P_FILEPATH": {
+						"type": "string"
+					},
+					"P_FILENAME": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": {
+							"value": "@dataset().P_FILENAME",
+							"type": "Expression"
+						},
+						"folderPath": {
+							"value": "@dataset().P_FILEPATH",
+							"type": "Expression"
+						},
+						"fileSystem": "working"
+					},
+					"columnDelimiter": "#",
+					"rowDelimiter": "#",
+					"escapeChar": "#",
+					"quoteChar": "\""
 				},
 				"schema": []
 			},

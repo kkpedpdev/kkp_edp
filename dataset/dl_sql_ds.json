@@ -28,9 +28,9 @@
 				},
 				"fileSystem": "working"
 			},
-			"columnDelimiter": "",
-			"rowDelimiter": "",
-			"escapeChar": "",
+			"columnDelimiter": "#",
+			"rowDelimiter": "#",
+			"escapeChar": "#",
 			"quoteChar": "\""
 		},
 		"schema": []

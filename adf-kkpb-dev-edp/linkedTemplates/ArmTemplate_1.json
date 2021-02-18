@@ -13,91 +13,6 @@
 	},
 	"resources": [
 		{
-			"name": "[concat(parameters('factoryName'), '/40_PCS_COMMON_TYPE5_copy1')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "EDW UPDATE COUNT TARGET",
-						"type": "SqlServerStoredProcedure",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"storedProcedureName": "[[CNTL].[COMMOM_SNAPSHOT_PROCESS]",
-							"storedProcedureParameters": {
-								"P_AS_AT_DT": {
-									"value": {
-										"value": "@pipeline().parameters.P_PCS_OBJ.asat_dt",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"P_PCS_ID": {
-									"value": {
-										"value": "@pipeline().parameters.P_PCS_OBJ.pcs_id",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"P_PCS_NM": {
-									"value": {
-										"value": "@pipeline().parameters.P_PCS_NM",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"P_TABLE_NM": {
-									"value": {
-										"value": "@pipeline().parameters.P_PCS_OBJ.table_name",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"P_TXN_V_NM": {
-									"value": {
-										"value": "@pipeline().parameters.P_PCS_OBJ.view_name",
-										"type": "Expression"
-									},
-									"type": "String"
-								}
-							}
-						},
-						"linkedServiceName": {
-							"referenceName": "link_syn_kkpb_edp",
-							"type": "LinkedServiceReference"
-						}
-					}
-				],
-				"parameters": {
-					"P_LOAD_ID": {
-						"type": "string",
-						"defaultValue": "-999"
-					},
-					"P_PCS_NM": {
-						"type": "string",
-						"defaultValue": "GET_LOCATION_FACE_RECOGNITION_CustGeoInfo"
-					},
-					"P_PCS_OBJ": {
-						"type": "object"
-					}
-				},
-				"folder": {
-					"name": "BK"
-				},
-				"annotations": [],
-				"lastPublishTime": "2021-02-06T18:20:11Z"
-			},
-			"dependsOn": []
-		},
-		{
 			"name": "[concat(parameters('factoryName'), '/RIB_EXT')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -173,42 +88,6 @@
 				},
 				"annotations": [],
 				"lastPublishTime": "2021-02-01T05:52:50Z"
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DelimitedText1')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "link_st_kkpb_edp",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "DelimitedText",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobFSLocation",
-						"fileName": "ribFolders.txt",
-						"folderPath": "TMP/RIBFOLDER",
-						"fileSystem": "working"
-					},
-					"columnDelimiter": ",",
-					"escapeChar": "\\",
-					"quoteChar": "\""
-				},
-				"schema": [
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					}
-				]
 			},
 			"dependsOn": []
 		},
@@ -522,6 +401,56 @@
 					"compressionCodec": "snappy"
 				},
 				"schema": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/dl_work_ds')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "link_st_kkpb_edp",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"P_FILEPATH": {
+						"type": "string"
+					},
+					"P_FILENAME": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": {
+							"value": "@dataset().P_FILENAME",
+							"type": "Expression"
+						},
+						"folderPath": {
+							"value": "@dataset().P_FILEPATH",
+							"type": "Expression"
+						},
+						"fileSystem": "working"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					}
+				]
 			},
 			"dependsOn": []
 		},
@@ -1366,6 +1295,180 @@
 				"[concat(variables('factoryId'), '/datasets/dl_csv_ds')]",
 				"[concat(variables('factoryId'), '/datasets/dl_parquet_ds')]",
 				"[concat(variables('factoryId'), '/datasets/dl_json_ds')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/40_PCS_COMMON_TYPE3')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Notebook1",
+						"type": "DatabricksNotebook",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": {
+								"value": "@pipeline().parameters.P_PRCS_OBJ.ADB_NM",
+								"type": "Expression"
+							},
+							"baseParameters": {
+								"PARAMS": {
+									"value": "@pipeline().parameters.P_PRCS_OBJ.ADB_PARM",
+									"type": "Expression"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "link_dbw_edp",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Lookup1",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "DelimitedTextSource",
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"recursive": true,
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "DelimitedTextReadSettings"
+								}
+							},
+							"dataset": {
+								"referenceName": "dl_work_ds",
+								"type": "DatasetReference",
+								"parameters": {
+									"P_FILEPATH": "TMP/STOREDSCRIPT",
+									"P_FILENAME": "concat(@pipeline().parameters.P_PRCS_NM,'.sql')"
+								}
+							}
+						}
+					},
+					{
+						"name": "Set variable1",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "Lookup1",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "V_SCRIPT",
+							"value": {
+								"value": "@replace(activity('Lookup1').output,'%ASAT_DT%',pipeline().parameters.P_PRCS_OBJ.CALC_ASAT_DT)",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "Wait1",
+						"type": "Wait",
+						"dependsOn": [
+							{
+								"activity": "Lookup1",
+								"dependencyConditions": [
+									"Failed"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"waitTimeInSeconds": 1
+						}
+					},
+					{
+						"name": "Stored procedure1",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "Notebook1",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "Set variable1",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[dbo].[CREATE_EXTERNAL_TABLE]",
+							"storedProcedureParameters": {
+								"SQL": {
+									"value": {
+										"value": "@variables('V_SCRIPT')",
+										"type": "Expression"
+									},
+									"type": "String"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "link_syn_kkpb_edp",
+							"type": "LinkedServiceReference"
+						}
+					}
+				],
+				"parameters": {
+					"P_LD_ID": {
+						"type": "string"
+					},
+					"P_PRCS_NM": {
+						"type": "string"
+					},
+					"P_PRCS_OBJ": {
+						"type": "object"
+					}
+				},
+				"variables": {
+					"V_SCRIPT": {
+						"type": "String"
+					}
+				},
+				"folder": {
+					"name": "COMMON JOB"
+				},
+				"annotations": [],
+				"lastPublishTime": "2021-02-06T18:32:10Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/dl_work_ds')]"
 			]
 		},
 		{
@@ -2219,9 +2322,12 @@
 								}
 							},
 							"dataset": {
-								"referenceName": "DelimitedText1",
+								"referenceName": "dl_work_ds",
 								"type": "DatasetReference",
-								"parameters": {}
+								"parameters": {
+									"P_FILEPATH": "TMP/RIBFOLDER",
+									"P_FILENAME": "ribFolders.txt"
+								}
 							},
 							"firstRowOnly": false
 						}
@@ -2316,7 +2422,7 @@
 				"lastPublishTime": "2021-02-01T06:04:59Z"
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/DelimitedText1')]"
+				"[concat(variables('factoryId'), '/datasets/dl_work_ds')]"
 			]
 		},
 		{
@@ -4451,6 +4557,7 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/mssql_cntl_ds')]",
 				"[concat(variables('factoryId'), '/pipelines/40_PCS_COMMON_TYPE2')]",
+				"[concat(variables('factoryId'), '/pipelines/40_PCS_COMMON_TYPE3')]",
 				"[concat(variables('factoryId'), '/pipelines/40_PCS_COMMON_TYPE4')]",
 				"[concat(variables('factoryId'), '/pipelines/40_PCS_COMMON_TYPE7')]"
 			]
@@ -5541,6 +5648,7 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/mssql_cntl_ds')]",
 				"[concat(variables('factoryId'), '/pipelines/40_PCS_COMMON_TYPE2')]",
+				"[concat(variables('factoryId'), '/pipelines/40_PCS_COMMON_TYPE3')]",
 				"[concat(variables('factoryId'), '/pipelines/40_PCS_COMMON_TYPE4')]"
 			]
 		}

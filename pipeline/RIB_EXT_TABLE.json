@@ -55,7 +55,11 @@
 					},
 					"dataset": {
 						"referenceName": "DelimitedText1",
-						"type": "DatasetReference"
+						"type": "DatasetReference",
+						"parameters": {
+							"P_FILEPATH": "TMP/RIBFOLDER",
+							"": "ribFolders.txt"
+						}
 					},
 					"firstRowOnly": false
 				}

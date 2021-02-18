@@ -5,8 +5,8 @@
 		"annotations": [],
 		"type": "AzureSqlDatabase",
 		"typeProperties": {
-			"connectionString": "integrated security=False;encrypt=True;connection timeout=30;data source=sql-kkpb-test-edp.database.windows.net;initial catalog=sqldb-kkpb-test-edp;user id=batchoper",
-			"encryptedCredential": "eyJDcmVkZW50aWFsSWQiOiJjY2NlZjVkZS0xMzVlLTRiYWEtODI4YS0xZTU2NDZiODRjNDMiLCJWZXJzaW9uIjoiMi4wIiwiQ2xhc3NUeXBlIjoiTWljcm9zb2Z0LkRhdGFQcm94eS5Db3JlLkludGVyU2VydmljZURhdGFDb250cmFjdC5DcmVkZW50aWFsU1UwNkNZMTQifQ=="
+			"connectionString": "integrated security=False;encrypt=True;connection timeout=30;data source=sql-kkpb-temp-edp.database.windows.net;initial catalog=sqldb-kkpb-temp-edp;user id=kkpbsqldbedpadm",
+			"encryptedCredential": "eyJDcmVkZW50aWFsSWQiOiI0MTk1YzJiNC05NjA3LTQ0YmItYmRjYS1lYTk2YjgwZjE5YTQiLCJWZXJzaW9uIjoiMi4wIiwiQ2xhc3NUeXBlIjoiTWljcm9zb2Z0LkRhdGFQcm94eS5Db3JlLkludGVyU2VydmljZURhdGFDb250cmFjdC5DcmVkZW50aWFsU1UwNkNZMTQifQ=="
 		},
 		"connectVia": {
 			"referenceName": "shir-kkpb-edp",

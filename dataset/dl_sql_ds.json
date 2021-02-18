@@ -1,0 +1,38 @@
+{
+	"name": "dl_sql_ds",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "link_st_kkpb_edp",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"P_FILEPATH": {
+				"type": "string"
+			},
+			"P_FILENAME": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": {
+					"value": "@dataset().P_FILENAME",
+					"type": "Expression"
+				},
+				"folderPath": {
+					"value": "@dataset().P_FILEPATH",
+					"type": "Expression"
+				},
+				"fileSystem": "working"
+			},
+			"columnDelimiter": "",
+			"rowDelimiter": "",
+			"escapeChar": "",
+			"quoteChar": "\""
+		},
+		"schema": []
+	}
+}

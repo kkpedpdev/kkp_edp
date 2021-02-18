@@ -1,5 +1,5 @@
 {
-	"name": "RIB_EXT_TABLE_copy1",
+	"name": "EXT_TABLE",
 	"properties": {
 		"activities": [
 			{
@@ -8,6 +8,12 @@
 				"dependsOn": [
 					{
 						"activity": "Get Metadata1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "Lookup2",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -46,7 +52,7 @@
 								"storedProcedureParameters": {
 									"SQL": {
 										"value": {
-											"value": "@activity('Lookup1').output",
+											"value": "@replace(activity('Lookup1').output.firstrow.prop_0,'%ASAT_DT%',activity('Lookup2').output.firstrow.ASAT_DT)",
 											"type": "Expression"
 										},
 										"type": "String"
@@ -59,29 +65,9 @@
 							}
 						},
 						{
-							"name": "Set variable1",
-							"type": "SetVariable",
-							"dependsOn": [],
-							"userProperties": [],
-							"typeProperties": {
-								"variableName": "p_file",
-								"value": {
-									"value": "@concat(pipeline().parameters.P_PATH,'/',item().name)",
-									"type": "Expression"
-								}
-							}
-						},
-						{
 							"name": "Lookup1",
 							"type": "Lookup",
-							"dependsOn": [
-								{
-									"activity": "Set variable1",
-									"dependencyConditions": [
-										"Succeeded"
-									]
-								}
-							],
+							"dependsOn": [],
 							"policy": {
 								"timeout": "7.00:00:00",
 								"retry": 0,
@@ -104,9 +90,19 @@
 								},
 								"dataset": {
 									"referenceName": "dl_sql_ds",
-									"type": "DatasetReference"
+									"type": "DatasetReference",
+									"parameters": {
+										"P_FILEPATH": {
+											"value": "@concat('TMP/STOREDSCRIPT/',pipeline().parameters.P_STREAM)",
+											"type": "Expression"
+										},
+										"P_FILENAME": {
+											"value": "@item().name",
+											"type": "Expression"
+										}
+									}
 								},
-								"firstRowOnly": false
+								"firstRowOnly": true
 							}
 						}
 					]
@@ -130,7 +126,7 @@
 						"type": "DatasetReference",
 						"parameters": {
 							"P_FILEPATH": {
-								"value": "@pipeline().parameters.P_PATH",
+								"value": "@concat('TMP/STOREDSCRIPT/',pipeline().parameters.P_STREAM)",
 								"type": "Expression"
 							},
 							"P_FILENAME": "*.*"
@@ -147,10 +143,38 @@
 						"type": "DelimitedTextReadSettings"
 					}
 				}
+			},
+			{
+				"name": "Lookup2",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "@concat('SELECT ASAT_DT FROM [CNTL].[CNTL_CFG_STREM] WHERE STREM_NM = ''' , pipeline().parameters.P_STREAM, '''')",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "mssql_cntl_ds",
+						"type": "DatasetReference"
+					}
+				}
 			}
 		],
 		"parameters": {
-			"P_PATH": {
+			"P_STREAM": {
 				"type": "string"
 			}
 		},

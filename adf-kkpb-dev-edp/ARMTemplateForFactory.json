@@ -7,6 +7,10 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "adf-kkpb-dev-edp"
 		},
+		"link_adls_onprim_edp_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'link_adls_onprim_edp'"
+		},
 		"link_blob_test_edp_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'link_blob_test_edp'"
@@ -39,6 +43,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'linkedService2'"
 		},
+		"link_adls_onprim_edp_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://stkkpbdevtempedp.dfs.core.windows.net/"
+		},
 		"link_fs_kkpb_dev_edp_properties_typeProperties_host": {
 			"type": "string",
 			"defaultValue": "E:\\Landing"
@@ -49,7 +57,7 @@
 		},
 		"link_func_edp_properties_typeProperties_functionAppUrl": {
 			"type": "string",
-			"defaultValue": "https://func-kkpb-test-edp.azurewebsites.net"
+			"defaultValue": "https://func-kkpb-temp-edp.azurewebsites.net"
 		},
 		"link_kv_edp_properties_typeProperties_baseUrl": {
 			"type": "string",
@@ -460,7 +468,7 @@
 				"parameters": {
 					"P_STREM_NM": {
 						"type": "string",
-						"defaultValue": "EDP_DLT"
+						"defaultValue": "EDP_SET"
 					},
 					"P_RUN_MODE": {
 						"type": "string",
@@ -5406,7 +5414,7 @@
 							"sink": {
 								"type": "BinarySink",
 								"storeSettings": {
-									"type": "AzureBlobStorageWriteSettings"
+									"type": "AzureBlobFSWriteSettings"
 								}
 							},
 							"enableStaging": false
@@ -5821,7 +5829,7 @@
 							"sink": {
 								"type": "BinarySink",
 								"storeSettings": {
-									"type": "AzureBlobStorageWriteSettings"
+									"type": "AzureBlobFSWriteSettings"
 								}
 							},
 							"enableStaging": false
@@ -6392,7 +6400,7 @@
 							"sink": {
 								"type": "BinarySink",
 								"storeSettings": {
-									"type": "AzureBlobStorageWriteSettings"
+									"type": "AzureBlobFSWriteSettings"
 								}
 							},
 							"enableStaging": false
@@ -6640,7 +6648,7 @@
 							"sink": {
 								"type": "BinarySink",
 								"storeSettings": {
-									"type": "AzureBlobStorageWriteSettings"
+									"type": "AzureBlobFSWriteSettings"
 								}
 							},
 							"enableStaging": false
@@ -7029,7 +7037,7 @@
 							"sink": {
 								"type": "BinarySink",
 								"storeSettings": {
-									"type": "AzureBlobStorageWriteSettings"
+									"type": "AzureBlobFSWriteSettings"
 								}
 							},
 							"enableStaging": false
@@ -7954,6 +7962,72 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/pipeline1')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Copy data1",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "BinarySource",
+								"storeSettings": {
+									"type": "FileServerReadSettings",
+									"recursive": true,
+									"wildcardFolderPath": "TEST",
+									"wildcardFileName": "*.*",
+									"deleteFilesAfterCompletion": false
+								},
+								"formatSettings": {
+									"type": "BinaryReadSettings"
+								}
+							},
+							"sink": {
+								"type": "BinarySink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								}
+							},
+							"enableStaging": false
+						},
+						"inputs": [
+							{
+								"referenceName": "bin_onprim_ds_copy1",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "bin_blob_ds_copy1",
+								"type": "DatasetReference",
+								"parameters": {
+									"P_CONTAINER": "raw",
+									"P_PATH": "TEST/20201231"
+								}
+							}
+						]
+					}
+				],
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/bin_onprim_ds_copy1')]",
+				"[concat(variables('factoryId'), '/datasets/bin_blob_ds_copy1')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/adls_csv_ds')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -8028,7 +8102,7 @@
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"linkedServiceName": {
-					"referenceName": "link_blob_test_edp",
+					"referenceName": "link_adls_onprim_edp",
 					"type": "LinkedServiceReference"
 				},
 				"parameters": {
@@ -8046,7 +8120,7 @@
 				"type": "Binary",
 				"typeProperties": {
 					"location": {
-						"type": "AzureBlobStorageLocation",
+						"type": "AzureBlobFSLocation",
 						"fileName": {
 							"value": "@dataset().P_FILENAME",
 							"type": "Expression"
@@ -8055,7 +8129,7 @@
 							"value": "@dataset().P_PATH",
 							"type": "Expression"
 						},
-						"container": {
+						"fileSystem": {
 							"value": "@dataset().P_CONTAINER",
 							"type": "Expression"
 						}
@@ -8063,7 +8137,44 @@
 				}
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/link_blob_test_edp')]"
+				"[concat(variables('factoryId'), '/linkedServices/link_adls_onprim_edp')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/bin_blob_ds_copy1')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "link_adls_onprim_edp",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"P_CONTAINER": {
+						"type": "string"
+					},
+					"P_PATH": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": {
+							"value": "@dataset().P_PATH",
+							"type": "Expression"
+						},
+						"fileSystem": {
+							"value": "@dataset().P_CONTAINER",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/link_adls_onprim_edp')]"
 			]
 		},
 		{
@@ -8096,6 +8207,27 @@
 							"value": "@dataset().P_PATH",
 							"type": "Expression"
 						}
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/link_fs_kkpb_dev_edp')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/bin_onprim_ds_copy1')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "link_fs_kkpb_dev_edp",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "FileServerLocation"
 					}
 				}
 			},
@@ -8391,6 +8523,29 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/link_sqldb_kkpb_edp')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/link_adls_onprim_edp')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('link_adls_onprim_edp_properties_typeProperties_url')]",
+					"accountKey": {
+						"type": "SecureString",
+						"value": "[parameters('link_adls_onprim_edp_accountKey')]"
+					}
+				},
+				"connectVia": {
+					"referenceName": "shir-onprim-kkbp-edp",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/shir-onprim-kkbp-edp')]"
 			]
 		},
 		{

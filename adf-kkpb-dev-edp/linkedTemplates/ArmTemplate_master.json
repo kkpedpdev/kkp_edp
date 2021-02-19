@@ -7,6 +7,10 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "adf-kkpb-dev-edp"
 		},
+		"link_adls_onprim_edp_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'link_adls_onprim_edp'"
+		},
 		"link_blob_test_edp_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'link_blob_test_edp'"
@@ -39,6 +43,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'linkedService2'"
 		},
+		"link_adls_onprim_edp_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://stkkpbdevtempedp.dfs.core.windows.net/"
+		},
 		"link_fs_kkpb_dev_edp_properties_typeProperties_host": {
 			"type": "string",
 			"defaultValue": "E:\\Landing"
@@ -49,7 +57,7 @@
 		},
 		"link_func_edp_properties_typeProperties_functionAppUrl": {
 			"type": "string",
-			"defaultValue": "https://func-kkpb-test-edp.azurewebsites.net"
+			"defaultValue": "https://func-kkpb-temp-edp.azurewebsites.net"
 		},
 		"link_kv_edp_properties_typeProperties_baseUrl": {
 			"type": "string",
@@ -100,6 +108,9 @@
 					"link_func_edp_functionKey": {
 						"value": "[parameters('link_func_edp_functionKey')]"
 					},
+					"link_adls_onprim_edp_accountKey": {
+						"value": "[parameters('link_adls_onprim_edp_accountKey')]"
+					},
 					"link_blob_test_edp_connectionString": {
 						"value": "[parameters('link_blob_test_edp_connectionString')]"
 					},
@@ -123,6 +134,9 @@
 					},
 					"link_kv_edp_properties_typeProperties_baseUrl": {
 						"value": "[parameters('link_kv_edp_properties_typeProperties_baseUrl')]"
+					},
+					"link_adls_onprim_edp_properties_typeProperties_url": {
+						"value": "[parameters('link_adls_onprim_edp_properties_typeProperties_url')]"
 					},
 					"link_fs_kkpb_dev_edp_properties_typeProperties_host": {
 						"value": "[parameters('link_fs_kkpb_dev_edp_properties_typeProperties_host')]"

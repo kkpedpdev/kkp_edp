@@ -379,7 +379,7 @@
 		"parameters": {
 			"P_STREM_NM": {
 				"type": "string",
-				"defaultValue": "EDP_DLT"
+				"defaultValue": "EDP_SET"
 			},
 			"P_RUN_MODE": {
 				"type": "string",

@@ -1,0 +1,17 @@
+{
+	"name": "bin_onprim_ds_copy1",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "link_fs_kkpb_dev_edp",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Binary",
+		"typeProperties": {
+			"location": {
+				"type": "FileServerLocation"
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

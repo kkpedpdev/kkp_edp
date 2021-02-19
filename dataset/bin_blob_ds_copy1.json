@@ -1,5 +1,5 @@
 {
-	"name": "bin_blob_ds",
+	"name": "bin_blob_ds_copy1",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "link_adls_onprim_edp",
@@ -11,9 +11,6 @@
 			},
 			"P_PATH": {
 				"type": "string"
-			},
-			"P_FILENAME": {
-				"type": "string"
 			}
 		},
 		"annotations": [],
@@ -21,10 +18,6 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
-				"fileName": {
-					"value": "@dataset().P_FILENAME",
-					"type": "Expression"
-				},
 				"folderPath": {
 					"value": "@dataset().P_PATH",
 					"type": "Expression"

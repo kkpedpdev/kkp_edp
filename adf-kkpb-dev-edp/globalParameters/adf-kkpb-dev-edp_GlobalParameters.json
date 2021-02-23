@@ -1,1 +1,6 @@
-{}
+{
+	"P_GLBL_CNTL_SCHEMA": {
+		"type": "string",
+		"value": "CNTL"
+	}
+}

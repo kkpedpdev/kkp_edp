@@ -1,4 +1,12 @@
 {
 	"name": "adf-kkpb-dev-edp",
+	"properties": {
+		"globalParameters": {
+			"P_GLBL_CNTL_SCHEMA": {
+				"type": "string",
+				"value": "CNTL"
+			}
+		}
+	},
 	"location": "southeastasia"
 }

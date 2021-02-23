@@ -15,7 +15,10 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"storedProcedureName": "[CNTL].[COMMOM_SNAPSHOT_PROCESS]",
+					"storedProcedureName": {
+						"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA,'.COMMOM_SNAPSHOT_PROCESS')",
+						"type": "Expression"
+					},
 					"storedProcedureParameters": {
 						"P_AS_AT_DT": {
 							"value": {

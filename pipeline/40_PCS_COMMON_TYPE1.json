@@ -50,7 +50,10 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"storedProcedureName": "[CNTL].[PROC_UPDT_PRCS]",
+					"storedProcedureName": {
+						"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA,'.PROC_UPDT_PRCS')",
+						"type": "Expression"
+					},
 					"storedProcedureParameters": {
 						"P_CNT_FI_SRC": {
 							"value": {

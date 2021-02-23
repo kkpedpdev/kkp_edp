@@ -17,7 +17,10 @@
 				"typeProperties": {
 					"source": {
 						"type": "SqlServerSource",
-						"sqlReaderStoredProcedureName": "[CNTL].[PROC_STRT_PRCS]",
+						"sqlReaderStoredProcedureName": {
+							"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA,'.PROC_STRT_PRCS')",
+							"type": "Expression"
+						},
 						"storedProcedureParameters": {
 							"P_PRCS_NM": {
 								"type": "String",

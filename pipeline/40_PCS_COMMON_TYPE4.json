@@ -128,7 +128,10 @@
 				"typeProperties": {
 					"source": {
 						"type": "SqlServerSource",
-						"sqlReaderStoredProcedureName": "[CNTL].[PROC_GET_FI]",
+						"sqlReaderStoredProcedureName": {
+							"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA,'.PROC_GET_FI')",
+							"type": "Expression"
+						},
 						"storedProcedureParameters": {
 							"P_ASAT_DT": {
 								"type": "String",

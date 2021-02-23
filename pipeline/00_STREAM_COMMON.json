@@ -24,7 +24,10 @@
 				"typeProperties": {
 					"source": {
 						"type": "SqlServerSource",
-						"sqlReaderStoredProcedureName": "[CNTL].[PROC_GET_PRCS_GRP_BY_STREM]",
+						"sqlReaderStoredProcedureName": {
+							"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA,'.PROC_GET_PRCS_GRP_BY_STREM')",
+							"type": "Expression"
+						},
 						"storedProcedureParameters": {
 							"P_STREM_NM": {
 								"type": "String",
@@ -116,7 +119,10 @@
 				"typeProperties": {
 					"source": {
 						"type": "SqlServerSource",
-						"sqlReaderStoredProcedureName": "[CNTL].[PROC_STREM_RSLT]",
+						"sqlReaderStoredProcedureName": {
+							"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA,'.PROC_STREM_RSLT')",
+							"type": "Expression"
+						},
 						"storedProcedureParameters": {
 							"P_STREM_NM": {
 								"type": "String",
@@ -165,7 +171,10 @@
 				"typeProperties": {
 					"source": {
 						"type": "SqlServerSource",
-						"sqlReaderStoredProcedureName": "[CNTL].[PROC_FINL_STREM]",
+						"sqlReaderStoredProcedureName": {
+							"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA,'.PROC_FINL_STREM')",
+							"type": "Expression"
+						},
 						"storedProcedureParameters": {
 							"P_ASAT_DT": {
 								"type": "String",
@@ -257,7 +266,10 @@
 				"typeProperties": {
 					"source": {
 						"type": "SqlServerSource",
-						"sqlReaderStoredProcedureName": "[CNTL].[PROC_GET_EMAIL]",
+						"sqlReaderStoredProcedureName": {
+							"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA,'.PROC_GET_EMAIL')",
+							"type": "Expression"
+						},
 						"storedProcedureParameters": {
 							"P_STREM_NM": {
 								"type": "String",
@@ -348,7 +360,10 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"storedProcedureName": "[CNTL].[PROC_UPDT_STREM]",
+					"storedProcedureName": {
+						"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA,'.PROC_UPDT_STREM')",
+						"type": "Expression"
+					},
 					"storedProcedureParameters": {
 						"P_STREM_NM": {
 							"value": {

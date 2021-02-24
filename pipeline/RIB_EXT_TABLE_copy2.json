@@ -1,0 +1,34 @@
+{
+	"name": "RIB_EXT_TABLE_copy2",
+	"properties": {
+		"activities": [
+			{
+				"name": "SEND EMAIL",
+				"type": "WebActivity",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"url": "https://prod-05.southeastasia.logic.azure.com:443/workflows/87cb500b80b74094a5bea5f149f3b45a/triggers/manual/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=U4UdfX5WK2SF1bQKwro9Wmujq8RKOiGaTvcvclI17pw",
+					"method": "POST",
+					"headers": {
+						"Content-Type": "application/json"
+					},
+					"body": {
+						"value": "{\n\"Message\": \"<html>\\r\\n\\t\\t\\t\\t\\t\\t<head>\\r\\n\\t\\t\\t\\t\\t\\t<style>\\r\\n\\t\\t\\t\\t\\t\\ttable, th, td {\\r\\n\\t\\t\\t\\t\\t\\t  border: 1px solid black;\\r\\n\\t\\t\\t\\t\\t\\t}\\r\\n\\t\\t\\t\\t\\t\\t</style>\\r\\n\\t\\t\\t\\t\\t\\t</head>\\r\\n\\t\\t\\t\\t\\t\\t<body>\\r\\n\\r\\n\\t\\t\\t\\t\\t\\t<h1>NEW TABLE</h1>\\r\\n\\r\\n\\t\\t\\t\\t\\t\\t<table>\\r\\n\\t\\t\\t\\t\\t\\t <tr style='background-color:powderblue;'>\\r\\n\\t\\t\\t\\t\\t\\t\\t<th>Source</th>\\r\\n\\t\\t\\t\\t\\t\\t\\t<th>Service</th>\\r\\n\\t\\t\\t\\t\\t\\t\\t<th>Version</th>\\r\\n\\t\\t\\t\\t\\t\\t\\t<th>Table Name</th>\\r\\n\\t\\t\\t\\t\\t\\t\\t </tr>\\r\\n\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\r\\n\\t\\t\\t\\t\\t\\t\\n<tr><td>kkp-kkpmobile-tracking-request</td><td>_api_Information_GetKeyUser</td><td>version_50</td><td>[kkp-kkpmobile-tracking-request].[_api_Information_GetKeyUserversion_50]</td></tr>\\r\\n\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\r\\n\\t\\t\\t\\t\\t\\t</table>\\r\\n\\r\\n\\t\\t\\t\\t\\t\\t</body>\\r\\n\\t\\t\\t\\t\\t\\t</html>\",\n\"EmailTo\":\"pran.inteltion@gmail.com\",\n}",
+						"type": "Expression"
+					}
+				}
+			}
+		],
+		"annotations": [],
+		"lastPublishTime": "2021-02-01T06:04:59Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

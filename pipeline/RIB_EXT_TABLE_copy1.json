@@ -1,0 +1,88 @@
+{
+	"name": "RIB_EXT_TABLE_copy1",
+	"properties": {
+		"activities": [
+			{
+				"name": "Notebook1",
+				"type": "DatabricksNotebook",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 5,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": "/DEV/00_Common/edp/adf/dbn-gen-folder-rib"
+				},
+				"linkedServiceName": {
+					"referenceName": "link_dbw_edp",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "Notebook2",
+				"type": "DatabricksNotebook",
+				"dependsOn": [
+					{
+						"activity": "Notebook1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 5,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": "/DEV/00_Common/edp/adf/dbn-compare-folder-rib"
+				},
+				"linkedServiceName": {
+					"referenceName": "link_dbw_edp",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "SEND EMAIL",
+				"type": "WebActivity",
+				"dependsOn": [
+					{
+						"activity": "Notebook2",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"url": "https://prod-05.southeastasia.logic.azure.com:443/workflows/87cb500b80b74094a5bea5f149f3b45a/triggers/manual/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=U4UdfX5WK2SF1bQKwro9Wmujq8RKOiGaTvcvclI17pw",
+					"method": "POST",
+					"headers": {
+						"Content-Type": "application/json"
+					},
+					"body": {
+						"value": "@concat('{\"Message\": \"',activity('Notebook2').output.runOutput.RESULT_SET,'\",\"EmailTo\":\"pran.inteltion@gmail.com\",\n}')",
+						"type": "Expression"
+					}
+				}
+			}
+		],
+		"annotations": [],
+		"lastPublishTime": "2021-02-01T06:04:59Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

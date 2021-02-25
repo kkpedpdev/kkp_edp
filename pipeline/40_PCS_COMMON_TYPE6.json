@@ -1,0 +1,211 @@
+{
+	"name": "40_PCS_COMMON_TYPE6",
+	"properties": {
+		"description": "Copy binary sharepoints by folder to STG",
+		"activities": [
+			{
+				"name": "Notebook1",
+				"type": "DatabricksNotebook",
+				"dependsOn": [
+					{
+						"activity": "ForEach1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 1,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": {
+						"value": "@pipeline().parameters.P_PRCS_OBJ.ADB_NM",
+						"type": "Expression"
+					},
+					"baseParameters": {
+						"PARAMS": {
+							"value": "@pipeline().parameters.P_PRCS_OBJ.ADB_PARM",
+							"type": "Expression"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "link_dbw_edp",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "GetBearerToken",
+				"type": "WebActivity",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"url": {
+						"value": "@pipeline().globalParameters.P_GLBL_BEARER_TOKEN",
+						"type": "Expression"
+					},
+					"method": "POST",
+					"headers": {
+						"Content-Type": "application/x-www-form-urlencoded"
+					},
+					"body": "grant_type=client_credentials&client_id=8578d84d-db28-449a-9c11-a8bae5465c04@9fce0284-1a8c-4368-85b0-571bbad0df08&client_secret=mVbWh~igL5kKkzFVXEg6BLOw86--_G4.cd&resource=00000003-0000-0ff1-ce00-000000000000/kiatnakin365.sharepoint.com@9fce0284-1a8c-4368-85b0-571bbad0df08"
+				}
+			},
+			{
+				"name": "List file in path",
+				"type": "WebActivity",
+				"dependsOn": [
+					{
+						"activity": "GetBearerToken",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"url": {
+						"value": "@concat('https://kiatnakin365.sharepoint.com/sites/EDPFileCenterUAT/_api/web/GetFolderByServerRelativeUrl(''ShareCenter/Landing/', pipeline().parameters.P_PRCS_OBJ.PTH, '/', pipeline().parameters.P_PRCS_OBJ.CALC_ASAT_DT, ''')/Files')",
+						"type": "Expression"
+					},
+					"method": "GET",
+					"headers": {
+						"Accept": "application/json;odata=verbose",
+						"Authorization": {
+							"value": "@{concat('Bearer ', activity('GetBearerToken').output.access_token)}",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			{
+				"name": "ForEach1",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "List file in path",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('List file in path').output.d.results",
+						"type": "Expression"
+					},
+					"isSequential": false,
+					"batchCount": 10,
+					"activities": [
+						{
+							"name": "Copy Raw",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "BinarySource",
+									"storeSettings": {
+										"type": "HttpReadSettings",
+										"requestMethod": "GET",
+										"additionalHeaders": {
+											"value": "@{concat('Authorization: Bearer ', activity('GetBearerToken').output.access_token)}",
+											"type": "Expression"
+										},
+										"requestTimeout": ""
+									},
+									"formatSettings": {
+										"type": "BinaryReadSettings"
+									}
+								},
+								"sink": {
+									"type": "BinarySink",
+									"storeSettings": {
+										"type": "AzureBlobFSWriteSettings"
+									}
+								},
+								"enableStaging": false
+							},
+							"inputs": [
+								{
+									"referenceName": "sp_bin_ds",
+									"type": "DatasetReference",
+									"parameters": {
+										"ServerRelativeUrl": {
+											"value": "@item().ServerRelativeUrl",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "dl_bin_ds2",
+									"type": "DatasetReference",
+									"parameters": {
+										"P_CONTAINER": {
+											"value": "@pipeline().parameters.P_PRCS_OBJ.CNTNR",
+											"type": "Expression"
+										},
+										"P_PATH": {
+											"value": "@concat(pipeline().parameters.P_PRCS_OBJ.PTH, '/',pipeline().parameters.P_PRCS_OBJ.CALC_ASAT_DT)",
+											"type": "Expression"
+										},
+										"P_FILENAME": {
+											"value": "@item().Name",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						}
+					]
+				}
+			}
+		],
+		"parameters": {
+			"P_LD_ID": {
+				"type": "string"
+			},
+			"P_PRCS_NM": {
+				"type": "string"
+			},
+			"P_PRCS_OBJ": {
+				"type": "object"
+			}
+		},
+		"folder": {
+			"name": "COMMON JOB"
+		},
+		"annotations": [],
+		"lastPublishTime": "2021-02-24T06:23:25Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

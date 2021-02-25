@@ -5,6 +5,14 @@
 			"P_GLBL_CNTL_SCHEMA": {
 				"type": "string",
 				"value": "CNTL"
+			},
+			"P_GLBL_SHAREPOINT_SITE": {
+				"type": "string",
+				"value": "EDPFileCenterUAT"
+			},
+			"P_GLBL_BEARER_TOKEN": {
+				"type": "string",
+				"value": "https://accounts.accesscontrol.windows.net/9fce0284-1a8c-4368-85b0-571bbad0df08/tokens/OAuth/2"
 			}
 		}
 	},

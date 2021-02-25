@@ -15,12 +15,16 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"url": "https://management.azure.com/subscriptions/39f31ac1-7170-4ce0-9582-ca6a8312bb55/resourceGroups/rg-kkpb-test-edp/providers/Microsoft.DataFactory/factories/adf-kkpb-dev-edp/pipelines/Oak_test/createRun?api-version=2018-06-01",
+					"url": "https://management.azure.com/subscriptions/39f31ac1-7170-4ce0-9582-ca6a8312bb55/resourceGroups/rg-kkpb-test-edp/providers/Microsoft.DataFactory/factories/adf-kkpb-dev-edp/pipelines/00_STREAM_COMMON/createRun?api-version=2018-06-01",
 					"connectVia": {
 						"referenceName": "shir-kkpb-edp",
 						"type": "IntegrationRuntimeReference"
 					},
 					"method": "POST",
+					"headers": {
+						"Content-Type": "application/json",
+						"Authorization": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6Im5PbzNaRHJPRFhFSzFqS1doWHNsSFJfS1hFZyIsImtpZCI6Im5PbzNaRHJPRFhFSzFqS1doWHNsSFJfS1hFZyJ9.eyJhdWQiOiJodHRwczovL21hbmFnZW1lbnQuY29yZS53aW5kb3dzLm5ldC8iLCJpc3MiOiJodHRwczovL3N0cy53aW5kb3dzLm5ldC84ZWI1MzYzNC04MThhLTQ2ZTUtYTMwZS04ZWJjYzFjMmQwNjkvIiwiaWF0IjoxNjE0MTYwNzgxLCJuYmYiOjE2MTQxNjA3ODEsImV4cCI6MTYxNDE2NDY4MSwiYWNyIjoiMSIsImFpbyI6IkFVUUF1LzhUQUFBQTNlU3g1ZUtDWFI3a3dGYXdsaU04WjQyZEZVU3hYSEJkVHI3SHZvbzM0T2RjeW5PUDJ4RnA1MTF2cDJiTkFCeGZIMkFZMWRZTmFob084TzgwNmFqMWVnPT0iLCJhbHRzZWNpZCI6IjU6OjEwMDMyMDAwRkU4OEU5MUEiLCJhbXIiOlsicHdkIl0sImFwcGlkIjoiN2Y1OWE3NzMtMmVhZi00MjljLWEwNTktNTBmYzViYjI4YjQ0IiwiYXBwaWRhY3IiOiIyIiwiZW1haWwiOiJzYXJpc0BpbnRlbHRpb24uY29tIiwiZmFtaWx5X25hbWUiOiLguYDguIHguLXguKLguKPguJXguLTguJDguLLguJvguJnguLLguKLguIciLCJnaXZlbl9uYW1lIjoi4Liq4Liy4Lij4Li04LioIiwiZ3JvdXBzIjpbImVmMWFhOWMzLTk2NTktNDQzMi05NDZmLTYxYTZmZGJhMDIwZSIsIjcxNGQwZTlmLThmMjQtNGM3MC04ZGMyLTFiYTdkYzcxYmFmZiJdLCJpZHAiOiJodHRwczovL3N0cy53aW5kb3dzLm5ldC9hNWMyMDY2NS1mM2Q4LTRmMDctYjIxMS01MDUxYTliOTJmMjYvIiwiaXBhZGRyIjoiMjIzLjI0LjE1OS4yMCIsIm5hbWUiOiLguKrguLLguKPguLTguKgg4LmA4LiB4Li14Lii4Lij4LiV4Li04LiQ4Liy4Lib4LiZ4Liy4Lii4LiHIiwib2lkIjoiYzEzYWNjNjgtMDgxMC00ZmZiLTliNmItZTU1NGI2ZGI2ZGFlIiwicHVpZCI6IjEwMDMyMDAxMDkyRUJENEMiLCJyaCI6IjAuQUFBQU5EYTFqb3FCNVVhakRvNjh3Y0xRYVhPbldYLXZMcHhDb0ZsUV9GdXlpMFJ4QUlrLiIsInNjcCI6InVzZXJfaW1wZXJzb25hdGlvbiIsInN1YiI6InhZaWlIY09fZGRWYnlfZFNNMk0xT3JGdldZcHpiVWstNkFYQndiTXg4bGsiLCJ0aWQiOiI4ZWI1MzYzNC04MThhLTQ2ZTUtYTMwZS04ZWJjYzFjMmQwNjkiLCJ1bmlxdWVfbmFtZSI6InNhcmlzQGludGVsdGlvbi5jb20iLCJ1dGkiOiJsQ3FLTldNRTJVMmEtWmJUMVloaUFBIiwidmVyIjoiMS4wIiwid2lkcyI6WyIxM2JkMWM3Mi02ZjRhLTRkY2YtOTg1Zi0xOGQzYjgwZjIwOGEiXSwieG1zX3RjZHQiOjE2MDk3NDc0NDF9.T9so5npAinqQMJX9Ex6ijYsR4gg6monKzSBGqRjn-7_GYoK6X-0EgV-BduBVviWTN1M70bKm0V4gr0wMiGXk9rFdCK-yFt-UDOyF_SXJDKF_XwcolqghYw-SqQedGPiDqMG8MO6Hh7ljpbRt6OSAcKd5neE4BVHZZqwSlKsuHBN6kQF_RcZ56e9GjwqLr_wcMXzfvicmLuKvljqrEsJiPC7HNQB35GTNdTSfaJDG1b9ybWnT8x84hsDxjAfd1-xirXF5nP3C7wkj7Hp-d8-hFr4So-lCTM0F78phRmWOtLXgd7MJ4LrLzBMVOeIV64VbBvcgdVKhbV_iJWY6ZdpSYw"
+					},
 					"body": {
 						"lastUpdatedAfter": "2018-06-16T00:36:44.3345758Z",
 						"lastUpdatedBefore": "2018-06-16T00:49:48.3686473Z"
@@ -47,7 +51,7 @@
 			},
 			"pipelineName": {
 				"type": "String",
-				"defaultValue": "Oak_test"
+				"defaultValue": "00_STREAM_COMMON"
 			},
 			"apiVersion": {
 				"type": "String",
@@ -55,7 +59,7 @@
 			}
 		},
 		"annotations": [],
-		"lastPublishTime": "2021-01-27T09:07:56Z"
+		"lastPublishTime": "2021-02-24T10:43:36Z"
 	},
 	"type": "Microsoft.DataFactory/factories/pipelines"
 }

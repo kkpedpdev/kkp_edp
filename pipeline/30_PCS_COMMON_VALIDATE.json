@@ -164,7 +164,7 @@
 					"source": {
 						"type": "SqlServerSource",
 						"sqlReaderStoredProcedureName": {
-							"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA,'.PROC_GET_PRCS')",
+							"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA, '.[PROC_GET_PRCS]')",
 							"type": "Expression"
 						},
 						"storedProcedureParameters": {
@@ -281,7 +281,7 @@
 					"source": {
 						"type": "SqlServerSource",
 						"sqlReaderStoredProcedureName": {
-							"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA,'.PROC_CHK_LTST_PRCS')",
+							"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA, '.[PROC_CHK_LTST_PRCS]')",
 							"type": "Expression"
 						},
 						"storedProcedureParameters": {
@@ -339,7 +339,7 @@
 					"source": {
 						"type": "SqlServerSource",
 						"sqlReaderStoredProcedureName": {
-							"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA,'.PROC_CHK_DPND_PRCS')",
+							"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA, '.[PROC_CHK_DPND_PRCS]')",
 							"type": "Expression"
 						},
 						"storedProcedureParameters": {
@@ -395,7 +395,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"storedProcedureName": {
-						"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA,'.PROC_UPDT_PRCS')",
+						"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA, '.[PROC_UPDT_PRCS]')",
 						"type": "Expression"
 					},
 					"storedProcedureParameters": {
@@ -465,7 +465,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"storedProcedureName": {
-						"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA,'.PROC_UPDT_PRCS')",
+						"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA, '.[PROC_UPDT_PRCS]')",
 						"type": "Expression"
 					},
 					"storedProcedureParameters": {
@@ -535,7 +535,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"storedProcedureName": {
-						"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA,'.PROC_UPDT_PRCS')",
+						"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA, '.[PROC_UPDT_PRCS]')",
 						"type": "Expression"
 					},
 					"storedProcedureParameters": {
@@ -607,7 +607,7 @@
 					"source": {
 						"type": "SqlServerSource",
 						"sqlReaderStoredProcedureName": {
-							"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA,'.PROC_CHK_RCNCL')",
+							"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA, '.[PROC_CHK_RCNCL]')",
 							"type": "Expression"
 						},
 						"storedProcedureParameters": {
@@ -703,7 +703,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"storedProcedureName": {
-						"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA,'.PROC_UPDT_PRCS')",
+						"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA, '.[PROC_UPDT_PRCS]')",
 						"type": "Expression"
 					},
 					"storedProcedureParameters": {
@@ -774,7 +774,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"storedProcedureName": {
-						"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA,'.PROC_UPDT_PRCS')",
+						"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA, '.[PROC_UPDT_PRCS]')",
 						"type": "Expression"
 					},
 					"storedProcedureParameters": {
@@ -847,7 +847,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"storedProcedureName": {
-						"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA,'.PROC_UPDT_PRCS')",
+						"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA, '.[PROC_UPDT_PRCS]')",
 						"type": "Expression"
 					},
 					"storedProcedureParameters": {
@@ -919,7 +919,7 @@
 							"value": "1",
 							"activities": [
 								{
-									"name": "40_PCS_COMMON_TYPE1",
+									"name": "Execute Pipeline Type 1",
 									"type": "ExecutePipeline",
 									"dependsOn": [],
 									"userProperties": [],
@@ -951,7 +951,7 @@
 							"value": "2",
 							"activities": [
 								{
-									"name": "PCS_COMMON_TYPE2",
+									"name": "Execute Pipeline Type 2",
 									"type": "ExecutePipeline",
 									"dependsOn": [],
 									"userProperties": [],
@@ -983,7 +983,7 @@
 							"value": "3",
 							"activities": [
 								{
-									"name": "40_PCS_COMMON_TYPE3",
+									"name": "Execute Pipeline Type 3",
 									"type": "ExecutePipeline",
 									"dependsOn": [],
 									"userProperties": [],
@@ -1015,7 +1015,7 @@
 							"value": "4",
 							"activities": [
 								{
-									"name": "40_PCS_COMMON_TYPE4",
+									"name": "Execute Pipeline Type 4",
 									"type": "ExecutePipeline",
 									"dependsOn": [],
 									"userProperties": [],
@@ -1047,7 +1047,7 @@
 							"value": "5",
 							"activities": [
 								{
-									"name": "40_PCS_COMMON_TYPE5",
+									"name": "Execute Pipeline Type 5",
 									"type": "ExecutePipeline",
 									"dependsOn": [],
 									"userProperties": [],
@@ -1076,10 +1076,42 @@
 							]
 						},
 						{
+							"value": "6",
+							"activities": [
+								{
+									"name": "Execute Pipeline Type 6",
+									"type": "ExecutePipeline",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "40_PCS_COMMON_TYPE6",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {
+											"P_LD_ID": {
+												"value": "@pipeline().parameters.P_LD_ID",
+												"type": "Expression"
+											},
+											"P_PRCS_NM": {
+												"value": "@pipeline().parameters.P_PRCS_NM",
+												"type": "Expression"
+											},
+											"P_PRCS_OBJ": {
+												"value": "@activity('GET PROCESS INFORMATION').output.FIRSTROW",
+												"type": "Expression"
+											}
+										}
+									}
+								}
+							]
+						},
+						{
 							"value": "7",
 							"activities": [
 								{
-									"name": "Execute Pipeline1",
+									"name": "Execute Pipeline Type 7",
 									"type": "ExecutePipeline",
 									"dependsOn": [],
 									"userProperties": [],
@@ -1129,7 +1161,7 @@
 			"name": "COMMON JOB"
 		},
 		"annotations": [],
-		"lastPublishTime": "2021-02-08T04:06:30Z"
+		"lastPublishTime": "2021-02-24T06:46:04Z"
 	},
 	"type": "Microsoft.DataFactory/factories/pipelines"
 }

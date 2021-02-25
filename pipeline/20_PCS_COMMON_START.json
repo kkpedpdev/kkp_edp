@@ -18,7 +18,7 @@
 					"source": {
 						"type": "SqlServerSource",
 						"sqlReaderStoredProcedureName": {
-							"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA,'.PROC_STRT_PRCS')",
+							"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA, '.[PROC_STRT_PRCS]')",
 							"type": "Expression"
 						},
 						"storedProcedureParameters": {
@@ -204,7 +204,7 @@
 			"name": "COMMON JOB"
 		},
 		"annotations": [],
-		"lastPublishTime": "2021-02-06T18:14:39Z"
+		"lastPublishTime": "2021-02-24T06:12:16Z"
 	},
 	"type": "Microsoft.DataFactory/factories/pipelines"
 }

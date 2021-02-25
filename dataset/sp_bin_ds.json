@@ -1,0 +1,26 @@
+{
+	"name": "sp_bin_ds",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "link_spo_http",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"ServerRelativeUrl": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "Binary",
+		"typeProperties": {
+			"location": {
+				"type": "HttpServerLocation",
+				"relativeUrl": {
+					"value": "@concat('/sites/EDPFileCenterUAT/_api/web/GetFileByServerRelativeUrl(''',dataset().ServerRelativeUrl,''')/$value')",
+					"type": "Expression"
+				}
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

@@ -1,12 +1,15 @@
 {
-	"name": "dl_sql_ds",
+	"name": "dl_bin_ds2",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "link_st_kkpb_edp",
 			"type": "LinkedServiceReference"
 		},
 		"parameters": {
-			"P_FILEPATH": {
+			"P_CONTAINER": {
+				"type": "string"
+			},
+			"P_PATH": {
 				"type": "string"
 			},
 			"P_FILENAME": {
@@ -14,7 +17,7 @@
 			}
 		},
 		"annotations": [],
-		"type": "DelimitedText",
+		"type": "Binary",
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
@@ -23,17 +26,15 @@
 					"type": "Expression"
 				},
 				"folderPath": {
-					"value": "@dataset().P_FILEPATH",
+					"value": "@dataset().P_PATH",
 					"type": "Expression"
 				},
-				"fileSystem": "working"
-			},
-			"columnDelimiter": "#",
-			"rowDelimiter": "#",
-			"escapeChar": "#",
-			"quoteChar": "\""
-		},
-		"schema": []
+				"fileSystem": {
+					"value": "@dataset().P_CONTAINER",
+					"type": "Expression"
+				}
+			}
+		}
 	},
 	"type": "Microsoft.DataFactory/factories/datasets"
 }

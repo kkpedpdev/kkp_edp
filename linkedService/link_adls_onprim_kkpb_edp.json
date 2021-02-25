@@ -1,0 +1,16 @@
+{
+	"name": "link_adls_onprim_kkpb_edp",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "AzureBlobFS",
+		"typeProperties": {
+			"url": "https://stkkpbdevtempedp.dfs.core.windows.net/",
+			"encryptedCredential": "eyJDcmVkZW50aWFsSWQiOiI2NzBlMzE3YS00MTQxLTQ4MTgtODZiNi02Zjg1ZTFmNGRkNjYiLCJWZXJzaW9uIjoiMi4wIiwiQ2xhc3NUeXBlIjoiTWljcm9zb2Z0LkRhdGFQcm94eS5Db3JlLkludGVyU2VydmljZURhdGFDb250cmFjdC5DcmVkZW50aWFsU1UwNkNZMTQifQ=="
+		},
+		"connectVia": {
+			"referenceName": "shir-onprim-kkbp-edp",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}

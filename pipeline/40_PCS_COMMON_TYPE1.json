@@ -93,7 +93,10 @@
 							"type": "String"
 						},
 						"P_RMRK": {
-							"value": "",
+							"value": {
+								"value": "@if(activity('Azure Function1').output.NumberOfFiles = '200','File not found','')",
+								"type": "Expression"
+							},
 							"type": "String"
 						},
 						"P_ST": {

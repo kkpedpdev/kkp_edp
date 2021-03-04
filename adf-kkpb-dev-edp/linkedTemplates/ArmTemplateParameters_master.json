@@ -8,6 +8,9 @@
 		"link_adls_onprim_edp_accountKey": {
 			"value": ""
 		},
+		"link_adls_onprim_kkpb_edp_accountKey": {
+			"value": ""
+		},
 		"link_blob_test_edp_connectionString": {
 			"value": ""
 		},
@@ -32,7 +35,13 @@
 		"linkedService2_password": {
 			"value": ""
 		},
+		"AzureDataLakeStorage1_properties_typeProperties_url": {
+			"value": "https://stkkpbdevtempedp.dfs.core.windows.net"
+		},
 		"link_adls_onprim_edp_properties_typeProperties_url": {
+			"value": "https://stkkpbdevtempedp.dfs.core.windows.net/"
+		},
+		"link_adls_onprim_kkpb_edp_properties_typeProperties_url": {
 			"value": "https://stkkpbdevtempedp.dfs.core.windows.net/"
 		},
 		"link_fs_kkpb_dev_edp_properties_typeProperties_host": {
@@ -46,6 +55,9 @@
 		},
 		"link_kv_edp_properties_typeProperties_baseUrl": {
 			"value": "https://kv-kkpb-dev-edp.vault.azure.net/"
+		},
+		"link_spo_http_properties_typeProperties_url": {
+			"value": "https://kiatnakin365.sharepoint.com"
 		},
 		"link_st_kkpb_edp_properties_typeProperties_url": {
 			"value": "https://stkkpbdevtempedp.dfs.core.windows.net"

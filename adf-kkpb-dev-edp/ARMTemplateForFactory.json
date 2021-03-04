@@ -11,6 +11,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'accountKey' of 'link_adls_onprim_edp'"
 		},
+		"link_adls_onprim_kkpb_edp_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'link_adls_onprim_kkpb_edp'"
+		},
 		"link_blob_test_edp_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'link_blob_test_edp'"
@@ -43,7 +47,15 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'linkedService2'"
 		},
+		"AzureDataLakeStorage1_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://stkkpbdevtempedp.dfs.core.windows.net"
+		},
 		"link_adls_onprim_edp_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://stkkpbdevtempedp.dfs.core.windows.net/"
+		},
+		"link_adls_onprim_kkpb_edp_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://stkkpbdevtempedp.dfs.core.windows.net/"
 		},
@@ -63,6 +75,10 @@
 			"type": "string",
 			"defaultValue": "https://kv-kkpb-dev-edp.vault.azure.net/"
 		},
+		"link_spo_http_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://kiatnakin365.sharepoint.com"
+		},
 		"link_st_kkpb_edp_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://stkkpbdevtempedp.dfs.core.windows.net"
@@ -80,6 +96,437 @@
 		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
 	},
 	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/00_STREAM_COMMON')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "GET PROCESS GROUP LIST",
+						"type": "Lookup",
+						"dependsOn": [
+							{
+								"activity": "START STREAM",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "SqlServerSource",
+								"sqlReaderStoredProcedureName": {
+									"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA,'.PROC_GET_PRCS_GRP_BY_STREM')",
+									"type": "Expression"
+								},
+								"storedProcedureParameters": {
+									"P_STREM_NM": {
+										"type": "String",
+										"value": {
+											"value": "@pipeline().parameters.P_STREM_NM",
+											"type": "Expression"
+										}
+									}
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "mssql_cntl_ds",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "FOR EACH PROCESS GROUP",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "GET PROCESS GROUP LIST",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('GET PROCESS GROUP LIST').output.value",
+								"type": "Expression"
+							},
+							"isSequential": false,
+							"batchCount": 20,
+							"activities": [
+								{
+									"name": "Run Each Process Group",
+									"type": "ExecutePipeline",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "10_COMMON_RUN_PCS_GRP",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {
+											"P_PRCS_GRP": {
+												"value": "@item().PRCS_GRP",
+												"type": "Expression"
+											},
+											"P_RUN_MODE": {
+												"value": "@pipeline().parameters.P_RUN_MODE",
+												"type": "Expression"
+											},
+											"P_STREM_ID": {
+												"value": "@activity('START STREAM').output.FIRSTROW.STREM_ID",
+												"type": "Expression"
+											}
+										}
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "STREAM RESULT",
+						"type": "Lookup",
+						"dependsOn": [
+							{
+								"activity": "UPDATE STREAM",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "SqlServerSource",
+								"sqlReaderStoredProcedureName": {
+									"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA,'.PROC_STREM_RSLT')",
+									"type": "Expression"
+								},
+								"storedProcedureParameters": {
+									"P_STREM_NM": {
+										"type": "String",
+										"value": {
+											"value": "@pipeline().parameters.P_STREM_NM",
+											"type": "Expression"
+										}
+									},
+									"P_STREM_ID": {
+										"type": "String",
+										"value": {
+											"value": "@activity('START STREAM').output.FIRSTROW.STREM_ID",
+											"type": "Expression"
+										}
+									}
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "mssql_cntl_ds",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": true
+						}
+					},
+					{
+						"name": "FINAL STREAM",
+						"type": "Lookup",
+						"dependsOn": [
+							{
+								"activity": "FOR EACH PROCESS GROUP",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "SqlServerSource",
+								"sqlReaderStoredProcedureName": {
+									"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA,'.PROC_FINL_STREM')",
+									"type": "Expression"
+								},
+								"storedProcedureParameters": {
+									"P_ASAT_DT": {
+										"type": "String",
+										"value": {
+											"value": "@activity('START STREAM').output.FIRSTROW.ASAT_DT",
+											"type": "Expression"
+										}
+									},
+									"P_STREM_NM": {
+										"type": "String",
+										"value": {
+											"value": "@pipeline().parameters.P_STREM_NM",
+											"type": "Expression"
+										}
+									},
+									"P_STREM_ID": {
+										"type": "String",
+										"value": {
+											"value": "@activity('START STREAM').output.FIRSTROW.STREM_ID",
+											"type": "Expression"
+										}
+									}
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "mssql_cntl_ds",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						}
+					},
+					{
+						"name": "SEND EMAIL",
+						"type": "WebActivity",
+						"dependsOn": [
+							{
+								"activity": "GET EMAIL",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "STREAM RESULT",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"url": "https://prod-05.southeastasia.logic.azure.com:443/workflows/87cb500b80b74094a5bea5f149f3b45a/triggers/manual/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=U4UdfX5WK2SF1bQKwro9Wmujq8RKOiGaTvcvclI17pw",
+							"method": "POST",
+							"headers": {
+								"Content-Type": "application/json"
+							},
+							"body": {
+								"value": "{\n\"Message\":\"@{activity('STREAM RESULT').output.firstrow.RESULT_SET}\",\n\"EmailTo\":\"@{activity('GET EMAIL').output.firstrow.EMAIL}\",\n\"Asat_dt\":\"@{activity('FINAL STREAM').output.firstrow.ASAT_DT_FORMAT}\",\n\"StreamName\":\"@{pipeline().parameters.P_STREM_NM}\"\n}",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "GET EMAIL",
+						"type": "Lookup",
+						"dependsOn": [
+							{
+								"activity": "FINAL STREAM",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "SqlServerSource",
+								"sqlReaderStoredProcedureName": {
+									"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA,'.PROC_GET_EMAIL')",
+									"type": "Expression"
+								},
+								"storedProcedureParameters": {
+									"P_STREM_NM": {
+										"type": "String",
+										"value": {
+											"value": "@pipeline().parameters.P_STREM_NM",
+											"type": "Expression"
+										}
+									},
+									"P_STREM_RSLT": {
+										"type": "String",
+										"value": {
+											"value": "@activity('FINAL STREAM').output.FIRSTROW.STREM_RSLT",
+											"type": "Expression"
+										}
+									}
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "mssql_cntl_ds",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": true
+						}
+					},
+					{
+						"name": "START STREAM",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "SqlServerSource",
+								"sqlReaderStoredProcedureName": {
+									"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA,'.PROC_STRT_STREM')",
+									"type": "Expression"
+								},
+								"storedProcedureParameters": {
+									"P_RUN_MODE": {
+										"type": "String",
+										"value": {
+											"value": "@pipeline().parameters.P_RUN_MODE",
+											"type": "Expression"
+										}
+									},
+									"P_STREM_NM": {
+										"type": "String",
+										"value": {
+											"value": "@pipeline().parameters.P_STREM_NM",
+											"type": "Expression"
+										}
+									}
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "mssql_cntl_ds",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						}
+					},
+					{
+						"name": "UPDATE STREAM",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "FINAL STREAM",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": {
+								"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA,'.PROC_UPDT_STREM')",
+								"type": "Expression"
+							},
+							"storedProcedureParameters": {
+								"P_STREM_NM": {
+									"value": {
+										"value": "@pipeline().parameters.P_STREM_NM",
+										"type": "Expression"
+									},
+									"type": "String"
+								},
+								"P_STREM_RSLT": {
+									"value": {
+										"value": "@activity('FINAL STREAM').output.firstrow.STREM_RSLT",
+										"type": "Expression"
+									},
+									"type": "String"
+								},
+								"P_STREM_ID": {
+									"value": {
+										"value": "@activity('START STREAM').output.FIRSTROW.STREM_ID",
+										"type": "Expression"
+									},
+									"type": "String"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "link_sqldb_kkpb_edp",
+							"type": "LinkedServiceReference"
+						}
+					}
+				],
+				"parameters": {
+					"P_STREM_NM": {
+						"type": "string",
+						"defaultValue": "EDP_SET"
+					},
+					"P_RUN_MODE": {
+						"type": "string",
+						"defaultValue": "R"
+					}
+				},
+				"variables": {
+					"V_STREAM_RESULT": {
+						"type": "String",
+						"defaultValue": "-999"
+					}
+				},
+				"folder": {
+					"name": "COMMON JOB"
+				},
+				"annotations": [],
+				"lastPublishTime": "2021-02-24T05:06:51Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/mssql_cntl_ds')]",
+				"[concat(variables('factoryId'), '/linkedServices/link_sqldb_kkpb_edp')]",
+				"[concat(variables('factoryId'), '/pipelines/10_COMMON_RUN_PCS_GRP')]"
+			]
+		},
 		{
 			"name": "[concat(parameters('factoryName'), '/00_STREAM_COMMON_copy1')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
@@ -485,11 +932,128 @@
 					"name": "BK"
 				},
 				"annotations": [],
-				"lastPublishTime": "2021-02-06T00:36:09Z"
+				"lastPublishTime": "2021-02-24T05:06:49Z"
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/mssql_cntl_ds')]",
 				"[concat(variables('factoryId'), '/linkedServices/link_sqldb_kkpb_edp')]",
+				"[concat(variables('factoryId'), '/pipelines/20_PCS_COMMON_START')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/10_COMMON_RUN_PCS_GRP')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "GET PROCESS LIST",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "SqlServerSource",
+								"sqlReaderStoredProcedureName": {
+									"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA,'.PROC_GET_PRCS_BY_GRP')",
+									"type": "Expression"
+								},
+								"storedProcedureParameters": {
+									"P_PRCS_GRP": {
+										"type": "String",
+										"value": {
+											"value": "@pipeline().parameters.P_PRCS_GRP",
+											"type": "Expression"
+										}
+									}
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "mssql_cntl_ds",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "ForEach1",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "GET PROCESS LIST",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('GET PROCESS LIST').output.value",
+								"type": "Expression"
+							},
+							"isSequential": true,
+							"activities": [
+								{
+									"name": "RUN COMMON PROCESS",
+									"type": "ExecutePipeline",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "20_PCS_COMMON_START",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {
+											"P_PRCS_NM": {
+												"value": "@item().PRCS_NM",
+												"type": "Expression"
+											},
+											"P_RUN_MODE": {
+												"value": "@pipeline().parameters.P_RUN_MODE",
+												"type": "Expression"
+											},
+											"P_STREM_ID": {
+												"value": "@pipeline().parameters.P_STREM_ID",
+												"type": "Expression"
+											}
+										}
+									}
+								}
+							]
+						}
+					}
+				],
+				"parameters": {
+					"P_PRCS_GRP": {
+						"type": "string"
+					},
+					"P_RUN_MODE": {
+						"type": "string"
+					},
+					"P_STREM_ID": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "COMMON JOB"
+				},
+				"annotations": [],
+				"lastPublishTime": "2021-02-24T05:06:49Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/mssql_cntl_ds')]",
 				"[concat(variables('factoryId'), '/pipelines/20_PCS_COMMON_START')]"
 			]
 		},
@@ -600,7 +1164,7 @@
 					"name": "BK"
 				},
 				"annotations": [],
-				"lastPublishTime": "2021-02-06T00:36:09Z"
+				"lastPublishTime": "2021-02-24T05:06:49Z"
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/mssql_cntl_ds')]",
@@ -814,7 +1378,224 @@
 					"name": "BK"
 				},
 				"annotations": [],
-				"lastPublishTime": "2021-01-08T08:47:36Z"
+				"lastPublishTime": "2021-02-24T05:06:47Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/mssql_cntl_ds')]",
+				"[concat(variables('factoryId'), '/pipelines/30_PCS_COMMON_VALIDATE')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/20_PCS_COMMON_START')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "START PROCESS",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "SqlServerSource",
+								"sqlReaderStoredProcedureName": {
+									"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA, '.[PROC_STRT_PRCS]')",
+									"type": "Expression"
+								},
+								"storedProcedureParameters": {
+									"P_PRCS_NM": {
+										"type": "String",
+										"value": {
+											"value": "@pipeline().parameters.P_PRCS_NM",
+											"type": "Expression"
+										}
+									},
+									"P_RUN_MODE": {
+										"type": "String",
+										"value": {
+											"value": "@pipeline().parameters.P_RUN_MODE",
+											"type": "Expression"
+										}
+									},
+									"P_STREM_ID": {
+										"type": "String",
+										"value": {
+											"value": "@pipeline().parameters.P_STREM_ID",
+											"type": "Expression"
+										}
+									}
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "mssql_cntl_ds",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": true
+						}
+					},
+					{
+						"name": "GET SKIP FLAG",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "START PROCESS",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "V_SKIP_PRCS",
+							"value": {
+								"value": "@activity('START PROCESS').output.FIRSTROW.SKIP_PRCS",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "CHECK SKIP FLAG",
+						"type": "IfCondition",
+						"dependsOn": [
+							{
+								"activity": "GET SKIP FLAG",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "GET LOAD ID",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"expression": {
+								"value": "@equals(variables('V_SKIP_PRCS'),'0')",
+								"type": "Expression"
+							},
+							"ifFalseActivities": [
+								{
+									"name": "SKIP PROCESS",
+									"type": "Lookup",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "SqlServerSource",
+											"sqlReaderQuery": "SELECT 1",
+											"queryTimeout": "02:00:00",
+											"partitionOption": "None"
+										},
+										"dataset": {
+											"referenceName": "mssql_cntl_ds",
+											"type": "DatasetReference",
+											"parameters": {}
+										}
+									}
+								}
+							],
+							"ifTrueActivities": [
+								{
+									"name": "RUN_PCS_COMMON_VALIDATE",
+									"type": "ExecutePipeline",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "30_PCS_COMMON_VALIDATE",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {
+											"P_PRCS_NM": {
+												"value": "@pipeline().parameters.P_PRCS_NM",
+												"type": "Expression"
+											},
+											"P_RUN_MODE": {
+												"value": "@pipeline().parameters.P_RUN_MODE",
+												"type": "Expression"
+											},
+											"P_LD_ID": {
+												"value": "@variables('V_LD_ID')",
+												"type": "Expression"
+											}
+										}
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "GET LOAD ID",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "START PROCESS",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "V_LD_ID",
+							"value": {
+								"value": "@activity('START PROCESS').output.FIRSTROW.LD_ID",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"parameters": {
+					"P_PRCS_NM": {
+						"type": "string",
+						"defaultValue": "SINGHAARM_SINGHAARM_AGENT"
+					},
+					"P_RUN_MODE": {
+						"type": "string",
+						"defaultValue": "R"
+					},
+					"P_STREM_ID": {
+						"type": "string",
+						"defaultValue": "-999"
+					}
+				},
+				"variables": {
+					"V_SKIP_PRCS": {
+						"type": "String",
+						"defaultValue": "999"
+					},
+					"V_LD_ID": {
+						"type": "String",
+						"defaultValue": "999"
+					}
+				},
+				"folder": {
+					"name": "COMMON JOB"
+				},
+				"annotations": [],
+				"lastPublishTime": "2021-02-24T06:12:16Z"
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/mssql_cntl_ds')]",
@@ -1028,7 +1809,7 @@
 					"name": "BK"
 				},
 				"annotations": [],
-				"lastPublishTime": "2021-02-06T00:36:08Z"
+				"lastPublishTime": "2021-02-24T05:06:47Z"
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/mssql_cntl_ds')]",
@@ -2041,7 +2822,7 @@
 					"name": "BK"
 				},
 				"annotations": [],
-				"lastPublishTime": "2021-02-06T18:31:08Z"
+				"lastPublishTime": "2021-02-24T05:06:45Z"
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/mssql_cntl_ds')]",
@@ -3131,7 +3912,7 @@
 					"name": "BK"
 				},
 				"annotations": [],
-				"lastPublishTime": "2021-02-06T18:37:50Z"
+				"lastPublishTime": "2021-02-24T05:06:45Z"
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/mssql_cntl_ds')]",
@@ -3141,6 +3922,192 @@
 				"[concat(variables('factoryId'), '/pipelines/40_PCS_COMMON_TYPE3')]",
 				"[concat(variables('factoryId'), '/pipelines/40_PCS_COMMON_TYPE4')]",
 				"[concat(variables('factoryId'), '/pipelines/40_PCS_COMMON_TYPE5')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/40_PCS_COMMON_TYPE1')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Load from external website to STG",
+				"activities": [
+					{
+						"name": "Azure Function1",
+						"type": "AzureFunctionActivity",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 2,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"functionName": {
+								"value": "@pipeline().parameters.P_PRCS_OBJ.FUNC_NM",
+								"type": "Expression"
+							},
+							"method": "POST",
+							"headers": {},
+							"body": {
+								"value": "@pipeline().parameters.P_PRCS_OBJ.FUNC_PARM",
+								"type": "Expression"
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "link_func_edp",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "EDW UPDATE COUNT TARGET",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "Azure Function1",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": {
+								"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA, '.[PROC_UPDT_PRCS]')",
+								"type": "Expression"
+							},
+							"storedProcedureParameters": {
+								"P_CNT_FI_SRC": {
+									"value": {
+										"value": "@activity('Azure Function1').output.NumberOfFiles",
+										"type": "Expression"
+									},
+									"type": "String"
+								},
+								"P_CNT_FI_TGT": {
+									"value": {
+										"value": "@activity('Azure Function1').output.NumberOfFiles",
+										"type": "Expression"
+									},
+									"type": "String"
+								},
+								"P_CNT_REC_SRC": {
+									"value": null,
+									"type": "String"
+								},
+								"P_CNT_REC_TGT": {
+									"value": null,
+									"type": "String"
+								},
+								"P_LD_ID": {
+									"value": {
+										"value": "@pipeline().parameters.P_LD_ID",
+										"type": "Expression"
+									},
+									"type": "String"
+								},
+								"P_PRCS_NM": {
+									"value": {
+										"value": "@pipeline().parameters.P_PRCS_NM",
+										"type": "Expression"
+									},
+									"type": "String"
+								},
+								"P_RMRK": {
+									"value": "",
+									"type": "String"
+								},
+								"P_ST": {
+									"value": "RUNNING",
+									"type": "String"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "link_sqldb_kkpb_edp",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "If Condition1",
+						"type": "IfCondition",
+						"dependsOn": [
+							{
+								"activity": "EDW UPDATE COUNT TARGET",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"expression": {
+								"value": "@not(equals(pipeline().parameters.P_PRCS_OBJ.ADB_NM,null))",
+								"type": "Expression"
+							},
+							"ifTrueActivities": [
+								{
+									"name": "Notebook1",
+									"type": "DatabricksNotebook",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 1,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"notebookPath": {
+											"value": "@pipeline().parameters.P_PRCS_OBJ.ADB_NM",
+											"type": "Expression"
+										},
+										"baseParameters": {
+											"PARAMS": {
+												"value": "@pipeline().parameters.P_PRCS_OBJ.ADB_PARM",
+												"type": "Expression"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "link_dbw_edp",
+										"type": "LinkedServiceReference"
+									}
+								}
+							]
+						}
+					}
+				],
+				"parameters": {
+					"P_LD_ID": {
+						"type": "string"
+					},
+					"P_PRCS_NM": {
+						"type": "string"
+					},
+					"P_PRCS_OBJ": {
+						"type": "object"
+					}
+				},
+				"folder": {
+					"name": "COMMON JOB"
+				},
+				"annotations": [],
+				"lastPublishTime": "2021-02-24T06:46:02Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/link_func_edp')]",
+				"[concat(variables('factoryId'), '/linkedServices/link_sqldb_kkpb_edp')]",
+				"[concat(variables('factoryId'), '/linkedServices/link_dbw_edp')]"
 			]
 		},
 		{
@@ -3317,7 +4284,7 @@
 					"name": "BK"
 				},
 				"annotations": [],
-				"lastPublishTime": "2021-02-06T18:20:10Z"
+				"lastPublishTime": "2021-02-24T05:06:42Z"
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/link_func_edp')]",
@@ -3728,7 +4695,7 @@
 					"name": "BK"
 				},
 				"annotations": [],
-				"lastPublishTime": "2021-02-06T18:20:10Z"
+				"lastPublishTime": "2021-02-24T05:06:43Z"
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/bin_onprim_ds')]",
@@ -3746,6 +4713,7 @@
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
+				"description": "Transform via databricks ",
 				"activities": [
 					{
 						"name": "Notebook1",
@@ -3753,7 +4721,7 @@
 						"dependsOn": [],
 						"policy": {
 							"timeout": "7.00:00:00",
-							"retry": 0,
+							"retry": 1,
 							"retryIntervalInSeconds": 30,
 							"secureOutput": false,
 							"secureInput": false
@@ -3788,16 +4756,11 @@
 						"type": "object"
 					}
 				},
-				"variables": {
-					"V_SCRIPT": {
-						"type": "String"
-					}
-				},
 				"folder": {
 					"name": "COMMON JOB"
 				},
 				"annotations": [],
-				"lastPublishTime": "2021-02-06T18:32:10Z"
+				"lastPublishTime": "2021-02-24T06:46:02Z"
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/link_dbw_edp')]"
@@ -3854,7 +4817,7 @@
 					"name": "BK"
 				},
 				"annotations": [],
-				"lastPublishTime": "2021-02-06T18:20:10Z"
+				"lastPublishTime": "2021-02-24T05:06:42Z"
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/link_dbw_edp')]"
@@ -3911,7 +4874,7 @@
 					"name": "BK"
 				},
 				"annotations": [],
-				"lastPublishTime": "2021-02-06T18:31:07Z"
+				"lastPublishTime": "2021-02-24T05:06:42Z"
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/link_dbw_edp')]"
@@ -4099,7 +5062,7 @@
 					"name": "BK"
 				},
 				"annotations": [],
-				"lastPublishTime": "2021-02-06T18:20:10Z"
+				"lastPublishTime": "2021-02-24T05:06:43Z"
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/link_dbw_edp')]",
@@ -4189,7 +5152,7 @@
 					"name": "BK"
 				},
 				"annotations": [],
-				"lastPublishTime": "2021-02-06T18:20:11Z"
+				"lastPublishTime": "2021-02-24T05:06:40Z"
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/link_syn_kkpb_edp')]"
@@ -4249,7 +5212,7 @@
 					"name": "BK"
 				},
 				"annotations": [],
-				"lastPublishTime": "2021-02-06T18:20:10Z"
+				"lastPublishTime": "2021-02-24T05:06:40Z"
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/integrationRuntimes/shir-kkpb-edp')]"
@@ -4445,7 +5408,7 @@
 					}
 				},
 				"annotations": [],
-				"lastPublishTime": "2021-02-01T06:04:59Z"
+				"lastPublishTime": "2021-02-24T05:06:43Z"
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/dl_work_ds')]",
@@ -4473,13 +5436,16 @@
 						},
 						"userProperties": [],
 						"typeProperties": {
-							"url": "https://management.azure.com/subscriptions/39f31ac1-7170-4ce0-9582-ca6a8312bb55/resourceGroups/rg-kkpb-test-edp/providers/Microsoft.DataFactory/factories/adf-kkpb-dev-edp/pipelines/Oak_test/createRun?api-version=2018-06-01",
+							"url": "https://management.azure.com/subscriptions/39f31ac1-7170-4ce0-9582-ca6a8312bb55/resourceGroups/rg-kkpb-test-edp/providers/Microsoft.DataFactory/factories/adf-kkpb-dev-edp/pipelines/00_STREAM_COMMON/createRun?api-version=2018-06-01",
 							"connectVia": {
 								"referenceName": "shir-kkpb-edp",
 								"type": "IntegrationRuntimeReference"
 							},
 							"method": "POST",
-							"headers": {},
+							"headers": {
+								"Content-Type": "application/json",
+								"Authorization": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6Im5PbzNaRHJPRFhFSzFqS1doWHNsSFJfS1hFZyIsImtpZCI6Im5PbzNaRHJPRFhFSzFqS1doWHNsSFJfS1hFZyJ9.eyJhdWQiOiJodHRwczovL21hbmFnZW1lbnQuY29yZS53aW5kb3dzLm5ldC8iLCJpc3MiOiJodHRwczovL3N0cy53aW5kb3dzLm5ldC84ZWI1MzYzNC04MThhLTQ2ZTUtYTMwZS04ZWJjYzFjMmQwNjkvIiwiaWF0IjoxNjE0MTYwNzgxLCJuYmYiOjE2MTQxNjA3ODEsImV4cCI6MTYxNDE2NDY4MSwiYWNyIjoiMSIsImFpbyI6IkFVUUF1LzhUQUFBQTNlU3g1ZUtDWFI3a3dGYXdsaU04WjQyZEZVU3hYSEJkVHI3SHZvbzM0T2RjeW5PUDJ4RnA1MTF2cDJiTkFCeGZIMkFZMWRZTmFob084TzgwNmFqMWVnPT0iLCJhbHRzZWNpZCI6IjU6OjEwMDMyMDAwRkU4OEU5MUEiLCJhbXIiOlsicHdkIl0sImFwcGlkIjoiN2Y1OWE3NzMtMmVhZi00MjljLWEwNTktNTBmYzViYjI4YjQ0IiwiYXBwaWRhY3IiOiIyIiwiZW1haWwiOiJzYXJpc0BpbnRlbHRpb24uY29tIiwiZmFtaWx5X25hbWUiOiLguYDguIHguLXguKLguKPguJXguLTguJDguLLguJvguJnguLLguKLguIciLCJnaXZlbl9uYW1lIjoi4Liq4Liy4Lij4Li04LioIiwiZ3JvdXBzIjpbImVmMWFhOWMzLTk2NTktNDQzMi05NDZmLTYxYTZmZGJhMDIwZSIsIjcxNGQwZTlmLThmMjQtNGM3MC04ZGMyLTFiYTdkYzcxYmFmZiJdLCJpZHAiOiJodHRwczovL3N0cy53aW5kb3dzLm5ldC9hNWMyMDY2NS1mM2Q4LTRmMDctYjIxMS01MDUxYTliOTJmMjYvIiwiaXBhZGRyIjoiMjIzLjI0LjE1OS4yMCIsIm5hbWUiOiLguKrguLLguKPguLTguKgg4LmA4LiB4Li14Lii4Lij4LiV4Li04LiQ4Liy4Lib4LiZ4Liy4Lii4LiHIiwib2lkIjoiYzEzYWNjNjgtMDgxMC00ZmZiLTliNmItZTU1NGI2ZGI2ZGFlIiwicHVpZCI6IjEwMDMyMDAxMDkyRUJENEMiLCJyaCI6IjAuQUFBQU5EYTFqb3FCNVVhakRvNjh3Y0xRYVhPbldYLXZMcHhDb0ZsUV9GdXlpMFJ4QUlrLiIsInNjcCI6InVzZXJfaW1wZXJzb25hdGlvbiIsInN1YiI6InhZaWlIY09fZGRWYnlfZFNNMk0xT3JGdldZcHpiVWstNkFYQndiTXg4bGsiLCJ0aWQiOiI4ZWI1MzYzNC04MThhLTQ2ZTUtYTMwZS04ZWJjYzFjMmQwNjkiLCJ1bmlxdWVfbmFtZSI6InNhcmlzQGludGVsdGlvbi5jb20iLCJ1dGkiOiJsQ3FLTldNRTJVMmEtWmJUMVloaUFBIiwidmVyIjoiMS4wIiwid2lkcyI6WyIxM2JkMWM3Mi02ZjRhLTRkY2YtOTg1Zi0xOGQzYjgwZjIwOGEiXSwieG1zX3RjZHQiOjE2MDk3NDc0NDF9.T9so5npAinqQMJX9Ex6ijYsR4gg6monKzSBGqRjn-7_GYoK6X-0EgV-BduBVviWTN1M70bKm0V4gr0wMiGXk9rFdCK-yFt-UDOyF_SXJDKF_XwcolqghYw-SqQedGPiDqMG8MO6Hh7ljpbRt6OSAcKd5neE4BVHZZqwSlKsuHBN6kQF_RcZ56e9GjwqLr_wcMXzfvicmLuKvljqrEsJiPC7HNQB35GTNdTSfaJDG1b9ybWnT8x84hsDxjAfd1-xirXF5nP3C7wkj7Hp-d8-hFr4So-lCTM0F78phRmWOtLXgd7MJ4LrLzBMVOeIV64VbBvcgdVKhbV_iJWY6ZdpSYw"
+							},
 							"body": {
 								"lastUpdatedAfter": "2018-06-16T00:36:44.3345758Z",
 								"lastUpdatedBefore": "2018-06-16T00:49:48.3686473Z"
@@ -4506,7 +5472,7 @@
 					},
 					"pipelineName": {
 						"type": "String",
-						"defaultValue": "Oak_test"
+						"defaultValue": "00_STREAM_COMMON"
 					},
 					"apiVersion": {
 						"type": "String",
@@ -4514,7 +5480,7 @@
 					}
 				},
 				"annotations": [],
-				"lastPublishTime": "2021-01-27T09:07:56Z"
+				"lastPublishTime": "2021-02-24T10:43:36Z"
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/integrationRuntimes/shir-kkpb-edp')]"
@@ -4595,7 +5561,7 @@
 					}
 				},
 				"annotations": [],
-				"lastPublishTime": "2021-02-01T05:52:50Z"
+				"lastPublishTime": "2021-02-24T05:06:42Z"
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/link_dbw_edp')]",
@@ -4754,15 +5720,279 @@
 								}
 							]
 						}
+					},
+					{
+						"name": "Notebook2_copy1",
+						"type": "DatabricksNotebook",
+						"dependsOn": [
+							{
+								"activity": "Notebook1",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 5,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": "/DEV/00_Common/edp/adf/dbn-compare-folder-rib"
+						},
+						"linkedServiceName": {
+							"referenceName": "link_dbw_edp",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "SEND EMAIL",
+						"type": "WebActivity",
+						"dependsOn": [
+							{
+								"activity": "Notebook2_copy1",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"url": "https://prod-05.southeastasia.logic.azure.com:443/workflows/87cb500b80b74094a5bea5f149f3b45a/triggers/manual/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=U4UdfX5WK2SF1bQKwro9Wmujq8RKOiGaTvcvclI17pw",
+							"method": "POST",
+							"headers": {
+								"Content-Type": "application/json"
+							},
+							"body": {
+								"value": "@concat('{\"Message\": \"',activity('Notebook2_copy1').output.runOutput.RESULT_SET,'\",\"EmailTo\":\"pran.inteltion@gmail.com\",\n}')",
+								"type": "Expression"
+							}
+						}
 					}
 				],
 				"annotations": [],
-				"lastPublishTime": "2021-02-01T06:04:59Z"
+				"lastPublishTime": "2021-02-24T05:06:43Z"
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/link_dbw_edp')]",
 				"[concat(variables('factoryId'), '/datasets/dl_work_ds')]",
 				"[concat(variables('factoryId'), '/linkedServices/link_syn_kkpb_edp')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/TEST SHAREPOINTS')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Copy sharepoints to ref",
+				"activities": [
+					{
+						"name": "Copy Raw",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "GetBearerToken",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "BinarySource",
+								"storeSettings": {
+									"type": "HttpReadSettings",
+									"requestMethod": "GET",
+									"additionalHeaders": {
+										"value": "@{concat('Authorization: Bearer ', activity('GetBearerToken').output.access_token)}",
+										"type": "Expression"
+									},
+									"requestTimeout": ""
+								},
+								"formatSettings": {
+									"type": "BinaryReadSettings"
+								}
+							},
+							"sink": {
+								"type": "BinarySink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								}
+							},
+							"enableStaging": false
+						},
+						"inputs": [
+							{
+								"referenceName": "sp_bin_ds",
+								"type": "DatasetReference",
+								"parameters": {
+									"ServerRelativeUrl": "/sites/EDPFileCenterUAT/ShareCenter/Landing/internal/manualfile/real_estate/RE_Code_Zone_Mapping.csv"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "dl_bin_ds3",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					},
+					{
+						"name": "GetBearerToken",
+						"type": "WebActivity",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"url": {
+								"value": "@pipeline().globalParameters.P_GLBL_BEARER_TOKEN",
+								"type": "Expression"
+							},
+							"method": "POST",
+							"headers": {
+								"Content-Type": "application/x-www-form-urlencoded"
+							},
+							"body": "grant_type=client_credentials&client_id=8578d84d-db28-449a-9c11-a8bae5465c04@9fce0284-1a8c-4368-85b0-571bbad0df08&client_secret=mVbWh~igL5kKkzFVXEg6BLOw86--_G4.cd&resource=00000003-0000-0ff1-ce00-000000000000/kiatnakin365.sharepoint.com@9fce0284-1a8c-4368-85b0-571bbad0df08"
+						}
+					}
+				],
+				"folder": {
+					"name": "TEST"
+				},
+				"annotations": [],
+				"lastPublishTime": "2021-02-25T03:32:43Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/sp_bin_ds')]",
+				"[concat(variables('factoryId'), '/datasets/dl_bin_ds3')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/TEST SHAREPOINTS_copy1')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Copy sharepoints to ref",
+				"activities": [
+					{
+						"name": "Copy Raw",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "GetBearerToken",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "BinarySource",
+								"storeSettings": {
+									"type": "HttpReadSettings",
+									"requestMethod": "GET",
+									"additionalHeaders": {
+										"value": "@{concat('Authorization: Bearer ', activity('GetBearerToken').output.access_token)}",
+										"type": "Expression"
+									},
+									"requestTimeout": ""
+								},
+								"formatSettings": {
+									"type": "BinaryReadSettings"
+								}
+							},
+							"sink": {
+								"type": "BinarySink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								}
+							},
+							"enableStaging": false
+						},
+						"inputs": [
+							{
+								"referenceName": "sp_bin_ds",
+								"type": "DatasetReference",
+								"parameters": {
+									"ServerRelativeUrl": "/sites/EDPFileCenterUAT/ShareCenter/Landing/internal/manualfile/real_estate/RE_Code_Zone_Mapping.csv"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "dl_bin_ds3",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					},
+					{
+						"name": "GetBearerToken",
+						"type": "WebActivity",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"url": {
+								"value": "@pipeline().globalParameters.P_GLBL_BEARER_TOKEN",
+								"type": "Expression"
+							},
+							"method": "POST",
+							"headers": {
+								"Content-Type": "application/x-www-form-urlencoded"
+							},
+							"body": "grant_type=client_credentials&client_id=8578d84d-db28-449a-9c11-a8bae5465c04@9fce0284-1a8c-4368-85b0-571bbad0df08&client_secret=mVbWh~igL5kKkzFVXEg6BLOw86--_G4.cd&resource=00000003-0000-0ff1-ce00-000000000000/kiatnakin365.sharepoint.com@9fce0284-1a8c-4368-85b0-571bbad0df08"
+						}
+					}
+				],
+				"folder": {
+					"name": "TEST"
+				},
+				"annotations": [],
+				"lastPublishTime": "2021-02-25T03:32:43Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/sp_bin_ds')]",
+				"[concat(variables('factoryId'), '/datasets/dl_bin_ds3')]"
 			]
 		},
 		{
@@ -4797,7 +6027,7 @@
 					}
 				],
 				"annotations": [],
-				"lastPublishTime": "2021-01-19T06:39:51Z"
+				"lastPublishTime": "2021-02-24T05:06:42Z"
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/link_dbw_edp')]"
@@ -4862,7 +6092,8 @@
 						]
 					}
 				],
-				"annotations": []
+				"annotations": [],
+				"lastPublishTime": "2021-02-24T05:06:43Z"
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/bin_onprim_ds_copy1')]",
@@ -5075,6 +6306,118 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/link_fs_kkpb_dev_edp')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/dl_bin_ds')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "link_blob_test_edp",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"P_CONTAINER": {
+						"type": "string"
+					},
+					"P_PATH": {
+						"type": "string"
+					},
+					"P_FILENAME": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": {
+							"value": "@dataset().P_FILENAME",
+							"type": "Expression"
+						},
+						"folderPath": {
+							"value": "@dataset().P_PATH",
+							"type": "Expression"
+						},
+						"container": {
+							"value": "@dataset().P_CONTAINER",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/link_blob_test_edp')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/dl_bin_ds2')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "link_st_kkpb_edp",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"P_CONTAINER": {
+						"type": "string"
+					},
+					"P_PATH": {
+						"type": "string"
+					},
+					"P_FILENAME": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": {
+							"value": "@dataset().P_FILENAME",
+							"type": "Expression"
+						},
+						"folderPath": {
+							"value": "@dataset().P_PATH",
+							"type": "Expression"
+						},
+						"fileSystem": {
+							"value": "@dataset().P_CONTAINER",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/link_st_kkpb_edp')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/dl_bin_ds3')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureDataLakeStorage1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "RE_Code_Zone_Mapping.csv",
+						"folderPath": "internal/manualfile/real_estate",
+						"fileSystem": "raw"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureDataLakeStorage1')]"
 			]
 		},
 		{
@@ -5368,6 +6711,86 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/onprim_bin_ds')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "link_fs_kkpb_dev_edp",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"P_PATH": {
+						"type": "string"
+					},
+					"P_FILENAME": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "FileServerLocation",
+						"fileName": {
+							"value": "@dataset().P_FILENAME",
+							"type": "Expression"
+						},
+						"folderPath": {
+							"value": "@dataset().P_PATH",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/link_fs_kkpb_dev_edp')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/sp_bin_ds')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "link_spo_http",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"ServerRelativeUrl": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "HttpServerLocation",
+						"relativeUrl": {
+							"value": "@concat('/sites/EDPFileCenterUAT/_api/web/GetFileByServerRelativeUrl(''',dataset().ServerRelativeUrl,''')/$value')",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/link_spo_http')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureDataLakeStorage1')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('AzureDataLakeStorage1_properties_typeProperties_url')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/link_adls_onprim_edp')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
@@ -5379,6 +6802,29 @@
 					"accountKey": {
 						"type": "SecureString",
 						"value": "[parameters('link_adls_onprim_edp_accountKey')]"
+					}
+				},
+				"connectVia": {
+					"referenceName": "shir-onprim-kkbp-edp",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/shir-onprim-kkbp-edp')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/link_adls_onprim_kkpb_edp')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('link_adls_onprim_kkpb_edp_properties_typeProperties_url')]",
+					"accountKey": {
+						"type": "SecureString",
+						"value": "[parameters('link_adls_onprim_kkpb_edp_accountKey')]"
 					}
 				},
 				"connectVia": {
@@ -5477,6 +6923,21 @@
 				"type": "AzureKeyVault",
 				"typeProperties": {
 					"baseUrl": "[parameters('link_kv_edp_properties_typeProperties_baseUrl')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/link_spo_http')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "HttpServer",
+				"typeProperties": {
+					"url": "[parameters('link_spo_http_properties_typeProperties_url')]",
+					"enableServerCertificateValidation": true,
+					"authenticationType": "Anonymous"
 				}
 			},
 			"dependsOn": []
@@ -5585,771 +7046,6 @@
 				"typeProperties": {}
 			},
 			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/00_STREAM_COMMON')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "GET PROCESS GROUP LIST",
-						"type": "Lookup",
-						"dependsOn": [
-							{
-								"activity": "START STREAM",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "SqlServerSource",
-								"sqlReaderStoredProcedureName": {
-									"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA,'.PROC_GET_PRCS_GRP_BY_STREM')",
-									"type": "Expression"
-								},
-								"storedProcedureParameters": {
-									"P_STREM_NM": {
-										"type": "String",
-										"value": {
-											"value": "@pipeline().parameters.P_STREM_NM",
-											"type": "Expression"
-										}
-									}
-								},
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "mssql_cntl_ds",
-								"type": "DatasetReference",
-								"parameters": {}
-							},
-							"firstRowOnly": false
-						}
-					},
-					{
-						"name": "FOR EACH PROCESS GROUP",
-						"type": "ForEach",
-						"dependsOn": [
-							{
-								"activity": "GET PROCESS GROUP LIST",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@activity('GET PROCESS GROUP LIST').output.value",
-								"type": "Expression"
-							},
-							"isSequential": false,
-							"batchCount": 20,
-							"activities": [
-								{
-									"name": "Run Each Process Group",
-									"type": "ExecutePipeline",
-									"dependsOn": [],
-									"userProperties": [],
-									"typeProperties": {
-										"pipeline": {
-											"referenceName": "10_COMMON_RUN_PCS_GRP",
-											"type": "PipelineReference"
-										},
-										"waitOnCompletion": true,
-										"parameters": {
-											"P_PRCS_GRP": {
-												"value": "@item().PRCS_GRP",
-												"type": "Expression"
-											},
-											"P_RUN_MODE": {
-												"value": "@pipeline().parameters.P_RUN_MODE",
-												"type": "Expression"
-											},
-											"P_STREM_ID": {
-												"value": "@activity('START STREAM').output.FIRSTROW.STREM_ID",
-												"type": "Expression"
-											}
-										}
-									}
-								}
-							]
-						}
-					},
-					{
-						"name": "STREAM RESULT",
-						"type": "Lookup",
-						"dependsOn": [
-							{
-								"activity": "UPDATE STREAM",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "SqlServerSource",
-								"sqlReaderStoredProcedureName": {
-									"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA,'.PROC_STREM_RSLT')",
-									"type": "Expression"
-								},
-								"storedProcedureParameters": {
-									"P_STREM_NM": {
-										"type": "String",
-										"value": {
-											"value": "@pipeline().parameters.P_STREM_NM",
-											"type": "Expression"
-										}
-									},
-									"P_STREM_ID": {
-										"type": "String",
-										"value": {
-											"value": "@activity('START STREAM').output.FIRSTROW.STREM_ID",
-											"type": "Expression"
-										}
-									}
-								},
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "mssql_cntl_ds",
-								"type": "DatasetReference",
-								"parameters": {}
-							},
-							"firstRowOnly": true
-						}
-					},
-					{
-						"name": "FINAL STREAM",
-						"type": "Lookup",
-						"dependsOn": [
-							{
-								"activity": "FOR EACH PROCESS GROUP",
-								"dependencyConditions": [
-									"Completed"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "SqlServerSource",
-								"sqlReaderStoredProcedureName": {
-									"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA,'.PROC_FINL_STREM')",
-									"type": "Expression"
-								},
-								"storedProcedureParameters": {
-									"P_ASAT_DT": {
-										"type": "String",
-										"value": {
-											"value": "@activity('START STREAM').output.FIRSTROW.ASAT_DT",
-											"type": "Expression"
-										}
-									},
-									"P_STREM_NM": {
-										"type": "String",
-										"value": {
-											"value": "@pipeline().parameters.P_STREM_NM",
-											"type": "Expression"
-										}
-									},
-									"P_STREM_ID": {
-										"type": "String",
-										"value": {
-											"value": "@activity('START STREAM').output.FIRSTROW.STREM_ID",
-											"type": "Expression"
-										}
-									}
-								},
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "mssql_cntl_ds",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						}
-					},
-					{
-						"name": "SEND EMAIL",
-						"type": "WebActivity",
-						"dependsOn": [
-							{
-								"activity": "GET EMAIL",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							},
-							{
-								"activity": "STREAM RESULT",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"url": "https://prod-05.southeastasia.logic.azure.com:443/workflows/87cb500b80b74094a5bea5f149f3b45a/triggers/manual/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=U4UdfX5WK2SF1bQKwro9Wmujq8RKOiGaTvcvclI17pw",
-							"method": "POST",
-							"headers": {
-								"Content-Type": "application/json"
-							},
-							"body": {
-								"value": "{\n\"Message\":\"@{activity('STREAM RESULT').output.firstrow.RESULT_SET}\",\n\"EmailTo\":\"@{activity('GET EMAIL').output.firstrow.EMAIL}\",\n\"Asat_dt\":\"@{activity('FINAL STREAM').output.firstrow.ASAT_DT_FORMAT}\",\n\"StreamName\":\"@{pipeline().parameters.P_STREM_NM}\"\n}",
-								"type": "Expression"
-							}
-						}
-					},
-					{
-						"name": "GET EMAIL",
-						"type": "Lookup",
-						"dependsOn": [
-							{
-								"activity": "FINAL STREAM",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "SqlServerSource",
-								"sqlReaderStoredProcedureName": {
-									"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA,'.PROC_GET_EMAIL')",
-									"type": "Expression"
-								},
-								"storedProcedureParameters": {
-									"P_STREM_NM": {
-										"type": "String",
-										"value": {
-											"value": "@pipeline().parameters.P_STREM_NM",
-											"type": "Expression"
-										}
-									},
-									"P_STREM_RSLT": {
-										"type": "String",
-										"value": {
-											"value": "@activity('FINAL STREAM').output.FIRSTROW.STREM_RSLT",
-											"type": "Expression"
-										}
-									}
-								},
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "mssql_cntl_ds",
-								"type": "DatasetReference",
-								"parameters": {}
-							},
-							"firstRowOnly": true
-						}
-					},
-					{
-						"name": "START STREAM",
-						"type": "Lookup",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "SqlServerSource",
-								"sqlReaderStoredProcedureName": {
-									"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA,'.PROC_STRT_STREM')",
-									"type": "Expression"
-								},
-								"storedProcedureParameters": {
-									"P_RUN_MODE": {
-										"type": "String",
-										"value": {
-											"value": "@pipeline().parameters.P_RUN_MODE",
-											"type": "Expression"
-										}
-									},
-									"P_STREM_NM": {
-										"type": "String",
-										"value": {
-											"value": "@pipeline().parameters.P_STREM_NM",
-											"type": "Expression"
-										}
-									}
-								},
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "mssql_cntl_ds",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						}
-					},
-					{
-						"name": "UPDATE STREAM",
-						"type": "SqlServerStoredProcedure",
-						"dependsOn": [
-							{
-								"activity": "FINAL STREAM",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"storedProcedureName": {
-								"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA,'.PROC_UPDT_STREM')",
-								"type": "Expression"
-							},
-							"storedProcedureParameters": {
-								"P_STREM_NM": {
-									"value": {
-										"value": "@pipeline().parameters.P_STREM_NM",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"P_STREM_RSLT": {
-									"value": {
-										"value": "@activity('FINAL STREAM').output.firstrow.STREM_RSLT",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"P_STREM_ID": {
-									"value": {
-										"value": "@activity('START STREAM').output.FIRSTROW.STREM_ID",
-										"type": "Expression"
-									},
-									"type": "String"
-								}
-							}
-						},
-						"linkedServiceName": {
-							"referenceName": "link_sqldb_kkpb_edp",
-							"type": "LinkedServiceReference"
-						}
-					}
-				],
-				"parameters": {
-					"P_STREM_NM": {
-						"type": "string",
-						"defaultValue": "EDP_SET"
-					},
-					"P_RUN_MODE": {
-						"type": "string",
-						"defaultValue": "R"
-					}
-				},
-				"variables": {
-					"V_STREAM_RESULT": {
-						"type": "String",
-						"defaultValue": "-999"
-					}
-				},
-				"folder": {
-					"name": "COMMON JOB"
-				},
-				"annotations": [],
-				"lastPublishTime": "2021-02-08T03:10:49Z"
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/mssql_cntl_ds')]",
-				"[concat(variables('factoryId'), '/linkedServices/link_sqldb_kkpb_edp')]",
-				"[concat(variables('factoryId'), '/pipelines/10_COMMON_RUN_PCS_GRP')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/10_COMMON_RUN_PCS_GRP')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "GET PROCESS LIST",
-						"type": "Lookup",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "SqlServerSource",
-								"sqlReaderStoredProcedureName": {
-									"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA,'.PROC_GET_PRCS_BY_GRP')",
-									"type": "Expression"
-								},
-								"storedProcedureParameters": {
-									"P_PRCS_GRP": {
-										"type": "String",
-										"value": {
-											"value": "@pipeline().parameters.P_PRCS_GRP",
-											"type": "Expression"
-										}
-									}
-								},
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "mssql_cntl_ds",
-								"type": "DatasetReference",
-								"parameters": {}
-							},
-							"firstRowOnly": false
-						}
-					},
-					{
-						"name": "ForEach1",
-						"type": "ForEach",
-						"dependsOn": [
-							{
-								"activity": "GET PROCESS LIST",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@activity('GET PROCESS LIST').output.value",
-								"type": "Expression"
-							},
-							"isSequential": true,
-							"activities": [
-								{
-									"name": "RUN COMMON PROCESS",
-									"type": "ExecutePipeline",
-									"dependsOn": [],
-									"userProperties": [],
-									"typeProperties": {
-										"pipeline": {
-											"referenceName": "20_PCS_COMMON_START",
-											"type": "PipelineReference"
-										},
-										"waitOnCompletion": true,
-										"parameters": {
-											"P_PRCS_NM": {
-												"value": "@item().PRCS_NM",
-												"type": "Expression"
-											},
-											"P_RUN_MODE": {
-												"value": "@pipeline().parameters.P_RUN_MODE",
-												"type": "Expression"
-											},
-											"P_STREM_ID": {
-												"value": "@pipeline().parameters.P_STREM_ID",
-												"type": "Expression"
-											}
-										}
-									}
-								}
-							]
-						}
-					}
-				],
-				"parameters": {
-					"P_PRCS_GRP": {
-						"type": "string"
-					},
-					"P_RUN_MODE": {
-						"type": "string"
-					},
-					"P_STREM_ID": {
-						"type": "string"
-					}
-				},
-				"folder": {
-					"name": "COMMON JOB"
-				},
-				"annotations": [],
-				"lastPublishTime": "2021-02-08T03:31:30Z"
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/mssql_cntl_ds')]",
-				"[concat(variables('factoryId'), '/pipelines/20_PCS_COMMON_START')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/20_PCS_COMMON_START')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "START PROCESS",
-						"type": "Lookup",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "SqlServerSource",
-								"sqlReaderStoredProcedureName": {
-									"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA,'.PROC_STRT_PRCS')",
-									"type": "Expression"
-								},
-								"storedProcedureParameters": {
-									"P_PRCS_NM": {
-										"type": "String",
-										"value": {
-											"value": "@pipeline().parameters.P_PRCS_NM",
-											"type": "Expression"
-										}
-									},
-									"P_RUN_MODE": {
-										"type": "String",
-										"value": {
-											"value": "@pipeline().parameters.P_RUN_MODE",
-											"type": "Expression"
-										}
-									},
-									"P_STREM_ID": {
-										"type": "String",
-										"value": {
-											"value": "@pipeline().parameters.P_STREM_ID",
-											"type": "Expression"
-										}
-									}
-								},
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "mssql_cntl_ds",
-								"type": "DatasetReference",
-								"parameters": {}
-							},
-							"firstRowOnly": true
-						}
-					},
-					{
-						"name": "GET SKIP FLAG",
-						"type": "SetVariable",
-						"dependsOn": [
-							{
-								"activity": "START PROCESS",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"variableName": "V_SKIP_PRCS",
-							"value": {
-								"value": "@activity('START PROCESS').output.FIRSTROW.SKIP_PRCS",
-								"type": "Expression"
-							}
-						}
-					},
-					{
-						"name": "CHECK SKIP FLAG",
-						"type": "IfCondition",
-						"dependsOn": [
-							{
-								"activity": "GET SKIP FLAG",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							},
-							{
-								"activity": "GET LOAD ID",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"expression": {
-								"value": "@equals(variables('V_SKIP_PRCS'),'0')",
-								"type": "Expression"
-							},
-							"ifFalseActivities": [
-								{
-									"name": "SKIP PROCESS",
-									"type": "Lookup",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "7.00:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"source": {
-											"type": "SqlServerSource",
-											"sqlReaderQuery": "SELECT 1",
-											"queryTimeout": "02:00:00",
-											"partitionOption": "None"
-										},
-										"dataset": {
-											"referenceName": "mssql_cntl_ds",
-											"type": "DatasetReference",
-											"parameters": {}
-										}
-									}
-								}
-							],
-							"ifTrueActivities": [
-								{
-									"name": "RUN_PCS_COMMON_VALIDATE",
-									"type": "ExecutePipeline",
-									"dependsOn": [],
-									"userProperties": [],
-									"typeProperties": {
-										"pipeline": {
-											"referenceName": "30_PCS_COMMON_VALIDATE",
-											"type": "PipelineReference"
-										},
-										"waitOnCompletion": true,
-										"parameters": {
-											"P_PRCS_NM": {
-												"value": "@pipeline().parameters.P_PRCS_NM",
-												"type": "Expression"
-											},
-											"P_RUN_MODE": {
-												"value": "@pipeline().parameters.P_RUN_MODE",
-												"type": "Expression"
-											},
-											"P_LD_ID": {
-												"value": "@variables('V_LD_ID')",
-												"type": "Expression"
-											}
-										}
-									}
-								}
-							]
-						}
-					},
-					{
-						"name": "GET LOAD ID",
-						"type": "SetVariable",
-						"dependsOn": [
-							{
-								"activity": "START PROCESS",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"variableName": "V_LD_ID",
-							"value": {
-								"value": "@activity('START PROCESS').output.FIRSTROW.LD_ID",
-								"type": "Expression"
-							}
-						}
-					}
-				],
-				"parameters": {
-					"P_PRCS_NM": {
-						"type": "string",
-						"defaultValue": "SINGHAARM_SINGHAARM_AGENT"
-					},
-					"P_RUN_MODE": {
-						"type": "string",
-						"defaultValue": "R"
-					},
-					"P_STREM_ID": {
-						"type": "string",
-						"defaultValue": "-999"
-					}
-				},
-				"variables": {
-					"V_SKIP_PRCS": {
-						"type": "String",
-						"defaultValue": "999"
-					},
-					"V_LD_ID": {
-						"type": "String",
-						"defaultValue": "999"
-					}
-				},
-				"folder": {
-					"name": "COMMON JOB"
-				},
-				"annotations": [],
-				"lastPublishTime": "2021-02-06T18:14:39Z"
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/mssql_cntl_ds')]",
-				"[concat(variables('factoryId'), '/pipelines/30_PCS_COMMON_VALIDATE')]"
-			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/30_PCS_COMMON_VALIDATE')]",
@@ -6523,7 +7219,7 @@
 							"source": {
 								"type": "SqlServerSource",
 								"sqlReaderStoredProcedureName": {
-									"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA,'.PROC_GET_PRCS')",
+									"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA, '.[PROC_GET_PRCS]')",
 									"type": "Expression"
 								},
 								"storedProcedureParameters": {
@@ -6643,7 +7339,7 @@
 							"source": {
 								"type": "SqlServerSource",
 								"sqlReaderStoredProcedureName": {
-									"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA,'.PROC_CHK_LTST_PRCS')",
+									"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA, '.[PROC_CHK_LTST_PRCS]')",
 									"type": "Expression"
 								},
 								"storedProcedureParameters": {
@@ -6702,14 +7398,14 @@
 							"source": {
 								"type": "SqlServerSource",
 								"sqlReaderStoredProcedureName": {
-									"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA,'.PROC_CHK_DPND_PRCS')",
+									"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA, '.[PROC_CHK_DPND_PRCS]')",
 									"type": "Expression"
 								},
 								"storedProcedureParameters": {
-									"P_ASAT_DT": {
+									"P_DATA_DT": {
 										"type": "String",
 										"value": {
-											"value": "@activity('GET PROCESS INFORMATION').output.firstrow.ASAT_DT",
+											"value": "@activity('GET PROCESS INFORMATION').output.firstrow.DATA_DT",
 											"type": "Expression"
 										}
 									},
@@ -6759,7 +7455,7 @@
 						"userProperties": [],
 						"typeProperties": {
 							"storedProcedureName": {
-								"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA,'.PROC_UPDT_PRCS')",
+								"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA, '.[PROC_UPDT_PRCS]')",
 								"type": "Expression"
 							},
 							"storedProcedureParameters": {
@@ -6829,7 +7525,7 @@
 						"userProperties": [],
 						"typeProperties": {
 							"storedProcedureName": {
-								"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA,'.PROC_UPDT_PRCS')",
+								"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA, '.[PROC_UPDT_PRCS]')",
 								"type": "Expression"
 							},
 							"storedProcedureParameters": {
@@ -6899,7 +7595,7 @@
 						"userProperties": [],
 						"typeProperties": {
 							"storedProcedureName": {
-								"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA,'.PROC_UPDT_PRCS')",
+								"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA, '.[PROC_UPDT_PRCS]')",
 								"type": "Expression"
 							},
 							"storedProcedureParameters": {
@@ -6971,7 +7667,7 @@
 							"source": {
 								"type": "SqlServerSource",
 								"sqlReaderStoredProcedureName": {
-									"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA,'.PROC_CHK_RCNCL')",
+									"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA, '.[PROC_CHK_RCNCL]')",
 									"type": "Expression"
 								},
 								"storedProcedureParameters": {
@@ -7069,7 +7765,7 @@
 						"userProperties": [],
 						"typeProperties": {
 							"storedProcedureName": {
-								"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA,'.PROC_UPDT_PRCS')",
+								"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA, '.[PROC_UPDT_PRCS]')",
 								"type": "Expression"
 							},
 							"storedProcedureParameters": {
@@ -7140,7 +7836,7 @@
 						"userProperties": [],
 						"typeProperties": {
 							"storedProcedureName": {
-								"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA,'.PROC_UPDT_PRCS')",
+								"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA, '.[PROC_UPDT_PRCS]')",
 								"type": "Expression"
 							},
 							"storedProcedureParameters": {
@@ -7213,7 +7909,7 @@
 						"userProperties": [],
 						"typeProperties": {
 							"storedProcedureName": {
-								"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA,'.PROC_UPDT_PRCS')",
+								"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA, '.[PROC_UPDT_PRCS]')",
 								"type": "Expression"
 							},
 							"storedProcedureParameters": {
@@ -7285,7 +7981,7 @@
 									"value": "1",
 									"activities": [
 										{
-											"name": "40_PCS_COMMON_TYPE1",
+											"name": "Execute Pipeline Type 1",
 											"type": "ExecutePipeline",
 											"dependsOn": [],
 											"userProperties": [],
@@ -7317,7 +8013,7 @@
 									"value": "2",
 									"activities": [
 										{
-											"name": "PCS_COMMON_TYPE2",
+											"name": "Execute Pipeline Type 2",
 											"type": "ExecutePipeline",
 											"dependsOn": [],
 											"userProperties": [],
@@ -7349,7 +8045,7 @@
 									"value": "3",
 									"activities": [
 										{
-											"name": "40_PCS_COMMON_TYPE3",
+											"name": "Execute Pipeline Type 3",
 											"type": "ExecutePipeline",
 											"dependsOn": [],
 											"userProperties": [],
@@ -7381,7 +8077,7 @@
 									"value": "4",
 									"activities": [
 										{
-											"name": "40_PCS_COMMON_TYPE4",
+											"name": "Execute Pipeline Type 4",
 											"type": "ExecutePipeline",
 											"dependsOn": [],
 											"userProperties": [],
@@ -7413,7 +8109,7 @@
 									"value": "5",
 									"activities": [
 										{
-											"name": "40_PCS_COMMON_TYPE5",
+											"name": "Execute Pipeline Type 5",
 											"type": "ExecutePipeline",
 											"dependsOn": [],
 											"userProperties": [],
@@ -7442,10 +8138,42 @@
 									]
 								},
 								{
+									"value": "6",
+									"activities": [
+										{
+											"name": "Execute Pipeline Type 6",
+											"type": "ExecutePipeline",
+											"dependsOn": [],
+											"userProperties": [],
+											"typeProperties": {
+												"pipeline": {
+													"referenceName": "40_PCS_COMMON_TYPE6",
+													"type": "PipelineReference"
+												},
+												"waitOnCompletion": true,
+												"parameters": {
+													"P_LD_ID": {
+														"value": "@pipeline().parameters.P_LD_ID",
+														"type": "Expression"
+													},
+													"P_PRCS_NM": {
+														"value": "@pipeline().parameters.P_PRCS_NM",
+														"type": "Expression"
+													},
+													"P_PRCS_OBJ": {
+														"value": "@activity('GET PROCESS INFORMATION').output.FIRSTROW",
+														"type": "Expression"
+													}
+												}
+											}
+										}
+									]
+								},
+								{
 									"value": "7",
 									"activities": [
 										{
-											"name": "Execute Pipeline1",
+											"name": "Execute Pipeline Type 7",
 											"type": "ExecutePipeline",
 											"dependsOn": [],
 											"userProperties": [],
@@ -7495,7 +8223,7 @@
 					"name": "COMMON JOB"
 				},
 				"annotations": [],
-				"lastPublishTime": "2021-02-08T04:06:30Z"
+				"lastPublishTime": "2021-02-24T06:46:04Z"
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/mssql_cntl_ds')]",
@@ -7505,192 +8233,8 @@
 				"[concat(variables('factoryId'), '/pipelines/40_PCS_COMMON_TYPE3')]",
 				"[concat(variables('factoryId'), '/pipelines/40_PCS_COMMON_TYPE4')]",
 				"[concat(variables('factoryId'), '/pipelines/40_PCS_COMMON_TYPE5')]",
+				"[concat(variables('factoryId'), '/pipelines/40_PCS_COMMON_TYPE6')]",
 				"[concat(variables('factoryId'), '/pipelines/40_PCS_COMMON_TYPE7')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/40_PCS_COMMON_TYPE1')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Azure Function1",
-						"type": "AzureFunctionActivity",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"functionName": {
-								"value": "@pipeline().parameters.P_PRCS_OBJ.FUNC_NM",
-								"type": "Expression"
-							},
-							"method": "POST",
-							"headers": {},
-							"body": {
-								"value": "@pipeline().parameters.P_PRCS_OBJ.FUNC_PARM",
-								"type": "Expression"
-							}
-						},
-						"linkedServiceName": {
-							"referenceName": "link_func_edp",
-							"type": "LinkedServiceReference"
-						}
-					},
-					{
-						"name": "EDW UPDATE COUNT TARGET",
-						"type": "SqlServerStoredProcedure",
-						"dependsOn": [
-							{
-								"activity": "Azure Function1",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"storedProcedureName": {
-								"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA,'.PROC_UPDT_PRCS')",
-								"type": "Expression"
-							},
-							"storedProcedureParameters": {
-								"P_CNT_FI_SRC": {
-									"value": {
-										"value": "@activity('Azure Function1').output.NumberOfFiles",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"P_CNT_FI_TGT": {
-									"value": {
-										"value": "@activity('Azure Function1').output.NumberOfFiles",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"P_CNT_REC_SRC": {
-									"value": null,
-									"type": "String"
-								},
-								"P_CNT_REC_TGT": {
-									"value": null,
-									"type": "String"
-								},
-								"P_LD_ID": {
-									"value": {
-										"value": "@pipeline().parameters.P_LD_ID",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"P_PRCS_NM": {
-									"value": {
-										"value": "@pipeline().parameters.P_PRCS_NM",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"P_RMRK": {
-									"value": "",
-									"type": "String"
-								},
-								"P_ST": {
-									"value": "RUNNING",
-									"type": "String"
-								}
-							}
-						},
-						"linkedServiceName": {
-							"referenceName": "link_sqldb_kkpb_edp",
-							"type": "LinkedServiceReference"
-						}
-					},
-					{
-						"name": "If Condition1",
-						"type": "IfCondition",
-						"dependsOn": [
-							{
-								"activity": "EDW UPDATE COUNT TARGET",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"expression": {
-								"value": "@not(equals(pipeline().parameters.P_PRCS_OBJ.ADB_NM,null))",
-								"type": "Expression"
-							},
-							"ifTrueActivities": [
-								{
-									"name": "Notebook1",
-									"type": "DatabricksNotebook",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "7.00:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"notebookPath": {
-											"value": "@pipeline().parameters.P_PRCS_OBJ.ADB_NM",
-											"type": "Expression"
-										},
-										"baseParameters": {
-											"PARAMS": {
-												"value": "@pipeline().parameters.P_PRCS_OBJ.ADB_PARM",
-												"type": "Expression"
-											}
-										}
-									},
-									"linkedServiceName": {
-										"referenceName": "link_dbw_edp",
-										"type": "LinkedServiceReference"
-									}
-								}
-							]
-						}
-					}
-				],
-				"parameters": {
-					"P_LD_ID": {
-						"type": "string"
-					},
-					"P_PRCS_NM": {
-						"type": "string"
-					},
-					"P_PRCS_OBJ": {
-						"type": "object"
-					}
-				},
-				"folder": {
-					"name": "COMMON JOB"
-				},
-				"annotations": [],
-				"lastPublishTime": "2021-02-06T18:23:27Z"
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/link_func_edp')]",
-				"[concat(variables('factoryId'), '/linkedServices/link_sqldb_kkpb_edp')]",
-				"[concat(variables('factoryId'), '/linkedServices/link_dbw_edp')]"
 			]
 		},
 		{
@@ -7698,6 +8242,7 @@
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
+				"description": "Load text data from On-prim to STG",
 				"activities": [
 					{
 						"name": "Copy Raw",
@@ -7732,18 +8277,18 @@
 							"sink": {
 								"type": "BinarySink",
 								"storeSettings": {
-									"type": "AzureBlobFSWriteSettings"
+									"type": "AzureBlobStorageWriteSettings"
 								}
 							},
 							"enableStaging": false
 						},
 						"inputs": [
 							{
-								"referenceName": "bin_onprim_ds",
+								"referenceName": "onprim_bin_ds",
 								"type": "DatasetReference",
 								"parameters": {
 									"P_PATH": {
-										"value": "@concat(pipeline().parameters.P_PRCS_OBJ.PTH, '/', pipeline().parameters.P_PRCS_OBJ.CALC_ASAT_DT)",
+										"value": "@concat(pipeline().parameters.P_PRCS_OBJ.PTH, '/', pipeline().parameters.P_PRCS_OBJ.CALC_DATA_DT)",
 										"type": "Expression"
 									},
 									"P_FILENAME": {
@@ -7755,7 +8300,7 @@
 						],
 						"outputs": [
 							{
-								"referenceName": "bin_blob_ds",
+								"referenceName": "dl_bin_ds",
 								"type": "DatasetReference",
 								"parameters": {
 									"P_CONTAINER": {
@@ -7763,7 +8308,7 @@
 										"type": "Expression"
 									},
 									"P_PATH": {
-										"value": "@concat(pipeline().parameters.P_PRCS_OBJ.PTH, '/', pipeline().parameters.P_PRCS_OBJ.CALC_ASAT_DT)",
+										"value": "@concat(pipeline().parameters.P_PRCS_OBJ.PTH, '/',pipeline().parameters.P_PRCS_OBJ.CALC_DATA_DT)",
 										"type": "Expression"
 									},
 									"P_FILENAME": {
@@ -7790,14 +8335,14 @@
 							"source": {
 								"type": "SqlServerSource",
 								"sqlReaderStoredProcedureName": {
-									"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA,'.PROC_GET_FI')",
+									"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA, '.[PROC_GET_FI]')",
 									"type": "Expression"
 								},
 								"storedProcedureParameters": {
-									"P_ASAT_DT": {
+									"P_DATA_DT": {
 										"type": "String",
 										"value": {
-											"value": "@pipeline().parameters.P_PRCS_OBJ.CALC_ASAT_DT",
+											"value": "@pipeline().parameters.P_PRCS_OBJ.CALC_DATA_DT",
 											"type": "Expression"
 										}
 									},
@@ -7839,14 +8384,14 @@
 						],
 						"policy": {
 							"timeout": "7.00:00:00",
-							"retry": 0,
+							"retry": 1,
 							"retryIntervalInSeconds": 30,
 							"secureOutput": false,
 							"secureInput": false
 						},
 						"userProperties": [],
 						"typeProperties": {
-							"notebookPath": "/DEV/00_Common/edp/adf/dbn-adf-pre-check",
+							"notebookPath": "/00_Common/edp/adf/dbn-adf-pre-check",
 							"baseParameters": {
 								"PARAMS": {
 									"value": "@activity('Lookup1').output.firstrow.PARM",
@@ -7917,7 +8462,7 @@
 								"type": "DatasetReference",
 								"parameters": {
 									"P_PATH": {
-										"value": "@concat(pipeline().parameters.P_PRCS_OBJ.PTH,'/',pipeline().parameters.P_PRCS_OBJ.CALC_ASAT_DT)",
+										"value": "@concat(pipeline().parameters.P_PRCS_OBJ.PTH,'/',pipeline().parameters.P_PRCS_OBJ.CALC_DATA_DT)",
 										"type": "Expression"
 									},
 									"P_FILENAME": {
@@ -7953,7 +8498,7 @@
 										"type": "Expression"
 									},
 									"P_PATH": {
-										"value": "@concat(pipeline().parameters.P_PRCS_OBJ.TGT_PTH, '/ASAT_DT=', pipeline().parameters.P_PRCS_OBJ.CALC_ASAT_DT)",
+										"value": "@concat(pipeline().parameters.P_PRCS_OBJ.TGT_PTH, '/DATA_DT=', pipeline().parameters.P_PRCS_OBJ.CALC_DATA_DT)",
 										"type": "Expression"
 									},
 									"P_FILENAME": {
@@ -7985,7 +8530,7 @@
 						"userProperties": [],
 						"typeProperties": {
 							"storedProcedureName": {
-								"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA,'.PROC_UPDT_PRCS')",
+								"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA, '.[PROC_UPDT_PRCS]')",
 								"type": "Expression"
 							},
 							"storedProcedureParameters": {
@@ -8101,11 +8646,11 @@
 					"name": "COMMON JOB"
 				},
 				"annotations": [],
-				"lastPublishTime": "2021-02-06T18:31:07Z"
+				"lastPublishTime": "2021-02-24T06:46:02Z"
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/bin_onprim_ds')]",
-				"[concat(variables('factoryId'), '/datasets/bin_blob_ds')]",
+				"[concat(variables('factoryId'), '/datasets/onprim_bin_ds')]",
+				"[concat(variables('factoryId'), '/datasets/dl_bin_ds')]",
 				"[concat(variables('factoryId'), '/datasets/mssql_cntl_ds')]",
 				"[concat(variables('factoryId'), '/linkedServices/link_dbw_edp')]",
 				"[concat(variables('factoryId'), '/datasets/dl_csv_ds')]",
@@ -8119,6 +8664,7 @@
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
+				"description": "Copy binary on-prim to STG",
 				"activities": [
 					{
 						"name": "Notebook1",
@@ -8133,7 +8679,7 @@
 						],
 						"policy": {
 							"timeout": "7.00:00:00",
-							"retry": 0,
+							"retry": 1,
 							"retryIntervalInSeconds": 30,
 							"secureOutput": false,
 							"secureInput": false
@@ -8189,18 +8735,18 @@
 							"sink": {
 								"type": "BinarySink",
 								"storeSettings": {
-									"type": "AzureBlobFSWriteSettings"
+									"type": "AzureBlobStorageWriteSettings"
 								}
 							},
 							"enableStaging": false
 						},
 						"inputs": [
 							{
-								"referenceName": "bin_onprim_ds",
+								"referenceName": "onprim_bin_ds",
 								"type": "DatasetReference",
 								"parameters": {
 									"P_PATH": {
-										"value": "@concat(pipeline().parameters.P_PRCS_OBJ.PTH, '/', pipeline().parameters.P_PRCS_OBJ.CALC_ASAT_DT)",
+										"value": "@concat(pipeline().parameters.P_PRCS_OBJ.PTH, '/', pipeline().parameters.P_PRCS_OBJ.CALC_DATA_DT)",
 										"type": "Expression"
 									},
 									"P_FILENAME": {
@@ -8212,7 +8758,7 @@
 						],
 						"outputs": [
 							{
-								"referenceName": "bin_blob_ds",
+								"referenceName": "dl_bin_ds",
 								"type": "DatasetReference",
 								"parameters": {
 									"P_CONTAINER": {
@@ -8220,7 +8766,7 @@
 										"type": "Expression"
 									},
 									"P_PATH": {
-										"value": "@concat(pipeline().parameters.P_PRCS_OBJ.PTH, '/', pipeline().parameters.P_PRCS_OBJ.CALC_ASAT_DT)",
+										"value": "@concat(pipeline().parameters.P_PRCS_OBJ.PTH, '/',pipeline().parameters.P_PRCS_OBJ.CALC_DATA_DT)",
 										"type": "Expression"
 									},
 									"P_FILENAME": {
@@ -8247,14 +8793,14 @@
 							"source": {
 								"type": "SqlServerSource",
 								"sqlReaderStoredProcedureName": {
-									"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA,'.PROC_GET_FI')",
+									"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA, '.[PROC_GET_FI]')",
 									"type": "Expression"
 								},
 								"storedProcedureParameters": {
-									"P_ASAT_DT": {
+									"P_DATA_DT": {
 										"type": "String",
 										"value": {
-											"value": "@pipeline().parameters.P_PRCS_OBJ.CALC_ASAT_DT",
+											"value": "@pipeline().parameters.P_PRCS_OBJ.CALC_DATA_DT",
 											"type": "Expression"
 										}
 									},
@@ -8299,12 +8845,12 @@
 					"name": "COMMON JOB"
 				},
 				"annotations": [],
-				"lastPublishTime": "2021-02-06T18:36:03Z"
+				"lastPublishTime": "2021-02-24T06:46:02Z"
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/link_dbw_edp')]",
-				"[concat(variables('factoryId'), '/datasets/bin_onprim_ds')]",
-				"[concat(variables('factoryId'), '/datasets/bin_blob_ds')]",
+				"[concat(variables('factoryId'), '/datasets/onprim_bin_ds')]",
+				"[concat(variables('factoryId'), '/datasets/dl_bin_ds')]",
 				"[concat(variables('factoryId'), '/datasets/mssql_cntl_ds')]"
 			]
 		},
@@ -8313,10 +8859,47 @@
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
+				"description": "Copy binary sharepoints to STG",
 				"activities": [
 					{
-						"name": "EDW UPDATE COUNT TARGET",
-						"type": "SqlServerStoredProcedure",
+						"name": "Notebook1",
+						"type": "DatabricksNotebook",
+						"dependsOn": [
+							{
+								"activity": "Copy Raw",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 1,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": {
+								"value": "@pipeline().parameters.P_PRCS_OBJ.ADB_NM",
+								"type": "Expression"
+							},
+							"baseParameters": {
+								"PARAMS": {
+									"value": "@pipeline().parameters.P_PRCS_OBJ.ADB_PARM",
+									"type": "Expression"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "link_dbw_edp",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Lookup1",
+						"type": "Lookup",
 						"dependsOn": [],
 						"policy": {
 							"timeout": "7.00:00:00",
@@ -8327,87 +8910,55 @@
 						},
 						"userProperties": [],
 						"typeProperties": {
-							"storedProcedureName": {
-								"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA,'.COMMOM_SNAPSHOT_PROCESS')",
-								"type": "Expression"
+							"source": {
+								"type": "SqlServerSource",
+								"sqlReaderStoredProcedureName": {
+									"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA, '.[PROC_GET_FI]')",
+									"type": "Expression"
+								},
+								"storedProcedureParameters": {
+									"P_DATA_DT": {
+										"type": "String",
+										"value": {
+											"value": "@pipeline().parameters.P_PRCS_OBJ.CALC_DATA_DT",
+											"type": "Expression"
+										}
+									},
+									"P_FI_ID": {
+										"type": "Int32",
+										"value": {
+											"value": "@pipeline().parameters.P_PRCS_OBJ.FI_ID",
+											"type": "Expression"
+										}
+									},
+									"P_PRCS_NM": {
+										"type": "String",
+										"value": {
+											"value": "@pipeline().parameters.P_PRCS_NM",
+											"type": "Expression"
+										}
+									}
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
 							},
-							"storedProcedureParameters": {
-								"P_AS_AT_DT": {
-									"value": {
-										"value": "@pipeline().parameters.P_PRCS_OBJ.asat_dt",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"P_PCS_ID": {
-									"value": {
-										"value": "@pipeline().parameters.P_PRCS_OBJ.pcs_id",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"P_PCS_NM": {
-									"value": {
-										"value": "@pipeline().parameters.P_PRCS_NM",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"P_TABLE_NM": {
-									"value": {
-										"value": "@pipeline().parameters.P_PRCS_OBJ.table_name",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"P_TXN_V_NM": {
-									"value": {
-										"value": "@pipeline().parameters.P_PRCS_OBJ.view_name",
-										"type": "Expression"
-									},
-									"type": "String"
-								}
+							"dataset": {
+								"referenceName": "mssql_cntl_ds",
+								"type": "DatasetReference",
+								"parameters": {}
 							}
-						},
-						"linkedServiceName": {
-							"referenceName": "link_syn_kkpb_edp",
-							"type": "LinkedServiceReference"
 						}
-					}
-				],
-				"parameters": {
-					"P_LD_ID": {
-						"type": "string",
-						"defaultValue": "-999"
 					},
-					"P_PRCS_NM": {
-						"type": "string",
-						"defaultValue": "GET_LOCATION_FACE_RECOGNITION_CustGeoInfo"
-					},
-					"P_PRCS_OBJ": {
-						"type": "object"
-					}
-				},
-				"folder": {
-					"name": "COMMON JOB"
-				},
-				"annotations": [],
-				"lastPublishTime": "2021-02-06T18:37:49Z"
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/link_syn_kkpb_edp')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/40_PCS_COMMON_TYPE7')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
 					{
 						"name": "Copy Raw",
 						"type": "Copy",
 						"dependsOn": [
+							{
+								"activity": "GetBearerToken",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
 							{
 								"activity": "Lookup1",
 								"dependencyConditions": [
@@ -8427,8 +8978,13 @@
 							"source": {
 								"type": "BinarySource",
 								"storeSettings": {
-									"type": "FileServerReadSettings",
-									"recursive": true
+									"type": "HttpReadSettings",
+									"requestMethod": "GET",
+									"additionalHeaders": {
+										"value": "@{concat('Authorization: Bearer ', activity('GetBearerToken').output.access_token)}",
+										"type": "Expression"
+									},
+									"requestTimeout": ""
 								},
 								"formatSettings": {
 									"type": "BinaryReadSettings"
@@ -8444,11 +9000,27 @@
 						},
 						"inputs": [
 							{
-								"referenceName": "bin_onprim_ds",
+								"referenceName": "sp_bin_ds",
 								"type": "DatasetReference",
 								"parameters": {
+									"ServerRelativeUrl": {
+										"value": "@concat('/sites/EDPFileCenterUAT/ShareCenter/Landing/', pipeline().parameters.P_PRCS_OBJ.PTH, '/', pipeline().parameters.P_PRCS_OBJ.CALC_DATA_DT, '/', activity('Lookup1').output.firstrow.FI_NM)",
+										"type": "Expression"
+									}
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "dl_bin_ds2",
+								"type": "DatasetReference",
+								"parameters": {
+									"P_CONTAINER": {
+										"value": "@pipeline().parameters.P_PRCS_OBJ.CNTNR",
+										"type": "Expression"
+									},
 									"P_PATH": {
-										"value": "@concat(pipeline().parameters.P_PRCS_OBJ.PTH, '/')",
+										"value": "@concat(pipeline().parameters.P_PRCS_OBJ.PTH, '/',pipeline().parameters.P_PRCS_OBJ.CALC_DATA_DT)",
 										"type": "Expression"
 									},
 									"P_FILENAME": {
@@ -8457,10 +9029,345 @@
 									}
 								}
 							}
+						]
+					},
+					{
+						"name": "GetBearerToken",
+						"type": "WebActivity",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"url": {
+								"value": "@pipeline().globalParameters.P_GLBL_BEARER_TOKEN",
+								"type": "Expression"
+							},
+							"method": "POST",
+							"headers": {
+								"Content-Type": "application/x-www-form-urlencoded"
+							},
+							"body": "grant_type=client_credentials&client_id=8578d84d-db28-449a-9c11-a8bae5465c04@9fce0284-1a8c-4368-85b0-571bbad0df08&client_secret=mVbWh~igL5kKkzFVXEg6BLOw86--_G4.cd&resource=00000003-0000-0ff1-ce00-000000000000/kiatnakin365.sharepoint.com@9fce0284-1a8c-4368-85b0-571bbad0df08"
+						}
+					}
+				],
+				"parameters": {
+					"P_LD_ID": {
+						"type": "string"
+					},
+					"P_PRCS_NM": {
+						"type": "string"
+					},
+					"P_PRCS_OBJ": {
+						"type": "object"
+					}
+				},
+				"folder": {
+					"name": "COMMON JOB"
+				},
+				"annotations": [],
+				"lastPublishTime": "2021-02-24T06:46:02Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/link_dbw_edp')]",
+				"[concat(variables('factoryId'), '/datasets/mssql_cntl_ds')]",
+				"[concat(variables('factoryId'), '/datasets/sp_bin_ds')]",
+				"[concat(variables('factoryId'), '/datasets/dl_bin_ds2')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/40_PCS_COMMON_TYPE6')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Copy binary sharepoints by folder to STG",
+				"activities": [
+					{
+						"name": "Notebook1",
+						"type": "DatabricksNotebook",
+						"dependsOn": [
+							{
+								"activity": "ForEach1",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 1,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": {
+								"value": "@pipeline().parameters.P_PRCS_OBJ.ADB_NM",
+								"type": "Expression"
+							},
+							"baseParameters": {
+								"PARAMS": {
+									"value": "@pipeline().parameters.P_PRCS_OBJ.ADB_PARM",
+									"type": "Expression"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "link_dbw_edp",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "GetBearerToken",
+						"type": "WebActivity",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"url": {
+								"value": "@pipeline().globalParameters.P_GLBL_BEARER_TOKEN",
+								"type": "Expression"
+							},
+							"method": "POST",
+							"headers": {
+								"Content-Type": "application/x-www-form-urlencoded"
+							},
+							"body": "grant_type=client_credentials&client_id=8578d84d-db28-449a-9c11-a8bae5465c04@9fce0284-1a8c-4368-85b0-571bbad0df08&client_secret=mVbWh~igL5kKkzFVXEg6BLOw86--_G4.cd&resource=00000003-0000-0ff1-ce00-000000000000/kiatnakin365.sharepoint.com@9fce0284-1a8c-4368-85b0-571bbad0df08"
+						}
+					},
+					{
+						"name": "List file in path",
+						"type": "WebActivity",
+						"dependsOn": [
+							{
+								"activity": "GetBearerToken",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"url": {
+								"value": "@concat('https://kiatnakin365.sharepoint.com/sites/EDPFileCenterUAT/_api/web/GetFolderByServerRelativeUrl(''ShareCenter/Landing/', pipeline().parameters.P_PRCS_OBJ.PTH, '/', pipeline().parameters.P_PRCS_OBJ.CALC_DATA_DT, ''')/Files')",
+								"type": "Expression"
+							},
+							"method": "GET",
+							"headers": {
+								"Accept": "application/json;odata=verbose",
+								"Authorization": {
+									"value": "@{concat('Bearer ', activity('GetBearerToken').output.access_token)}",
+									"type": "Expression"
+								}
+							}
+						}
+					},
+					{
+						"name": "ForEach1",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "List file in path",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('List file in path').output.d.results",
+								"type": "Expression"
+							},
+							"isSequential": false,
+							"batchCount": 10,
+							"activities": [
+								{
+									"name": "Copy Raw",
+									"type": "Copy",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "BinarySource",
+											"storeSettings": {
+												"type": "HttpReadSettings",
+												"requestMethod": "GET",
+												"additionalHeaders": {
+													"value": "@{concat('Authorization: Bearer ', activity('GetBearerToken').output.access_token)}",
+													"type": "Expression"
+												},
+												"requestTimeout": ""
+											},
+											"formatSettings": {
+												"type": "BinaryReadSettings"
+											}
+										},
+										"sink": {
+											"type": "BinarySink",
+											"storeSettings": {
+												"type": "AzureBlobFSWriteSettings"
+											}
+										},
+										"enableStaging": false
+									},
+									"inputs": [
+										{
+											"referenceName": "sp_bin_ds",
+											"type": "DatasetReference",
+											"parameters": {
+												"ServerRelativeUrl": {
+													"value": "@item().ServerRelativeUrl",
+													"type": "Expression"
+												}
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "dl_bin_ds2",
+											"type": "DatasetReference",
+											"parameters": {
+												"P_CONTAINER": {
+													"value": "@pipeline().parameters.P_PRCS_OBJ.CNTNR",
+													"type": "Expression"
+												},
+												"P_PATH": {
+													"value": "@concat(pipeline().parameters.P_PRCS_OBJ.PTH, '/',pipeline().parameters.P_PRCS_OBJ.CALC_DATA_DT)",
+													"type": "Expression"
+												},
+												"P_FILENAME": {
+													"value": "@item().Name",
+													"type": "Expression"
+												}
+											}
+										}
+									]
+								}
+							]
+						}
+					}
+				],
+				"parameters": {
+					"P_LD_ID": {
+						"type": "string"
+					},
+					"P_PRCS_NM": {
+						"type": "string"
+					},
+					"P_PRCS_OBJ": {
+						"type": "object"
+					}
+				},
+				"folder": {
+					"name": "COMMON JOB"
+				},
+				"annotations": [],
+				"lastPublishTime": "2021-02-24T06:23:25Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/link_dbw_edp')]",
+				"[concat(variables('factoryId'), '/datasets/sp_bin_ds')]",
+				"[concat(variables('factoryId'), '/datasets/dl_bin_ds2')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/40_PCS_COMMON_TYPE7')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Copy sharepoints to ref",
+				"activities": [
+					{
+						"name": "Copy Raw",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Lookup1",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "GetBearerToken",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "BinarySource",
+								"storeSettings": {
+									"type": "HttpReadSettings",
+									"requestMethod": "GET",
+									"additionalHeaders": {
+										"value": "@{concat('Authorization: Bearer ', activity('GetBearerToken').output.access_token)}",
+										"type": "Expression"
+									},
+									"requestTimeout": ""
+								},
+								"formatSettings": {
+									"type": "BinaryReadSettings"
+								}
+							},
+							"sink": {
+								"type": "BinarySink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								}
+							},
+							"enableStaging": false
+						},
+						"inputs": [
+							{
+								"referenceName": "sp_bin_ds",
+								"type": "DatasetReference",
+								"parameters": {
+									"ServerRelativeUrl": {
+										"value": "@concat('/sites/EDPFileCenterUAT/ShareCenter/Landing/', pipeline().parameters.P_PRCS_OBJ.PTH, '/', activity('Lookup1').output.firstrow.FI_NM)",
+										"type": "Expression"
+									}
+								}
+							}
 						],
 						"outputs": [
 							{
-								"referenceName": "bin_blob_ds",
+								"referenceName": "dl_bin_ds2",
 								"type": "DatasetReference",
 								"parameters": {
 									"P_CONTAINER": {
@@ -8468,7 +9375,7 @@
 										"type": "Expression"
 									},
 									"P_PATH": {
-										"value": "@concat(pipeline().parameters.P_PRCS_OBJ.PTH, '/', pipeline().parameters.P_PRCS_OBJ.CALC_ASAT_DT)",
+										"value": "@concat(pipeline().parameters.P_PRCS_OBJ.PTH, '/')",
 										"type": "Expression"
 									},
 									"P_FILENAME": {
@@ -8495,14 +9402,14 @@
 							"source": {
 								"type": "SqlServerSource",
 								"sqlReaderStoredProcedureName": {
-									"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA,'.PROC_GET_FI')",
+									"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA, '.[PROC_GET_FI]')",
 									"type": "Expression"
 								},
 								"storedProcedureParameters": {
-									"P_ASAT_DT": {
+									"P_DATA_DT": {
 										"type": "String",
 										"value": {
-											"value": "@pipeline().parameters.P_PRCS_OBJ.CALC_ASAT_DT",
+											"value": "@pipeline().parameters.P_PRCS_OBJ.CALC_DATA_DT",
 											"type": "Expression"
 										}
 									},
@@ -8532,44 +9439,11 @@
 						}
 					},
 					{
-						"name": "Check NULL and Duplicated",
-						"type": "DatabricksNotebook",
-						"dependsOn": [
-							{
-								"activity": "Copy Raw",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"notebookPath": "/DEV/00_Common/edp/adf/dbn-adf-pre-check",
-							"baseParameters": {
-								"PARAMS": {
-									"value": "@activity('Lookup1').output.firstrow.PARM",
-									"type": "Expression"
-								}
-							}
-						},
-						"linkedServiceName": {
-							"referenceName": "link_dbw_edp",
-							"type": "LinkedServiceReference"
-						}
-					},
-					{
 						"name": "Copy STG",
 						"type": "Copy",
 						"dependsOn": [
 							{
-								"activity": "Check NULL and Duplicated",
+								"activity": "Copy Raw",
 								"dependencyConditions": [
 									"Succeeded"
 								]
@@ -8622,7 +9496,419 @@
 								"type": "DatasetReference",
 								"parameters": {
 									"P_PATH": {
-										"value": "@concat(pipeline().parameters.P_PRCS_OBJ.PTH,'/',pipeline().parameters.P_PRCS_OBJ.CALC_ASAT_DT)",
+										"value": "@concat(pipeline().parameters.P_PRCS_OBJ.PTH,'/')",
+										"type": "Expression"
+									},
+									"P_FILENAME": {
+										"value": "@activity('Lookup1').output.firstrow.FI_NM",
+										"type": "Expression"
+									},
+									"P_DELIMITER": {
+										"value": "@activity('Lookup1').output.firstrow.DLM_STRNG",
+										"type": "Expression"
+									},
+									"P_ENCODING": {
+										"value": "@activity('Lookup1').output.firstrow.ENCDNG",
+										"type": "Expression"
+									},
+									"P_FIRSTROW_HDR": {
+										"value": "@activity('Lookup1').output.firstrow.FRST_ROW_HD",
+										"type": "Expression"
+									},
+									"P_CONTAINER": {
+										"value": "@activity('Lookup1').output.firstrow.CNTNR",
+										"type": "Expression"
+									}
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "dl_parquet_ds",
+								"type": "DatasetReference",
+								"parameters": {
+									"P_CONTAINER": {
+										"value": "@pipeline().parameters.P_PRCS_OBJ.TGT_CNTNR",
+										"type": "Expression"
+									},
+									"P_PATH": {
+										"value": "@concat(pipeline().parameters.P_PRCS_OBJ.TGT_PTH)",
+										"type": "Expression"
+									},
+									"P_FILENAME": {
+										"value": "@activity('Lookup1').output.firstrow.FI_NM",
+										"type": "Expression"
+									}
+								}
+							}
+						]
+					},
+					{
+						"name": "Lookup Schema",
+						"type": "Lookup",
+						"dependsOn": [
+							{
+								"activity": "Lookup1",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "JsonSource",
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"recursive": true,
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "JsonReadSettings"
+								}
+							},
+							"dataset": {
+								"referenceName": "dl_json_ds",
+								"type": "DatasetReference",
+								"parameters": {
+									"P_FILENAME": {
+										"value": "@activity('Lookup1').output.firstrow.SCHM_FI",
+										"type": "Expression"
+									}
+								}
+							}
+						}
+					},
+					{
+						"name": "Update Log Count",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "Copy STG",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": {
+								"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA, '.[PROC_UPDT_PRCS]')",
+								"type": "Expression"
+							},
+							"storedProcedureParameters": {
+								"P_CNT_FI_SRC": {
+									"value": null,
+									"type": "String"
+								},
+								"P_CNT_FI_TGT": {
+									"value": null,
+									"type": "String"
+								},
+								"P_CNT_REC_SRC": {
+									"value": {
+										"value": "@activity('Copy STG').output.rowsRead",
+										"type": "Expression"
+									},
+									"type": "String"
+								},
+								"P_CNT_REC_TGT": {
+									"value": {
+										"value": "@activity('Copy STG').output.rowsCopied",
+										"type": "Expression"
+									},
+									"type": "String"
+								},
+								"P_LD_ID": {
+									"value": {
+										"value": "@pipeline().parameters.P_LD_ID",
+										"type": "Expression"
+									},
+									"type": "String"
+								},
+								"P_PRCS_NM": {
+									"value": {
+										"value": "@pipeline().parameters.P_PRCS_NM",
+										"type": "Expression"
+									},
+									"type": "String"
+								},
+								"P_RMRK": {
+									"value": "Complete Copy to Staging",
+									"type": "String"
+								},
+								"P_ST": {
+									"value": "Running",
+									"type": "String"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "link_sqldb_kkpb_edp",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "GetBearerToken",
+						"type": "WebActivity",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"url": {
+								"value": "@pipeline().globalParameters.P_GLBL_BEARER_TOKEN",
+								"type": "Expression"
+							},
+							"method": "POST",
+							"headers": {
+								"Content-Type": "application/x-www-form-urlencoded"
+							},
+							"body": "grant_type=client_credentials&client_id=8578d84d-db28-449a-9c11-a8bae5465c04@9fce0284-1a8c-4368-85b0-571bbad0df08&client_secret=mVbWh~igL5kKkzFVXEg6BLOw86--_G4.cd&resource=00000003-0000-0ff1-ce00-000000000000/kiatnakin365.sharepoint.com@9fce0284-1a8c-4368-85b0-571bbad0df08"
+						}
+					}
+				],
+				"parameters": {
+					"P_LD_ID": {
+						"type": "string",
+						"defaultValue": "-999"
+					},
+					"P_PRCS_NM": {
+						"type": "string",
+						"defaultValue": "GET_LOCATION_FACE_RECOGNITION_CustGeoInfo"
+					},
+					"P_PRCS_OBJ": {
+						"type": "object"
+					}
+				},
+				"folder": {
+					"name": "COMMON JOB"
+				},
+				"annotations": [],
+				"lastPublishTime": "2021-02-24T06:50:32Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/sp_bin_ds')]",
+				"[concat(variables('factoryId'), '/datasets/dl_bin_ds2')]",
+				"[concat(variables('factoryId'), '/datasets/mssql_cntl_ds')]",
+				"[concat(variables('factoryId'), '/datasets/dl_csv_ds')]",
+				"[concat(variables('factoryId'), '/datasets/dl_parquet_ds')]",
+				"[concat(variables('factoryId'), '/datasets/dl_json_ds')]",
+				"[concat(variables('factoryId'), '/linkedServices/link_sqldb_kkpb_edp')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/40_PCS_COMMON_TYPE8')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Reference file from On-prim",
+				"activities": [
+					{
+						"name": "Copy Raw",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Lookup1",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "BinarySource",
+								"storeSettings": {
+									"type": "FileServerReadSettings",
+									"recursive": true
+								},
+								"formatSettings": {
+									"type": "BinaryReadSettings"
+								}
+							},
+							"sink": {
+								"type": "BinarySink",
+								"storeSettings": {
+									"type": "AzureBlobStorageWriteSettings"
+								}
+							},
+							"enableStaging": false
+						},
+						"inputs": [
+							{
+								"referenceName": "onprim_bin_ds",
+								"type": "DatasetReference",
+								"parameters": {
+									"P_PATH": {
+										"value": "@concat(pipeline().parameters.P_PRCS_OBJ.PTH, '/')",
+										"type": "Expression"
+									},
+									"P_FILENAME": {
+										"value": "@activity('Lookup1').output.firstrow.FI_NM",
+										"type": "Expression"
+									}
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "dl_bin_ds",
+								"type": "DatasetReference",
+								"parameters": {
+									"P_CONTAINER": {
+										"value": "@pipeline().parameters.P_PRCS_OBJ.CNTNR",
+										"type": "Expression"
+									},
+									"P_PATH": {
+										"value": "@concat(pipeline().parameters.P_PRCS_OBJ.PTH, '/')",
+										"type": "Expression"
+									},
+									"P_FILENAME": {
+										"value": "@activity('Lookup1').output.firstrow.FI_NM",
+										"type": "Expression"
+									}
+								}
+							}
+						]
+					},
+					{
+						"name": "Lookup1",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "SqlServerSource",
+								"sqlReaderStoredProcedureName": {
+									"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA, '.[PROC_GET_FI]')",
+									"type": "Expression"
+								},
+								"storedProcedureParameters": {
+									"P_DATA_DT": {
+										"type": "String",
+										"value": {
+											"value": "@pipeline().parameters.P_PRCS_OBJ.CALC_DATA_DT",
+											"type": "Expression"
+										}
+									},
+									"P_FI_ID": {
+										"type": "Int32",
+										"value": {
+											"value": "@pipeline().parameters.P_PRCS_OBJ.FI_ID",
+											"type": "Expression"
+										}
+									},
+									"P_PRCS_NM": {
+										"type": "String",
+										"value": {
+											"value": "@pipeline().parameters.P_PRCS_NM",
+											"type": "Expression"
+										}
+									}
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "mssql_cntl_ds",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						}
+					},
+					{
+						"name": "Copy STG",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Lookup Schema",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "Copy Raw",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "DelimitedTextSource",
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"recursive": true,
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "DelimitedTextReadSettings"
+								}
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"value": "@activity('Lookup Schema').output",
+								"type": "Expression"
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "dl_csv_ds",
+								"type": "DatasetReference",
+								"parameters": {
+									"P_PATH": {
+										"value": "@concat(pipeline().parameters.P_PRCS_OBJ.PTH,'/')",
 										"type": "Expression"
 									},
 									"P_FILENAME": {
@@ -8690,7 +9976,7 @@
 						"userProperties": [],
 						"typeProperties": {
 							"storedProcedureName": {
-								"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA,'.PROC_UPDT_PRCS')",
+								"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA, '.[PROC_UPDT_PRCS]')",
 								"type": "Expression"
 							},
 							"storedProcedureParameters": {
@@ -8806,13 +10092,12 @@
 					"name": "COMMON JOB"
 				},
 				"annotations": [],
-				"lastPublishTime": "2021-02-06T18:31:07Z"
+				"lastPublishTime": "2021-02-24T06:25:52Z"
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/bin_onprim_ds')]",
-				"[concat(variables('factoryId'), '/datasets/bin_blob_ds')]",
+				"[concat(variables('factoryId'), '/datasets/onprim_bin_ds')]",
+				"[concat(variables('factoryId'), '/datasets/dl_bin_ds')]",
 				"[concat(variables('factoryId'), '/datasets/mssql_cntl_ds')]",
-				"[concat(variables('factoryId'), '/linkedServices/link_dbw_edp')]",
 				"[concat(variables('factoryId'), '/datasets/dl_csv_ds')]",
 				"[concat(variables('factoryId'), '/datasets/dl_parquet_ds')]",
 				"[concat(variables('factoryId'), '/linkedServices/link_sqldb_kkpb_edp')]",

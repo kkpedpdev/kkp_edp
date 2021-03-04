@@ -136,9 +136,6 @@
 					"link_fs_kkpb_dev_edp_password": {
 						"value": "[parameters('link_fs_kkpb_dev_edp_password')]"
 					},
-					"link_sqldb_kkpb_edp_connectionString": {
-						"value": "[parameters('link_sqldb_kkpb_edp_connectionString')]"
-					},
 					"AzureDataLakeStorage1_properties_typeProperties_url": {
 						"value": "[parameters('AzureDataLakeStorage1_properties_typeProperties_url')]"
 					},
@@ -180,6 +177,9 @@
 				"parameters": {
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
+					},
+					"link_sqldb_kkpb_edp_connectionString": {
+						"value": "[parameters('link_sqldb_kkpb_edp_connectionString')]"
 					},
 					"link_st_kkpb_edp_accountKey": {
 						"value": "[parameters('link_st_kkpb_edp_accountKey')]"

@@ -31,10 +31,6 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'link_fs_kkpb_dev_edp'"
 		},
-		"link_sqldb_kkpb_edp_connectionString": {
-			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'link_sqldb_kkpb_edp'"
-		},
 		"AzureDataLakeStorage1_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://stkkpbdevtempedp.dfs.core.windows.net"
@@ -508,6 +504,50 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/dl_bin_ds2')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureDataLakeStorage1",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"P_CONTAINER": {
+						"type": "string"
+					},
+					"P_PATH": {
+						"type": "string"
+					},
+					"P_FILENAME": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": {
+							"value": "@dataset().P_FILENAME",
+							"type": "Expression"
+						},
+						"folderPath": {
+							"value": "@dataset().P_PATH",
+							"type": "Expression"
+						},
+						"fileSystem": {
+							"value": "@dataset().P_CONTAINER",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureDataLakeStorage1')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/dl_bin_ds3')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -648,25 +688,6 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/integrationRuntimes/shir-onprim-kkbp-edp')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/link_sqldb_kkpb_edp')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureSqlDatabase",
-				"typeProperties": {
-					"connectionString": "[parameters('link_sqldb_kkpb_edp_connectionString')]"
-				},
-				"connectVia": {
-					"referenceName": "shir-kkpb-edp",
-					"type": "IntegrationRuntimeReference"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/integrationRuntimes/shir-kkpb-edp')]"
 			]
 		}
 	]

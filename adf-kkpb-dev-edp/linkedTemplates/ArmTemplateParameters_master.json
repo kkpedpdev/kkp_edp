@@ -39,7 +39,7 @@
 			"value": "https://stkkpbdevtempedp.dfs.core.windows.net"
 		},
 		"link_adls_onprim_edp_properties_typeProperties_url": {
-			"value": "https://stkkpbdevtempedp.dfs.core.windows.net/"
+			"value": "https://stkkpbdevtempedp.dfs.core.windows.net"
 		},
 		"link_adls_onprim_kkpb_edp_properties_typeProperties_url": {
 			"value": "https://stkkpbdevtempedp.dfs.core.windows.net/"

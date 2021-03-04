@@ -53,7 +53,7 @@
 		},
 		"link_adls_onprim_edp_properties_typeProperties_url": {
 			"type": "string",
-			"defaultValue": "https://stkkpbdevtempedp.dfs.core.windows.net/"
+			"defaultValue": "https://stkkpbdevtempedp.dfs.core.windows.net"
 		},
 		"link_adls_onprim_kkpb_edp_properties_typeProperties_url": {
 			"type": "string",

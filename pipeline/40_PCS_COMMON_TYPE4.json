@@ -72,7 +72,7 @@
 					"sink": {
 						"type": "BinarySink",
 						"storeSettings": {
-							"type": "AzureBlobStorageWriteSettings"
+							"type": "AzureBlobFSWriteSettings"
 						}
 					},
 					"enableStaging": false
@@ -95,22 +95,8 @@
 				],
 				"outputs": [
 					{
-						"referenceName": "dl_bin_ds",
-						"type": "DatasetReference",
-						"parameters": {
-							"P_CONTAINER": {
-								"value": "@pipeline().parameters.P_PRCS_OBJ.CNTNR",
-								"type": "Expression"
-							},
-							"P_PATH": {
-								"value": "@concat(pipeline().parameters.P_PRCS_OBJ.PTH, '/',pipeline().parameters.P_PRCS_OBJ.CALC_DATA_DT)",
-								"type": "Expression"
-							},
-							"P_FILENAME": {
-								"value": "@activity('Lookup1').output.firstrow.FI_NM",
-								"type": "Expression"
-							}
-						}
+						"referenceName": "bin_blob_ds",
+						"type": "DatasetReference"
 					}
 				]
 			},

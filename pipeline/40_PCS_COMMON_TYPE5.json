@@ -59,10 +59,10 @@
 							"type": "Expression"
 						},
 						"storedProcedureParameters": {
-							"P_ASAT_DT": {
+							"P_DATA_DT": {
 								"type": "String",
 								"value": {
-									"value": "@pipeline().parameters.P_PRCS_OBJ.CALC_ASAT_DT",
+									"value": "@pipeline().parameters.P_PRCS_OBJ.CALC_DATA_DT",
 									"type": "Expression"
 								}
 							},
@@ -145,7 +145,7 @@
 						"type": "DatasetReference",
 						"parameters": {
 							"ServerRelativeUrl": {
-								"value": "@concat('/sites/EDPFileCenterUAT/ShareCenter/Landing/', pipeline().parameters.P_PRCS_OBJ.PTH, '/', pipeline().parameters.P_PRCS_OBJ.CALC_ASAT_DT, '/', activity('Lookup1').output.firstrow.FI_NM)",
+								"value": "@concat('/sites/EDPFileCenterUAT/ShareCenter/Landing/', pipeline().parameters.P_PRCS_OBJ.PTH, '/', pipeline().parameters.P_PRCS_OBJ.CALC_DATA_DT, '/', activity('Lookup1').output.firstrow.FI_NM)",
 								"type": "Expression"
 							}
 						}
@@ -161,7 +161,7 @@
 								"type": "Expression"
 							},
 							"P_PATH": {
-								"value": "@concat(pipeline().parameters.P_PRCS_OBJ.PTH, '/',pipeline().parameters.P_PRCS_OBJ.CALC_ASAT_DT)",
+								"value": "@concat(pipeline().parameters.P_PRCS_OBJ.PTH, '/',pipeline().parameters.P_PRCS_OBJ.CALC_DATA_DT)",
 								"type": "Expression"
 							},
 							"P_FILENAME": {

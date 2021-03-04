@@ -1097,7 +1097,7 @@
 							"sink": {
 								"type": "BinarySink",
 								"storeSettings": {
-									"type": "AzureBlobStorageWriteSettings"
+									"type": "AzureBlobFSWriteSettings"
 								}
 							},
 							"enableStaging": false
@@ -1120,7 +1120,7 @@
 						],
 						"outputs": [
 							{
-								"referenceName": "dl_bin_ds",
+								"referenceName": "bin_blob_ds",
 								"type": "DatasetReference",
 								"parameters": {
 									"P_CONTAINER": {

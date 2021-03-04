@@ -176,10 +176,10 @@
 							"type": "Expression"
 						},
 						"storedProcedureParameters": {
-							"P_ASAT_DT": {
+							"P_DATA_DT": {
 								"type": "String",
 								"value": {
-									"value": "@activity('START STREAM').output.FIRSTROW.ASAT_DT",
+									"value": "@activity('START STREAM').output.FIRSTROW.DATA_DT",
 									"type": "Expression"
 								}
 							},
@@ -239,7 +239,7 @@
 						"Content-Type": "application/json"
 					},
 					"body": {
-						"value": "{\n\"Message\":\"@{activity('STREAM RESULT').output.firstrow.RESULT_SET}\",\n\"EmailTo\":\"@{activity('GET EMAIL').output.firstrow.EMAIL}\",\n\"Asat_dt\":\"@{activity('FINAL STREAM').output.firstrow.ASAT_DT_FORMAT}\",\n\"StreamName\":\"@{pipeline().parameters.P_STREM_NM}\"\n}",
+						"value": "{\n\"Message\":\"@{activity('STREAM RESULT').output.firstrow.RESULT_SET}\",\n\"EmailTo\":\"@{activity('GET EMAIL').output.firstrow.EMAIL}\",\n\"DATA_dt\":\"@{activity('FINAL STREAM').output.firstrow.DATA_DT_FORMAT}\",\n\"StreamName\":\"@{pipeline().parameters.P_STREM_NM}\"\n}",
 						"type": "Expression"
 					}
 				}

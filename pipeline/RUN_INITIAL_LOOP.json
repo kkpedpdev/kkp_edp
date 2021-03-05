@@ -3,14 +3,10 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "Until1",
+				"name": "RUN_LOOP",
 				"type": "Until",
 				"dependsOn": [],
-				"userProperties": [
-					{
-						"name": ""
-					}
-				],
+				"userProperties": [],
 				"typeProperties": {
 					"expression": {
 						"value": "@equals(variables('V_DATA_DT'), '20210331')",

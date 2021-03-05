@@ -5213,7 +5213,7 @@
 								},
 								"P_RMRK": {
 									"value": {
-										"value": "@if(equals(activity('Azure Function1').output.status, '200'),'File not found','')",
+										"value": "@if(equals(activity('Azure Function1').output.statusCode, '200'),'File not found','')",
 										"type": "Expression"
 									},
 									"type": "String"
@@ -8850,6 +8850,110 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/RUN_INITIAL_LOOP')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "RUN_LOOP",
+						"type": "Until",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"expression": {
+								"value": "@equals(variables('V_DATA_DT'), '20210331')",
+								"type": "Expression"
+							},
+							"activities": [
+								{
+									"name": "00_STREAM_COMMON",
+									"type": "ExecutePipeline",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "00_STREAM_COMMON",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {
+											"P_STREM_NM": "EDP_SET",
+											"P_RUN_MODE": "N"
+										}
+									}
+								},
+								{
+									"name": "Lookup1",
+									"type": "Lookup",
+									"dependsOn": [
+										{
+											"activity": "00_STREAM_COMMON",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "AzureSqlSource",
+											"sqlReaderQuery": "select data_dt from CNTL.CNTL_CFG_STREM where STREM_NM = 'EDP_DLT'",
+											"queryTimeout": "02:00:00",
+											"partitionOption": "None"
+										},
+										"dataset": {
+											"referenceName": "mssql_cntl_ds",
+											"type": "DatasetReference",
+											"parameters": {}
+										}
+									}
+								},
+								{
+									"name": "Set variable1",
+									"type": "SetVariable",
+									"dependsOn": [
+										{
+											"activity": "Lookup1",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "V_DATA_DT",
+										"value": {
+											"value": "@activity('Lookup1').output.firstrow.data_dt",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"timeout": "7.00:00:00"
+						}
+					}
+				],
+				"variables": {
+					"V_DATA_DT": {
+						"type": "String"
+					}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/00_STREAM_COMMON')]",
+				"[concat(variables('factoryId'), '/datasets/mssql_cntl_ds')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/TEST SHAREPOINTS')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -10106,110 +10210,6 @@
 				"typeProperties": {}
 			},
 			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/RUN_INITIAL_LOOP')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "RUN_LOOP",
-						"type": "Until",
-						"dependsOn": [],
-						"userProperties": [],
-						"typeProperties": {
-							"expression": {
-								"value": "@equals(variables('V_DATA_DT'), '20210331')",
-								"type": "Expression"
-							},
-							"activities": [
-								{
-									"name": "00_STREAM_COMMON",
-									"type": "ExecutePipeline",
-									"dependsOn": [],
-									"userProperties": [],
-									"typeProperties": {
-										"pipeline": {
-											"referenceName": "00_STREAM_COMMON",
-											"type": "PipelineReference"
-										},
-										"waitOnCompletion": true,
-										"parameters": {
-											"P_STREM_NM": "EDP_SET",
-											"P_RUN_MODE": "N"
-										}
-									}
-								},
-								{
-									"name": "Lookup1",
-									"type": "Lookup",
-									"dependsOn": [
-										{
-											"activity": "00_STREAM_COMMON",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										}
-									],
-									"policy": {
-										"timeout": "7.00:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"source": {
-											"type": "AzureSqlSource",
-											"sqlReaderQuery": "select data_dt from CNTL.CNTL_CFG_STREM where STREM_NM = 'EDP_DLT'",
-											"queryTimeout": "02:00:00",
-											"partitionOption": "None"
-										},
-										"dataset": {
-											"referenceName": "mssql_cntl_ds",
-											"type": "DatasetReference",
-											"parameters": {}
-										}
-									}
-								},
-								{
-									"name": "Set variable1",
-									"type": "SetVariable",
-									"dependsOn": [
-										{
-											"activity": "Lookup1",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										}
-									],
-									"userProperties": [],
-									"typeProperties": {
-										"variableName": "V_DATA_DT",
-										"value": {
-											"value": "@activity('Lookup1').output.firstrow.data_dt",
-											"type": "Expression"
-										}
-									}
-								}
-							],
-							"timeout": "7.00:00:00"
-						}
-					}
-				],
-				"variables": {
-					"V_DATA_DT": {
-						"type": "String"
-					}
-				},
-				"annotations": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/pipelines/00_STREAM_COMMON')]",
-				"[concat(variables('factoryId'), '/datasets/mssql_cntl_ds')]"
-			]
 		}
 	]
 }

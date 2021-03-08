@@ -1103,7 +1103,7 @@
 								"Content-Type": "application/json"
 							},
 							"body": {
-								"value": "{\n\"Message\":\"@{activity('STREAM RESULT').output.firstrow.RESULT_SET}\",\n\"EmailTo\":\"@{activity('GET EMAIL').output.firstrow.EMAIL}\",\n\"DATA_dt\":\"@{activity('FINAL STREAM').output.firstrow.DATA_DT_FORMAT}\",\n\"StreamName\":\"@{pipeline().parameters.P_STREM_NM}\"\n}",
+								"value": "{\n\"Message\":\"@{activity('STREAM RESULT').output.firstrow.RESULT_SET}\",\n\"EmailTo\":\"@{activity('GET EMAIL').output.firstrow.EMAIL}\",\n\"Data_dt\":\"@{activity('FINAL STREAM').output.firstrow.DATA_DT_FORMAT}\",\n\"StreamName\":\"@{pipeline().parameters.P_STREM_NM}\"\n}",
 								"type": "Expression"
 							}
 						}

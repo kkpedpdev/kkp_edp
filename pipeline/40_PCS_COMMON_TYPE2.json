@@ -260,7 +260,7 @@
 								"type": "Expression"
 							},
 							"P_FILENAME": {
-								"value": "@activity('Lookup1').output.firstrow.FI_NM",
+								"value": "@concat(activity('Lookup1').output.firstrow.FI_NM, pipeline().parameters.P_PRCS_OBJ.TGT_TBL)",
 								"type": "Expression"
 							}
 						}

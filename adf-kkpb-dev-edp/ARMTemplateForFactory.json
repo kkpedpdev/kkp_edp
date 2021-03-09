@@ -336,7 +336,7 @@
 						},
 						"userProperties": [],
 						"typeProperties": {
-							"url": "https://prod-05.southeastasia.logic.azure.com:443/workflows/87cb500b80b74094a5bea5f149f3b45a/triggers/manual/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=U4UdfX5WK2SF1bQKwro9Wmujq8RKOiGaTvcvclI17pw",
+							"url": "https://prod-27.southeastasia.logic.azure.com:443/workflows/ae3c11e07db340b39cd14f5b2ed0356a/triggers/manual/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=r1EYZIlJt1ptTTkCekMQHnkWORNI-YGcR5tvGIGDNsg",
 							"method": "POST",
 							"headers": {
 								"Content-Type": "application/json"
@@ -8443,7 +8443,7 @@
 							"source": {
 								"type": "AzureSqlSource",
 								"sqlReaderQuery": {
-									"value": "@concat('SELECT ASAT_DT FROM [CNTL].[CNTL_CFG_STREM] WHERE STREM_NM = ''' , pipeline().parameters.P_STREAM, '''')",
+									"value": "@concat('SELECT DATA_DT FROM [CNTL].[CNTL_CFG_STREM] WHERE STREM_NM = ''' , pipeline().parameters.P_STREAM, '''')",
 									"type": "Expression"
 								},
 								"queryTimeout": "02:00:00",

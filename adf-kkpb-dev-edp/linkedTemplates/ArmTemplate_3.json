@@ -13,6 +13,220 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('factoryName'), '/20_PCS_COMMON_START')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "START PROCESS",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "SqlServerSource",
+								"sqlReaderStoredProcedureName": {
+									"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA, '.[PROC_STRT_PRCS]')",
+									"type": "Expression"
+								},
+								"storedProcedureParameters": {
+									"P_PRCS_NM": {
+										"type": "String",
+										"value": {
+											"value": "@pipeline().parameters.P_PRCS_NM",
+											"type": "Expression"
+										}
+									},
+									"P_RUN_MODE": {
+										"type": "String",
+										"value": {
+											"value": "@pipeline().parameters.P_RUN_MODE",
+											"type": "Expression"
+										}
+									},
+									"P_STREM_ID": {
+										"type": "String",
+										"value": {
+											"value": "@pipeline().parameters.P_STREM_ID",
+											"type": "Expression"
+										}
+									}
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "mssql_cntl_ds",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": true
+						}
+					},
+					{
+						"name": "GET SKIP FLAG",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "START PROCESS",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "V_SKIP_PRCS",
+							"value": {
+								"value": "@activity('START PROCESS').output.FIRSTROW.SKIP_PRCS",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "CHECK SKIP FLAG",
+						"type": "IfCondition",
+						"dependsOn": [
+							{
+								"activity": "GET SKIP FLAG",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "GET LOAD ID",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"expression": {
+								"value": "@equals(variables('V_SKIP_PRCS'),'0')",
+								"type": "Expression"
+							},
+							"ifFalseActivities": [
+								{
+									"name": "SKIP PROCESS",
+									"type": "Lookup",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "SqlServerSource",
+											"sqlReaderQuery": "SELECT 1",
+											"queryTimeout": "02:00:00",
+											"partitionOption": "None"
+										},
+										"dataset": {
+											"referenceName": "mssql_cntl_ds",
+											"type": "DatasetReference",
+											"parameters": {}
+										}
+									}
+								}
+							],
+							"ifTrueActivities": [
+								{
+									"name": "RUN_PCS_COMMON_VALIDATE",
+									"type": "ExecutePipeline",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "30_PCS_COMMON_VALIDATE",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {
+											"P_PRCS_NM": {
+												"value": "@pipeline().parameters.P_PRCS_NM",
+												"type": "Expression"
+											},
+											"P_RUN_MODE": {
+												"value": "@pipeline().parameters.P_RUN_MODE",
+												"type": "Expression"
+											},
+											"P_LD_ID": {
+												"value": "@variables('V_LD_ID')",
+												"type": "Expression"
+											}
+										}
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "GET LOAD ID",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "START PROCESS",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "V_LD_ID",
+							"value": {
+								"value": "@activity('START PROCESS').output.FIRSTROW.LD_ID",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"parameters": {
+					"P_PRCS_NM": {
+						"type": "string",
+						"defaultValue": "SINGHAARM_SINGHAARM_AGENT"
+					},
+					"P_RUN_MODE": {
+						"type": "string",
+						"defaultValue": "R"
+					},
+					"P_STREM_ID": {
+						"type": "string",
+						"defaultValue": "-999"
+					}
+				},
+				"variables": {
+					"V_SKIP_PRCS": {
+						"type": "String",
+						"defaultValue": "999"
+					},
+					"V_LD_ID": {
+						"type": "String",
+						"defaultValue": "999"
+					}
+				},
+				"folder": {
+					"name": "COMMON JOB"
+				},
+				"annotations": [],
+				"lastPublishTime": "2021-02-24T06:12:16Z"
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/20_PCS_COMMON_START_copy1')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -630,7 +844,9 @@
 				"annotations": [],
 				"lastPublishTime": "2021-02-24T05:06:49Z"
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/20_PCS_COMMON_START')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/10_COMMON_RUN_PCS_GRP')]",
@@ -744,7 +960,9 @@
 				"annotations": [],
 				"lastPublishTime": "2021-02-24T05:06:49Z"
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/20_PCS_COMMON_START')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/10_COMMON_RUN_PCS_GRP_copy1')]",
@@ -855,7 +1073,9 @@
 				"annotations": [],
 				"lastPublishTime": "2021-02-24T05:06:49Z"
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/20_PCS_COMMON_START')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/00_STREAM_COMMON')]",
@@ -1284,6 +1504,483 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/pipelines/10_COMMON_RUN_PCS_GRP')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/MAIN_BATCH_SP1')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Stream TIDE Staging",
+						"type": "ExecutePipeline",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "00_STREAM_COMMON",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"P_STREM_NM": "EDP_TIDE",
+								"P_RUN_MODE": "N"
+							}
+						}
+					},
+					{
+						"name": "Stream Tide Culated",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Stream TIDE Staging",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "00_STREAM_COMMON",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"P_STREM_NM": "EDP_TIDE_CR",
+								"P_RUN_MODE": "N"
+							}
+						}
+					},
+					{
+						"name": "Stream DLT Staging",
+						"type": "ExecutePipeline",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "00_STREAM_COMMON",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"P_STREM_NM": "EDP_DLT",
+								"P_RUN_MODE": "N"
+							}
+						}
+					},
+					{
+						"name": "Stream DLT Culated",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Stream DLT Staging",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "00_STREAM_COMMON",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"P_STREM_NM": "EDP_DLT_CR",
+								"P_RUN_MODE": "N"
+							}
+						}
+					},
+					{
+						"name": "Stream KK Staging",
+						"type": "ExecutePipeline",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "00_STREAM_COMMON",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"P_STREM_NM": "EDP_KK",
+								"P_RUN_MODE": "N"
+							}
+						}
+					},
+					{
+						"name": "Stream KK Culated",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Stream KK Staging",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "00_STREAM_COMMON",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"P_STREM_NM": "EDP_KK_CR",
+								"P_RUN_MODE": "N"
+							}
+						}
+					},
+					{
+						"name": "Stream RIB Staging",
+						"type": "ExecutePipeline",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "00_STREAM_COMMON",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"P_STREM_NM": "EDP_RIB",
+								"P_RUN_MODE": "N"
+							}
+						}
+					},
+					{
+						"name": "Stream RIB Culated",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Stream RIB Staging",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "00_STREAM_COMMON",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"P_STREM_NM": "EDP_RIB_CR",
+								"P_RUN_MODE": "N"
+							}
+						}
+					},
+					{
+						"name": "Stream RBE Staging",
+						"type": "ExecutePipeline",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "00_STREAM_COMMON",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"P_STREM_NM": "EDP_RBE",
+								"P_RUN_MODE": "N"
+							}
+						}
+					},
+					{
+						"name": "Stream RBE Culated",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Stream RBE Staging",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "00_STREAM_COMMON",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"P_STREM_NM": "EDP_RBE_CR",
+								"P_RUN_MODE": "N"
+							}
+						}
+					},
+					{
+						"name": "Stream BOT Staging",
+						"type": "ExecutePipeline",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "00_STREAM_COMMON",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"P_STREM_NM": "EDP_BOT",
+								"P_RUN_MODE": "N"
+							}
+						}
+					},
+					{
+						"name": "Stream BOT Culated",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Stream BOT Staging",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "00_STREAM_COMMON",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"P_STREM_NM": "EDP_BOT_CR",
+								"P_RUN_MODE": "N"
+							}
+						}
+					},
+					{
+						"name": "Stream RE Staging",
+						"type": "ExecutePipeline",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "00_STREAM_COMMON",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"P_STREM_NM": "EDP_RE",
+								"P_RUN_MODE": "N"
+							}
+						}
+					},
+					{
+						"name": "Stream RE Culated",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Stream RE Staging",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "00_STREAM_COMMON",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"P_STREM_NM": "EDP_RE_CR",
+								"P_RUN_MODE": "N"
+							}
+						}
+					},
+					{
+						"name": "Stream SET Staging",
+						"type": "ExecutePipeline",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "00_STREAM_COMMON",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"P_STREM_NM": "EDP_SET",
+								"P_RUN_MODE": "N"
+							}
+						}
+					},
+					{
+						"name": "Stream SET Culated",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Stream SET Staging",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "00_STREAM_COMMON",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"P_STREM_NM": "EDP_SET_CR",
+								"P_RUN_MODE": "N"
+							}
+						}
+					},
+					{
+						"name": "Stream BANK Staging",
+						"type": "ExecutePipeline",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "00_STREAM_COMMON",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"P_STREM_NM": "EDP_BANK",
+								"P_RUN_MODE": "N"
+							}
+						}
+					},
+					{
+						"name": "EXT_TABLE_KK",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Stream KK Culated",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "EXT_TABLE",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"P_STREAM": "EDP_KK_CR"
+							}
+						}
+					},
+					{
+						"name": "EXT_TABLE_BOT",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Stream BOT Culated",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "EXT_TABLE",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"P_STREAM": "EDP_BOT_CR"
+							}
+						}
+					},
+					{
+						"name": "EXT_TABLE_TIDE",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Stream Tide Culated",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "EXT_TABLE",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"P_STREAM": "EDP_TIDE_CR"
+							}
+						}
+					},
+					{
+						"name": "EXT_TABLE_RBE",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Stream RBE Culated",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "EXT_TABLE",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"P_STREAM": "EDP_RBE_CR"
+							}
+						}
+					},
+					{
+						"name": "EXT_TABLE_DLT",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Stream DLT Culated",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "EXT_TABLE",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"P_STREAM": "EDP_DLT_CR"
+							}
+						}
+					}
+				],
+				"folder": {
+					"name": "BATCH"
+				},
+				"annotations": [],
+				"lastPublishTime": "2021-03-05T04:52:16Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/00_STREAM_COMMON')]"
 			]
 		},
 		{

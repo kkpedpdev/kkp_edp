@@ -2479,7 +2479,7 @@
 										"storedProcedureParameters": {
 											"SQL": {
 												"value": {
-													"value": "@replace(activity('Lookup1').output.firstrow.prop_0,'%ASAT_DT%',activity('Lookup2').output.firstrow.ASAT_DT)",
+													"value": "@replace(activity('Lookup1').output.firstrow.prop_0,'%DATA_DT%',activity('Lookup2').output.firstrow.DATA_DT)",
 													"type": "Expression"
 												},
 												"type": "String"

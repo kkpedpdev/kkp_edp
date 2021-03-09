@@ -161,7 +161,7 @@
 					"source": {
 						"type": "AzureSqlSource",
 						"sqlReaderQuery": {
-							"value": "@concat('SELECT ASAT_DT FROM [CNTL].[CNTL_CFG_STREM] WHERE STREM_NM = ''' , pipeline().parameters.P_STREAM, '''')",
+							"value": "@concat('SELECT DATA_DT FROM [CNTL].[CNTL_CFG_STREM] WHERE STREM_NM = ''' , pipeline().parameters.P_STREAM, '''')",
 							"type": "Expression"
 						},
 						"queryTimeout": "02:00:00",

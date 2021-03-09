@@ -8,7 +8,7 @@
 				"dependsOn": [],
 				"userProperties": [
 					{
-						"name": "P_STREM"
+						"name": "P_STREM_NM"
 					}
 				],
 				"typeProperties": {

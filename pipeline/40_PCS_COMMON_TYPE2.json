@@ -232,10 +232,7 @@
 								"value": "@activity('Lookup1').output.firstrow.ENCDNG",
 								"type": "Expression"
 							},
-							"P_FIRSTROW_HDR": {
-								"value": "@activity('Lookup1').output.firstrow.FRST_ROW_HD",
-								"type": "Expression"
-							},
+							"P_FIRSTROW_HDR": "N",
 							"P_CONTAINER": "working"
 						}
 					}

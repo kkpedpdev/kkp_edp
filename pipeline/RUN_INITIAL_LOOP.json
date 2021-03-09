@@ -30,7 +30,7 @@
 								"waitOnCompletion": true,
 								"parameters": {
 									"P_STREM_NM": {
-										"value": "@pipeline().parameters.P_STREAM",
+										"value": "@pipeline().parameters.P_STREAM_NM",
 										"type": "Expression"
 									},
 									"P_RUN_MODE": "N"

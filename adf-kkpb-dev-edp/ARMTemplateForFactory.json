@@ -5525,7 +5525,7 @@
 							"sink": {
 								"type": "BinarySink",
 								"storeSettings": {
-									"type": "AzureBlobStorageWriteSettings"
+									"type": "AzureBlobFSWriteSettings"
 								}
 							},
 							"enableStaging": false
@@ -7930,7 +7930,7 @@
 							"sink": {
 								"type": "BinarySink",
 								"storeSettings": {
-									"type": "AzureBlobStorageWriteSettings"
+									"type": "AzureBlobFSWriteSettings"
 								}
 							},
 							"enableStaging": false
@@ -9478,7 +9478,7 @@
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"linkedServiceName": {
-					"referenceName": "link_blob_test_edp",
+					"referenceName": "link_adls_onprim_edp",
 					"type": "LinkedServiceReference"
 				},
 				"parameters": {
@@ -9496,7 +9496,7 @@
 				"type": "Binary",
 				"typeProperties": {
 					"location": {
-						"type": "AzureBlobStorageLocation",
+						"type": "AzureBlobFSLocation",
 						"fileName": {
 							"value": "@dataset().P_FILENAME",
 							"type": "Expression"
@@ -9505,7 +9505,7 @@
 							"value": "@dataset().P_PATH",
 							"type": "Expression"
 						},
-						"container": {
+						"fileSystem": {
 							"value": "@dataset().P_CONTAINER",
 							"type": "Expression"
 						}
@@ -9513,7 +9513,7 @@
 				}
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/link_blob_test_edp')]"
+				"[concat(variables('factoryId'), '/linkedServices/link_adls_onprim_edp')]"
 			]
 		},
 		{

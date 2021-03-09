@@ -2,7 +2,7 @@
 	"name": "dl_bin_ds",
 	"properties": {
 		"linkedServiceName": {
-			"referenceName": "link_blob_test_edp",
+			"referenceName": "link_adls_onprim_edp",
 			"type": "LinkedServiceReference"
 		},
 		"parameters": {
@@ -20,7 +20,7 @@
 		"type": "Binary",
 		"typeProperties": {
 			"location": {
-				"type": "AzureBlobStorageLocation",
+				"type": "AzureBlobFSLocation",
 				"fileName": {
 					"value": "@dataset().P_FILENAME",
 					"type": "Expression"
@@ -29,7 +29,7 @@
 					"value": "@dataset().P_PATH",
 					"type": "Expression"
 				},
-				"container": {
+				"fileSystem": {
 					"value": "@dataset().P_CONTAINER",
 					"type": "Expression"
 				}

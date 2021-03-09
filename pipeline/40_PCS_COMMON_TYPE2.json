@@ -149,7 +149,7 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"notebookPath": "/00_Common/edp/adf/dbn-adf-pre-check",
+					"notebookPath": "/DEV/00_Common/edp/adf/dbn-adf-pre-check",
 					"baseParameters": {
 						"PARAMS": {
 							"value": "@activity('Lookup1').output.firstrow.PARM",

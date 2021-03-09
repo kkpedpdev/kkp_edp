@@ -8878,7 +8878,10 @@
 										},
 										"waitOnCompletion": true,
 										"parameters": {
-											"P_STREM_NM": "EDP_SET",
+											"P_STREM_NM": {
+												"value": "@pipeline().parameters.P_STREAM_NM",
+												"type": "Expression"
+											},
 											"P_RUN_MODE": "N"
 										}
 									}
@@ -8905,7 +8908,10 @@
 									"typeProperties": {
 										"source": {
 											"type": "AzureSqlSource",
-											"sqlReaderQuery": "select data_dt from CNTL.CNTL_CFG_STREM where STREM_NM = 'EDP_DLT'",
+											"sqlReaderQuery": {
+												"value": "@concat('SELECT  CONVERT(VARCHAR, [CALC_DATA_DT], 112) AS DATA_DT FROM ',pipeline().globalParameters.P_GLBL_CNTL_SCHEMA,'.[CNTL_CFG_STREM] WHERE STREM_NM = ''' , pipeline().parameters.P_STREAM_NM, '''')",
+												"type": "Expression"
+											},
 											"queryTimeout": "02:00:00",
 											"partitionOption": "None"
 										},
@@ -8941,6 +8947,11 @@
 						}
 					}
 				],
+				"parameters": {
+					"P_STREAM_NM": {
+						"type": "string"
+					}
+				},
 				"variables": {
 					"V_DATA_DT": {
 						"type": "String"

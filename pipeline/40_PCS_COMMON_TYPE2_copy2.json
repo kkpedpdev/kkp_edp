@@ -1,5 +1,5 @@
 {
-	"name": "40_PCS_COMMON_TYPE2",
+	"name": "40_PCS_COMMON_TYPE2_copy2",
 	"properties": {
 		"description": "Load text data from On-prim to STG",
 		"activities": [
@@ -219,7 +219,10 @@
 						"referenceName": "dl_csv_ds",
 						"type": "DatasetReference",
 						"parameters": {
-							"P_PATH": "TMP/SOURCE/",
+							"P_PATH": {
+								"value": "@concat(pipeline().parameters.P_PRCS_OBJ.PTH,'/',pipeline().parameters.P_PRCS_OBJ.CALC_DATA_DT)",
+								"type": "Expression"
+							},
 							"P_FILENAME": {
 								"value": "@activity('Lookup1').output.firstrow.FI_NM",
 								"type": "Expression"
@@ -236,7 +239,10 @@
 								"value": "@activity('Lookup1').output.firstrow.FRST_ROW_HD",
 								"type": "Expression"
 							},
-							"P_CONTAINER": "working"
+							"P_CONTAINER": {
+								"value": "@activity('Lookup1').output.firstrow.CNTNR",
+								"type": "Expression"
+							}
 						}
 					}
 				],

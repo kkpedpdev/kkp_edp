@@ -6,7 +6,11 @@
 				"name": "RUN_LOOP",
 				"type": "Until",
 				"dependsOn": [],
-				"userProperties": [],
+				"userProperties": [
+					{
+						"name": "P_STREM"
+					}
+				],
 				"typeProperties": {
 					"expression": {
 						"value": "@equals(variables('V_DATA_DT'), '20210331')",
@@ -25,7 +29,10 @@
 								},
 								"waitOnCompletion": true,
 								"parameters": {
-									"P_STREM_NM": "EDP_SET",
+									"P_STREM_NM": {
+										"value": "@pipeline().parameters.P_STREAM",
+										"type": "Expression"
+									},
 									"P_RUN_MODE": "N"
 								}
 							}
@@ -87,6 +94,11 @@
 				}
 			}
 		],
+		"parameters": {
+			"P_STREAM": {
+				"type": "string"
+			}
+		},
 		"variables": {
 			"V_DATA_DT": {
 				"type": "String"

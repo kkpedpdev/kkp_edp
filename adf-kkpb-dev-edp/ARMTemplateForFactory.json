@@ -6824,7 +6824,7 @@
 					}
 				},
 				"folder": {
-					"name": "COMMON JOB"
+					"name": "BK"
 				},
 				"annotations": [],
 				"lastPublishTime": "2021-02-24T06:46:02Z"
@@ -8344,6 +8344,10 @@
 								},
 								"P_ST": {
 									"value": "Running",
+									"type": "String"
+								},
+								"P_CNT_REC_CNTL": {
+									"value": null,
 									"type": "String"
 								}
 							}

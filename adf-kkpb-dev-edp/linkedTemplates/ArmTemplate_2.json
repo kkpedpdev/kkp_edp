@@ -612,7 +612,7 @@
 								},
 								"P_CNT_REC_SRC": {
 									"value": {
-										"value": "@activity('Preprocessing').output.unOutput.ActualRecord",
+										"value": "@activity('Preprocessing').output.runOutput.ActualRecord",
 										"type": "Expression"
 									},
 									"type": "String"

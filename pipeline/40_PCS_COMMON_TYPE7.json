@@ -352,6 +352,10 @@
 						"P_ST": {
 							"value": "Running",
 							"type": "String"
+						},
+						"P_CNT_REC_CNTL": {
+							"value": null,
+							"type": "String"
 						}
 					}
 				},

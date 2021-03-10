@@ -644,7 +644,7 @@
 								},
 								"P_CNT_REC_CNTL": {
 									"value": {
-										"value": "@activity('Preprocessing').output.unOutput.ExpectedRecord",
+										"value": "@activity('Preprocessing').output.runOutput.ExpectedRecord",
 										"type": "Expression"
 									},
 									"type": "String"

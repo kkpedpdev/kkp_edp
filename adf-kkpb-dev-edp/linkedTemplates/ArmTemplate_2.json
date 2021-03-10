@@ -618,6 +618,7 @@
 									"type": "String"
 								},
 								"P_CNT_REC_TGT": {
+									"value": null,
 									"type": "String"
 								},
 								"P_LD_ID": {
@@ -635,7 +636,7 @@
 									"type": "String"
 								},
 								"P_RMRK": {
-									"value": "Complete Copy to Staging",
+									"value": "Complete Preprocessing",
 									"type": "String"
 								},
 								"P_ST": {

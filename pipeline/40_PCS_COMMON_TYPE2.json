@@ -317,7 +317,7 @@
 							"type": "String"
 						},
 						"P_RMRK": {
-							"value": "Complete Copy to Staging",
+							"value": null,
 							"type": "String"
 						},
 						"P_ST": {
@@ -437,7 +437,7 @@
 							"type": "String"
 						},
 						"P_RMRK": {
-							"value": "Complete Preprocessing",
+							"value": null,
 							"type": "String"
 						},
 						"P_ST": {

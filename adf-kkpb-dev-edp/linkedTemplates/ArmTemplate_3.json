@@ -58,6 +58,13 @@
 											"value": "@pipeline().parameters.P_STREM_ID",
 											"type": "Expression"
 										}
+									},
+									"P_ADF_RUN_ID": {
+										"type": "String",
+										"value": {
+											"value": "@pipeline().RunId",
+											"type": "Expression"
+										}
 									}
 								},
 								"queryTimeout": "02:00:00",

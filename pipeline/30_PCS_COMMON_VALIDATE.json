@@ -436,6 +436,10 @@
 						"P_ST": {
 							"value": "FAILED",
 							"type": "String"
+						},
+						"P_CNT_REC_CNTL": {
+							"value": null,
+							"type": "String"
 						}
 					}
 				},
@@ -506,6 +510,10 @@
 						"P_ST": {
 							"value": "FAILED",
 							"type": "String"
+						},
+						"P_CNT_REC_CNTL": {
+							"value": null,
+							"type": "String"
 						}
 					}
 				},
@@ -575,6 +583,10 @@
 						},
 						"P_ST": {
 							"value": "FAILED",
+							"type": "String"
+						},
+						"P_CNT_REC_CNTL": {
+							"value": null,
 							"type": "String"
 						}
 					}
@@ -744,6 +756,10 @@
 						"P_ST": {
 							"value": "SUCCESS",
 							"type": "String"
+						},
+						"P_CNT_REC_CNTL": {
+							"value": null,
+							"type": "String"
 						}
 					}
 				},
@@ -818,6 +834,10 @@
 						"P_ST": {
 							"value": "FAILED",
 							"type": "String"
+						},
+						"P_CNT_REC_CNTL": {
+							"value": null,
+							"type": "String"
 						}
 					}
 				},
@@ -887,6 +907,10 @@
 						},
 						"P_ST": {
 							"value": "FAILED",
+							"type": "String"
+						},
+						"P_CNT_REC_CNTL": {
+							"value": null,
 							"type": "String"
 						}
 					}

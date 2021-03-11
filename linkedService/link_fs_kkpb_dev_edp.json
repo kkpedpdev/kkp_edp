@@ -1,17 +1,24 @@
 {
 	"name": "link_fs_kkpb_dev_edp",
-	"type": "Microsoft.DataFactory/factories/linkedservices",
 	"properties": {
 		"annotations": [],
 		"type": "FileServer",
 		"typeProperties": {
 			"host": "E:\\Landing",
 			"userId": "administrator",
-			"encryptedCredential": "eyJDcmVkZW50aWFsSWQiOiI4N2Y4MGJiNy01YjQ3LTQ2MDMtOGE2Ni04NTg5ZmNjNDhlNzMiLCJWZXJzaW9uIjoiMi4wIiwiQ2xhc3NUeXBlIjoiTWljcm9zb2Z0LkRhdGFQcm94eS5Db3JlLkludGVyU2VydmljZURhdGFDb250cmFjdC5DcmVkZW50aWFsU1UwNkNZMTQifQ=="
+			"password": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "link_kv_edp",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": "shir-on-prim-password"
+			}
 		},
 		"connectVia": {
 			"referenceName": "shir-onprim-kkbp-edp",
 			"type": "IntegrationRuntimeReference"
 		}
-	}
+	},
+	"type": "Microsoft.DataFactory/factories/linkedservices"
 }

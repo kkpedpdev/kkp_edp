@@ -51,7 +51,7 @@
 						"referenceName": "sp_bin_ds",
 						"type": "DatasetReference",
 						"parameters": {
-							"ServerRelativeUrl": "/sites/EDPFileCenterUAT/ShareCenter/Landing/internal/manualfile/real_estate/RE_Code_Zone_Mapping.csv"
+							"ServerRelativeUrl": "/sites/EDPFileCenterUAT/ShareCenter/Landing/internal/manualfile/real_estate/20201231/BMR_202012.xlsx"
 						}
 					}
 				],

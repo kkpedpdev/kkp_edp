@@ -9,7 +9,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"expression": {
-						"value": "@equals(variables('V_DATA_DT'), '20210310')",
+						"value": "@equals(variables('V_DATA_DT'), '20110310')",
 						"type": "Expression"
 					},
 					"activities": [

@@ -1171,7 +1171,10 @@
 				"type": "DelimitedText",
 				"typeProperties": {
 					"location": {
-						"type": "AzureBlobFSLocation"
+						"type": "AzureBlobFSLocation",
+						"fileName": "test.csv",
+						"folderPath": "test",
+						"fileSystem": "working"
 					},
 					"columnDelimiter": ",",
 					"escapeChar": "\\",

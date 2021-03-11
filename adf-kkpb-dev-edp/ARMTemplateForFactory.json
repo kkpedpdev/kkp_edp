@@ -10031,7 +10031,7 @@
 								"referenceName": "sp_bin_ds",
 								"type": "DatasetReference",
 								"parameters": {
-									"ServerRelativeUrl": "/sites/EDPFileCenterUAT/ShareCenter/Landing/internal/manualfile/real_estate/RE_Code_Zone_Mapping.csv"
+									"ServerRelativeUrl": "/sites/EDPFileCenterUAT/ShareCenter/Landing/internal/manualfile/real_estate/20201231/BMR_202012.xlsx"
 								}
 							}
 						],
@@ -11095,9 +11095,15 @@
 						"value": "[parameters('link_dbw_edp_accessToken')]"
 					},
 					"existingClusterId": "0112-023856-dare238"
+				},
+				"connectVia": {
+					"referenceName": "shir-kkpb-edp",
+					"type": "IntegrationRuntimeReference"
 				}
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/shir-kkpb-edp')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/link_fs_kkpb_dev_edp')]",

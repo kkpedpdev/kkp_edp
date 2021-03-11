@@ -114,9 +114,6 @@
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
 					},
-					"link_dbw_edp_accessToken": {
-						"value": "[parameters('link_dbw_edp_accessToken')]"
-					},
 					"link_func_edp_functionKey": {
 						"value": "[parameters('link_func_edp_functionKey')]"
 					},
@@ -128,6 +125,21 @@
 					},
 					"link_blob_test_edp_connectionString": {
 						"value": "[parameters('link_blob_test_edp_connectionString')]"
+					},
+					"link_dbw_edp_accessToken": {
+						"value": "[parameters('link_dbw_edp_accessToken')]"
+					},
+					"link_sqldb_kkpb_edp_connectionString": {
+						"value": "[parameters('link_sqldb_kkpb_edp_connectionString')]"
+					},
+					"link_st_kkpb_edp_accountKey": {
+						"value": "[parameters('link_st_kkpb_edp_accountKey')]"
+					},
+					"link_syn_kkpb_edp_connectionString": {
+						"value": "[parameters('link_syn_kkpb_edp_connectionString')]"
+					},
+					"linkedService2_password": {
+						"value": "[parameters('linkedService2_password')]"
 					},
 					"AzureDataLakeStorage1_properties_typeProperties_url": {
 						"value": "[parameters('AzureDataLakeStorage1_properties_typeProperties_url')]"
@@ -152,6 +164,15 @@
 					},
 					"link_fs_kkpb_dev_edp_properties_typeProperties_userId": {
 						"value": "[parameters('link_fs_kkpb_dev_edp_properties_typeProperties_userId')]"
+					},
+					"link_st_kkpb_edp_properties_typeProperties_url": {
+						"value": "[parameters('link_st_kkpb_edp_properties_typeProperties_url')]"
+					},
+					"linkedService2_properties_typeProperties_host": {
+						"value": "[parameters('linkedService2_properties_typeProperties_host')]"
+					},
+					"linkedService2_properties_typeProperties_userId": {
+						"value": "[parameters('linkedService2_properties_typeProperties_userId')]"
 					}
 				}
 			},
@@ -170,27 +191,6 @@
 				"parameters": {
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
-					},
-					"link_sqldb_kkpb_edp_connectionString": {
-						"value": "[parameters('link_sqldb_kkpb_edp_connectionString')]"
-					},
-					"link_st_kkpb_edp_accountKey": {
-						"value": "[parameters('link_st_kkpb_edp_accountKey')]"
-					},
-					"link_syn_kkpb_edp_connectionString": {
-						"value": "[parameters('link_syn_kkpb_edp_connectionString')]"
-					},
-					"linkedService2_password": {
-						"value": "[parameters('linkedService2_password')]"
-					},
-					"link_st_kkpb_edp_properties_typeProperties_url": {
-						"value": "[parameters('link_st_kkpb_edp_properties_typeProperties_url')]"
-					},
-					"linkedService2_properties_typeProperties_host": {
-						"value": "[parameters('linkedService2_properties_typeProperties_host')]"
-					},
-					"linkedService2_properties_typeProperties_userId": {
-						"value": "[parameters('linkedService2_properties_typeProperties_userId')]"
 					}
 				}
 			},

@@ -7,10 +7,6 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "adf-kkpb-dev-edp"
 		},
-		"link_dbw_edp_accessToken": {
-			"type": "secureString",
-			"metadata": "Secure string for 'accessToken' of 'link_dbw_edp'"
-		},
 		"link_func_edp_functionKey": {
 			"type": "secureString",
 			"metadata": "Secure string for 'functionKey' of 'link_func_edp'"
@@ -26,6 +22,26 @@
 		"link_blob_test_edp_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'link_blob_test_edp'"
+		},
+		"link_dbw_edp_accessToken": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accessToken' of 'link_dbw_edp'"
+		},
+		"link_sqldb_kkpb_edp_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'link_sqldb_kkpb_edp'"
+		},
+		"link_st_kkpb_edp_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'link_st_kkpb_edp'"
+		},
+		"link_syn_kkpb_edp_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'link_syn_kkpb_edp'"
+		},
+		"linkedService2_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'linkedService2'"
 		},
 		"AzureDataLakeStorage1_properties_typeProperties_url": {
 			"type": "string",
@@ -58,6 +74,18 @@
 		"link_fs_kkpb_dev_edp_properties_typeProperties_userId": {
 			"type": "string",
 			"defaultValue": "administrator"
+		},
+		"link_st_kkpb_edp_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://stkkpbdevtempedp.dfs.core.windows.net"
+		},
+		"linkedService2_properties_typeProperties_host": {
+			"type": "string",
+			"defaultValue": "D:Landing"
+		},
+		"linkedService2_properties_typeProperties_userId": {
+			"type": "string",
+			"defaultValue": "kkpbvmshiredpadm"
 		}
 	},
 	"variables": {
@@ -73,24 +101,6 @@
 				"type": "AzureBlobFS",
 				"typeProperties": {
 					"url": "[parameters('AzureDataLakeStorage1_properties_typeProperties_url')]"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/link_dbw_edp')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureDatabricks",
-				"typeProperties": {
-					"domain": "https://adb-4668344029063629.9.azuredatabricks.net",
-					"accessToken": {
-						"type": "SecureString",
-						"value": "[parameters('link_dbw_edp_accessToken')]"
-					},
-					"existingClusterId": "0112-023856-dare238"
 				}
 			},
 			"dependsOn": []
@@ -159,178 +169,6 @@
 				"typeProperties": {}
 			},
 			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/40_PCS_COMMON_TYPE3')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"description": "Transform via databricks ",
-				"activities": [
-					{
-						"name": "Notebook1",
-						"type": "DatabricksNotebook",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 1,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"notebookPath": {
-								"value": "@pipeline().parameters.P_PRCS_OBJ.ADB_NM",
-								"type": "Expression"
-							},
-							"baseParameters": {
-								"PARAMS": {
-									"value": "@pipeline().parameters.P_PRCS_OBJ.ADB_PARM",
-									"type": "Expression"
-								}
-							}
-						},
-						"linkedServiceName": {
-							"referenceName": "link_dbw_edp",
-							"type": "LinkedServiceReference"
-						}
-					}
-				],
-				"parameters": {
-					"P_LD_ID": {
-						"type": "string"
-					},
-					"P_PRCS_NM": {
-						"type": "string"
-					},
-					"P_PRCS_OBJ": {
-						"type": "object"
-					}
-				},
-				"folder": {
-					"name": "COMMON JOB"
-				},
-				"annotations": [],
-				"lastPublishTime": "2021-02-24T06:46:02Z"
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/link_dbw_edp')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/40_PCS_COMMON_TYPE3_copy1')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Notebook1",
-						"type": "DatabricksNotebook",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"notebookPath": {
-								"value": "@pipeline().parameters.P_PCS_OBJ.ADB_NM",
-								"type": "Expression"
-							},
-							"baseParameters": {
-								"PARAMS": {
-									"value": "@pipeline().parameters.P_PCS_OBJ.ADB_PARAMS",
-									"type": "Expression"
-								}
-							}
-						},
-						"linkedServiceName": {
-							"referenceName": "link_dbw_edp",
-							"type": "LinkedServiceReference"
-						}
-					}
-				],
-				"parameters": {
-					"P_LOAD_ID": {
-						"type": "string"
-					},
-					"P_PCS_NM": {
-						"type": "string"
-					},
-					"P_PCS_OBJ": {
-						"type": "object"
-					}
-				},
-				"folder": {
-					"name": "BK"
-				},
-				"annotations": [],
-				"lastPublishTime": "2021-02-24T05:06:42Z"
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/link_dbw_edp')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/40_PCS_COMMON_TYPE4_bk')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Notebook1",
-						"type": "DatabricksNotebook",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"notebookPath": {
-								"value": "@pipeline().parameters.P_PCS_OBJ.ADB_NM",
-								"type": "Expression"
-							},
-							"baseParameters": {
-								"PARAMS": {
-									"value": "@pipeline().parameters.P_PCS_OBJ.ADB_PARAMS",
-									"type": "Expression"
-								}
-							}
-						},
-						"linkedServiceName": {
-							"referenceName": "link_dbw_edp",
-							"type": "LinkedServiceReference"
-						}
-					}
-				],
-				"parameters": {
-					"P_LOAD_ID": {
-						"type": "string"
-					},
-					"P_PCS_NM": {
-						"type": "string"
-					},
-					"P_PCS_OBJ": {
-						"type": "object"
-					}
-				},
-				"folder": {
-					"name": "BK"
-				},
-				"annotations": [],
-				"lastPublishTime": "2021-02-24T05:06:42Z"
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/link_dbw_edp')]"
-			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/40_PCS_COMMON_TYPE6_copy1')]",
@@ -458,44 +296,6 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/integrationRuntimes/shir-kkpb-edp')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Test DBW')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Notebook1",
-						"type": "DatabricksNotebook",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"notebookPath": "/Users/pran@inteltion.com/pran@inteltion.com/Kafka Test",
-							"baseParameters": {
-								"Date": "20210115",
-								"Source": "kkp-kkpmobile-tracking-request"
-							}
-						},
-						"linkedServiceName": {
-							"referenceName": "link_dbw_edp",
-							"type": "LinkedServiceReference"
-						}
-					}
-				],
-				"annotations": [],
-				"lastPublishTime": "2021-02-24T05:06:42Z"
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/link_dbw_edp')]"
 			]
 		},
 		{
@@ -662,6 +462,30 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/link_dbw_edp')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureDatabricks",
+				"typeProperties": {
+					"domain": "https://adb-4668344029063629.9.azuredatabricks.net",
+					"accessToken": {
+						"type": "SecureString",
+						"value": "[parameters('link_dbw_edp_accessToken')]"
+					},
+					"existingClusterId": "0112-023856-dare238"
+				},
+				"connectVia": {
+					"referenceName": "shir-kkpb-edp",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/shir-kkpb-edp')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/link_fs_kkpb_dev_edp')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
@@ -688,6 +512,91 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/integrationRuntimes/shir-onprim-kkbp-edp')]",
 				"[concat(variables('factoryId'), '/linkedServices/link_kv_edp')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/link_sqldb_kkpb_edp')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"connectionString": "[parameters('link_sqldb_kkpb_edp_connectionString')]"
+				},
+				"connectVia": {
+					"referenceName": "shir-kkpb-edp",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/shir-kkpb-edp')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/link_st_kkpb_edp')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('link_st_kkpb_edp_properties_typeProperties_url')]",
+					"accountKey": {
+						"type": "SecureString",
+						"value": "[parameters('link_st_kkpb_edp_accountKey')]"
+					}
+				},
+				"connectVia": {
+					"referenceName": "shir-kkpb-edp",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/shir-kkpb-edp')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/link_syn_kkpb_edp')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDW",
+				"typeProperties": {
+					"connectionString": "[parameters('link_syn_kkpb_edp_connectionString')]"
+				},
+				"connectVia": {
+					"referenceName": "shir-kkpb-edp",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/shir-kkpb-edp')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/linkedService2')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "FileServer",
+				"typeProperties": {
+					"host": "[parameters('linkedService2_properties_typeProperties_host')]",
+					"userId": "[parameters('linkedService2_properties_typeProperties_userId')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('linkedService2_password')]"
+					}
+				},
+				"connectVia": {
+					"referenceName": "shir-kkpb-edp",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/shir-kkpb-edp')]"
 			]
 		}
 	]

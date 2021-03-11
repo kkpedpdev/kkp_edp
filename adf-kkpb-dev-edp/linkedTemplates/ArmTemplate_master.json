@@ -23,10 +23,6 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'accessToken' of 'link_dbw_edp'"
 		},
-		"link_fs_kkpb_dev_edp_password": {
-			"type": "secureString",
-			"metadata": "Secure string for 'password' of 'link_fs_kkpb_dev_edp'"
-		},
 		"link_func_edp_functionKey": {
 			"type": "secureString",
 			"metadata": "Secure string for 'functionKey' of 'link_func_edp'"
@@ -132,9 +128,6 @@
 					},
 					"link_blob_test_edp_connectionString": {
 						"value": "[parameters('link_blob_test_edp_connectionString')]"
-					},
-					"link_fs_kkpb_dev_edp_password": {
-						"value": "[parameters('link_fs_kkpb_dev_edp_password')]"
 					},
 					"AzureDataLakeStorage1_properties_typeProperties_url": {
 						"value": "[parameters('AzureDataLakeStorage1_properties_typeProperties_url')]"

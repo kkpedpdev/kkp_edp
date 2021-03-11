@@ -27,10 +27,6 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'link_blob_test_edp'"
 		},
-		"link_fs_kkpb_dev_edp_password": {
-			"type": "secureString",
-			"metadata": "Secure string for 'password' of 'link_fs_kkpb_dev_edp'"
-		},
 		"AzureDataLakeStorage1_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://stkkpbdevtempedp.dfs.core.windows.net"
@@ -677,8 +673,12 @@
 					"host": "[parameters('link_fs_kkpb_dev_edp_properties_typeProperties_host')]",
 					"userId": "[parameters('link_fs_kkpb_dev_edp_properties_typeProperties_userId')]",
 					"password": {
-						"type": "SecureString",
-						"value": "[parameters('link_fs_kkpb_dev_edp_password')]"
+						"type": "AzureKeyVaultSecret",
+						"store": {
+							"referenceName": "link_kv_edp",
+							"type": "LinkedServiceReference"
+						},
+						"secretName": "shir-on-prim-password"
 					}
 				},
 				"connectVia": {
@@ -687,7 +687,8 @@
 				}
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/integrationRuntimes/shir-onprim-kkbp-edp')]"
+				"[concat(variables('factoryId'), '/integrationRuntimes/shir-onprim-kkbp-edp')]",
+				"[concat(variables('factoryId'), '/linkedServices/link_kv_edp')]"
 			]
 		}
 	]

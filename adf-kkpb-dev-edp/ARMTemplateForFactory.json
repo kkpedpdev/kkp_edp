@@ -23,10 +23,6 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'accessToken' of 'link_dbw_edp'"
 		},
-		"link_fs_kkpb_dev_edp_password": {
-			"type": "secureString",
-			"metadata": "Secure string for 'password' of 'link_fs_kkpb_dev_edp'"
-		},
 		"link_func_edp_functionKey": {
 			"type": "secureString",
 			"metadata": "Secure string for 'functionKey' of 'link_func_edp'"
@@ -9879,7 +9875,7 @@
 						"userProperties": [],
 						"typeProperties": {
 							"expression": {
-								"value": "@equals(variables('V_DATA_DT'), '20210331')",
+								"value": "@equals(variables('V_DATA_DT'), '20110310')",
 								"type": "Expression"
 							},
 							"activities": [
@@ -11076,8 +11072,12 @@
 					"host": "[parameters('link_fs_kkpb_dev_edp_properties_typeProperties_host')]",
 					"userId": "[parameters('link_fs_kkpb_dev_edp_properties_typeProperties_userId')]",
 					"password": {
-						"type": "SecureString",
-						"value": "[parameters('link_fs_kkpb_dev_edp_password')]"
+						"type": "AzureKeyVaultSecret",
+						"store": {
+							"referenceName": "link_kv_edp",
+							"type": "LinkedServiceReference"
+						},
+						"secretName": "shir-on-prim-password"
 					}
 				},
 				"connectVia": {
@@ -11086,7 +11086,8 @@
 				}
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/integrationRuntimes/shir-onprim-kkbp-edp')]"
+				"[concat(variables('factoryId'), '/integrationRuntimes/shir-onprim-kkbp-edp')]",
+				"[concat(variables('factoryId'), '/linkedServices/link_kv_edp')]"
 			]
 		},
 		{

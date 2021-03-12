@@ -3119,7 +3119,7 @@
 					}
 				},
 				"folder": {
-					"name": "COMMON JOB"
+					"name": "TEST"
 				},
 				"annotations": []
 			},
@@ -4227,34 +4227,6 @@
 										}
 									}
 								}
-							],
-							"ifTrueActivities": [
-								{
-									"name": "PASS CHECK STREAM INFORMATION",
-									"type": "Lookup",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "7.00:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"source": {
-											"type": "SqlServerSource",
-											"sqlReaderQuery": "SELECT 1",
-											"queryTimeout": "02:00:00",
-											"partitionOption": "None"
-										},
-										"dataset": {
-											"referenceName": "mssql_cntl_ds",
-											"type": "DatasetReference",
-											"parameters": {}
-										}
-									}
-								}
 							]
 						}
 					},
@@ -4292,34 +4264,6 @@
 										"source": {
 											"type": "SqlServerSource",
 											"sqlReaderQuery": "SELECT 1/0",
-											"queryTimeout": "02:00:00",
-											"partitionOption": "None"
-										},
-										"dataset": {
-											"referenceName": "mssql_cntl_ds",
-											"type": "DatasetReference",
-											"parameters": {}
-										}
-									}
-								}
-							],
-							"ifTrueActivities": [
-								{
-									"name": "PASS CHECK LATEST LOG",
-									"type": "Lookup",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "7.00:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"source": {
-											"type": "SqlServerSource",
-											"sqlReaderQuery": "SELECT 1",
 											"queryTimeout": "02:00:00",
 											"partitionOption": "None"
 										},
@@ -4405,34 +4349,6 @@
 										"source": {
 											"type": "SqlServerSource",
 											"sqlReaderQuery": "SELECT 1/0",
-											"queryTimeout": "02:00:00",
-											"partitionOption": "None"
-										},
-										"dataset": {
-											"referenceName": "mssql_cntl_ds",
-											"type": "DatasetReference",
-											"parameters": {}
-										}
-									}
-								}
-							],
-							"ifTrueActivities": [
-								{
-									"name": "PASS CHECK DNDP",
-									"type": "Lookup",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "7.00:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"source": {
-											"type": "SqlServerSource",
-											"sqlReaderQuery": "SELECT 1",
 											"queryTimeout": "02:00:00",
 											"partitionOption": "None"
 										},

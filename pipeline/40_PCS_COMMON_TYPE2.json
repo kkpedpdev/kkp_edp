@@ -305,7 +305,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"expression": {
-						"value": "@equals(activity('Preprocessing').output.StatusRecord,'Success')",
+						"value": "@equals(activity('Preprocessing').output.runOutput.StatusRecord,'Success')",
 						"type": "Expression"
 					},
 					"ifTrueActivities": [

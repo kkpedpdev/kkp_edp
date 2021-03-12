@@ -1,0 +1,52 @@
+{
+	"name": "pipeline3",
+	"properties": {
+		"activities": [
+			{
+				"name": "00_STREAM_COMMON",
+				"type": "ExecutePipeline",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "00_STREAM_COMMON",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"P_STREM_NM": "EDP_SET",
+						"P_RUN_MODE": "R"
+					}
+				}
+			},
+			{
+				"name": "00_STREAM_COMMON1",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "00_STREAM_COMMON",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "00_STREAM_COMMON",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"P_STREM_NM": "EDP_SET_CR",
+						"P_RUN_MODE": "R"
+					}
+				}
+			}
+		],
+		"folder": {
+			"name": "UTILS"
+		},
+		"annotations": []
+	}
+}

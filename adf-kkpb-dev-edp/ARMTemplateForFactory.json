@@ -8848,7 +8848,7 @@
 								"type": "Expression"
 							},
 							"isSequential": false,
-							"batchCount": 20,
+							"batchCount": 50,
 							"activities": [
 								{
 									"name": "kkpmobile-req-db",
@@ -9014,7 +9014,7 @@
 								"type": "Expression"
 							},
 							"isSequential": false,
-							"batchCount": 20,
+							"batchCount": 50,
 							"activities": [
 								{
 									"name": "kkpmobile-res-db",
@@ -9122,7 +9122,7 @@
 								"type": "Expression"
 							},
 							"isSequential": false,
-							"batchCount": 20,
+							"batchCount": 50,
 							"activities": [
 								{
 									"name": "ribmobile-req-db",
@@ -9230,7 +9230,7 @@
 								"type": "Expression"
 							},
 							"isSequential": false,
-							"batchCount": 20,
+							"batchCount": 35,
 							"activities": [
 								{
 									"name": "ribmobile-res-db",
@@ -9338,7 +9338,7 @@
 								"type": "Expression"
 							},
 							"isSequential": false,
-							"batchCount": 20,
+							"batchCount": 50,
 							"activities": [
 								{
 									"name": "ribpibweb-req-db",
@@ -9446,7 +9446,7 @@
 								"type": "Expression"
 							},
 							"isSequential": false,
-							"batchCount": 20,
+							"batchCount": 50,
 							"activities": [
 								{
 									"name": "ribpibweb-res-db",

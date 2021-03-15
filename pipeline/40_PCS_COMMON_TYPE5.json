@@ -145,7 +145,7 @@
 						"type": "DatasetReference",
 						"parameters": {
 							"ServerRelativeUrl": {
-								"value": "@concat('/sites/EDPFileCenterUAT/ShareCenter/Landing/', pipeline().parameters.P_PRCS_OBJ.PTH, '/', pipeline().parameters.P_PRCS_OBJ.CALC_DATA_DT, '/', activity('Lookup1').output.firstrow.FI_NM)",
+								"value": "@concat('/sites/',pipeline().globalParameters.P_GLBL_SHAREPOINT_SITE,'/ShareCenter/Landing/', pipeline().parameters.P_PRCS_OBJ.PTH, '/', pipeline().parameters.P_PRCS_OBJ.CALC_DATA_DT, '/', activity('Lookup1').output.firstrow.FI_NM)",
 								"type": "Expression"
 							}
 						}
@@ -188,6 +188,10 @@
 					"url": {
 						"value": "@pipeline().globalParameters.P_GLBL_BEARER_TOKEN",
 						"type": "Expression"
+					},
+					"connectVia": {
+						"referenceName": "shir-kkpb-edp",
+						"type": "IntegrationRuntimeReference"
 					},
 					"method": "POST",
 					"headers": {

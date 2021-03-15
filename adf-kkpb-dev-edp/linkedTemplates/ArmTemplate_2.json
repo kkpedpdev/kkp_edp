@@ -3188,6 +3188,77 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/Test FIlter')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Lookup1",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "DelimitedTextSource",
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"recursive": true,
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "DelimitedTextReadSettings"
+								}
+							},
+							"dataset": {
+								"referenceName": "dl_work_ds",
+								"type": "DatasetReference",
+								"parameters": {
+									"P_FILEPATH": "TMP/RIBFOLDER",
+									"P_FILENAME": "ribFolders.txt"
+								}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "Filter1",
+						"type": "Filter",
+						"dependsOn": [
+							{
+								"activity": "Lookup1",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('Lookup1').output.value.prop_0",
+								"type": "Expression"
+							},
+							"condition": {
+								"value": "@equals(item().prop_0,'kkp-kkpmobile-tracking-request')",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/dl_work_ds')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/20_PCS_COMMON_VALIDATE_copy1')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -6624,202 +6695,6 @@
 				},
 				"annotations": [],
 				"lastPublishTime": "2021-02-24T05:06:47Z"
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/mssql_cntl_ds')]",
-				"[concat(variables('factoryId'), '/pipelines/30_PCS_COMMON_VALIDATE')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/20_PCS_COMMON_START')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "START PROCESS",
-						"type": "Lookup",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "SqlServerSource",
-								"sqlReaderStoredProcedureName": {
-									"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA, '.[PROC_STRT_PRCS]')",
-									"type": "Expression"
-								},
-								"storedProcedureParameters": {
-									"P_PRCS_NM": {
-										"type": "String",
-										"value": {
-											"value": "@pipeline().parameters.P_PRCS_NM",
-											"type": "Expression"
-										}
-									},
-									"P_RUN_MODE": {
-										"type": "String",
-										"value": {
-											"value": "@pipeline().parameters.P_RUN_MODE",
-											"type": "Expression"
-										}
-									},
-									"P_STREM_ID": {
-										"type": "String",
-										"value": {
-											"value": "@pipeline().parameters.P_STREM_ID",
-											"type": "Expression"
-										}
-									},
-									"P_ADF_RUN_ID": {
-										"type": "String",
-										"value": {
-											"value": "@pipeline().RunId",
-											"type": "Expression"
-										}
-									}
-								},
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "mssql_cntl_ds",
-								"type": "DatasetReference",
-								"parameters": {}
-							},
-							"firstRowOnly": true
-						}
-					},
-					{
-						"name": "GET SKIP FLAG",
-						"type": "SetVariable",
-						"dependsOn": [
-							{
-								"activity": "START PROCESS",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"variableName": "V_SKIP_PRCS",
-							"value": {
-								"value": "@activity('START PROCESS').output.FIRSTROW.SKIP_PRCS",
-								"type": "Expression"
-							}
-						}
-					},
-					{
-						"name": "CHECK SKIP FLAG",
-						"type": "IfCondition",
-						"dependsOn": [
-							{
-								"activity": "GET SKIP FLAG",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							},
-							{
-								"activity": "GET LOAD ID",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"expression": {
-								"value": "@equals(variables('V_SKIP_PRCS'),'0')",
-								"type": "Expression"
-							},
-							"ifTrueActivities": [
-								{
-									"name": "RUN_PCS_COMMON_VALIDATE",
-									"type": "ExecutePipeline",
-									"dependsOn": [],
-									"userProperties": [],
-									"typeProperties": {
-										"pipeline": {
-											"referenceName": "30_PCS_COMMON_VALIDATE",
-											"type": "PipelineReference"
-										},
-										"waitOnCompletion": true,
-										"parameters": {
-											"P_PRCS_NM": {
-												"value": "@pipeline().parameters.P_PRCS_NM",
-												"type": "Expression"
-											},
-											"P_RUN_MODE": {
-												"value": "@pipeline().parameters.P_RUN_MODE",
-												"type": "Expression"
-											},
-											"P_LD_ID": {
-												"value": "@variables('V_LD_ID')",
-												"type": "Expression"
-											}
-										}
-									}
-								}
-							]
-						}
-					},
-					{
-						"name": "GET LOAD ID",
-						"type": "SetVariable",
-						"dependsOn": [
-							{
-								"activity": "START PROCESS",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"variableName": "V_LD_ID",
-							"value": {
-								"value": "@activity('START PROCESS').output.FIRSTROW.LD_ID",
-								"type": "Expression"
-							}
-						}
-					}
-				],
-				"parameters": {
-					"P_PRCS_NM": {
-						"type": "string",
-						"defaultValue": "SINGHAARM_SINGHAARM_AGENT"
-					},
-					"P_RUN_MODE": {
-						"type": "string",
-						"defaultValue": "R"
-					},
-					"P_STREM_ID": {
-						"type": "string",
-						"defaultValue": "-999"
-					}
-				},
-				"variables": {
-					"V_SKIP_PRCS": {
-						"type": "String",
-						"defaultValue": "999"
-					},
-					"V_LD_ID": {
-						"type": "String",
-						"defaultValue": "999"
-					}
-				},
-				"folder": {
-					"name": "COMMON JOB"
-				},
-				"annotations": [],
-				"lastPublishTime": "2021-02-24T06:12:16Z"
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/mssql_cntl_ds')]",

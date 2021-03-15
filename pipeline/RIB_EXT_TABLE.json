@@ -85,7 +85,7 @@
 					"batchCount": 20,
 					"activities": [
 						{
-							"name": "Notebook2",
+							"name": "kkpmobile-req-db",
 							"type": "DatabricksNotebook",
 							"dependsOn": [],
 							"policy": {
@@ -111,11 +111,11 @@
 							}
 						},
 						{
-							"name": "Stored procedure1",
+							"name": "kkpmobile-req-sp",
 							"type": "SqlServerStoredProcedure",
 							"dependsOn": [
 								{
-									"activity": "Notebook2",
+									"activity": "kkpmobile-req-db",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -134,7 +134,7 @@
 								"storedProcedureParameters": {
 									"SQL": {
 										"value": {
-											"value": "@activity('Notebook2').output.runOutput",
+											"value": "@activity('kkpmobile-req-db').output.runOutput",
 											"type": "Expression"
 										},
 										"type": "String"
@@ -251,7 +251,7 @@
 					"batchCount": 20,
 					"activities": [
 						{
-							"name": "Notebook2_copy2",
+							"name": "kkpmobile-res-db",
 							"type": "DatabricksNotebook",
 							"dependsOn": [],
 							"policy": {
@@ -277,11 +277,11 @@
 							}
 						},
 						{
-							"name": "Stored procedure1_copy1",
+							"name": "kkpmobile-res-sp",
 							"type": "SqlServerStoredProcedure",
 							"dependsOn": [
 								{
-									"activity": "Notebook2_copy2",
+									"activity": "kkpmobile-res-db",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -300,7 +300,7 @@
 								"storedProcedureParameters": {
 									"SQL": {
 										"value": {
-											"value": "@activity('Notebook2').output.runOutput",
+											"value": "@activity('kkpmobile-res-db').output.runOutput",
 											"type": "Expression"
 										},
 										"type": "String"
@@ -359,7 +359,7 @@
 					"batchCount": 20,
 					"activities": [
 						{
-							"name": "Notebook2_copy2_copy1",
+							"name": "ribmobile-req-db",
 							"type": "DatabricksNotebook",
 							"dependsOn": [],
 							"policy": {
@@ -385,11 +385,11 @@
 							}
 						},
 						{
-							"name": "Stored procedure1_copy1_copy1",
+							"name": "rib-mobile-req-sp",
 							"type": "SqlServerStoredProcedure",
 							"dependsOn": [
 								{
-									"activity": "Notebook2_copy2_copy1",
+									"activity": "ribmobile-req-db",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -408,7 +408,7 @@
 								"storedProcedureParameters": {
 									"SQL": {
 										"value": {
-											"value": "@activity('Notebook2').output.runOutput",
+											"value": "@activity('ribmobile-req-db').output.runOutput",
 											"type": "Expression"
 										},
 										"type": "String"
@@ -467,7 +467,7 @@
 					"batchCount": 20,
 					"activities": [
 						{
-							"name": "Notebook2_copy2_copy1_copy1",
+							"name": "ribmobile-res-db",
 							"type": "DatabricksNotebook",
 							"dependsOn": [],
 							"policy": {
@@ -493,11 +493,11 @@
 							}
 						},
 						{
-							"name": "Stored procedure1_copy1_copy1_copy1",
+							"name": "ribmobile-res-sp",
 							"type": "SqlServerStoredProcedure",
 							"dependsOn": [
 								{
-									"activity": "Notebook2_copy2_copy1_copy1",
+									"activity": "ribmobile-res-db",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -516,7 +516,7 @@
 								"storedProcedureParameters": {
 									"SQL": {
 										"value": {
-											"value": "@activity('Notebook2').output.runOutput",
+											"value": "@activity('ribmobile-res-db').output.runOutput",
 											"type": "Expression"
 										},
 										"type": "String"
@@ -575,7 +575,7 @@
 					"batchCount": 20,
 					"activities": [
 						{
-							"name": "Notebook2_copy2_copy1_copy2",
+							"name": "ribpibweb-req-db",
 							"type": "DatabricksNotebook",
 							"dependsOn": [],
 							"policy": {
@@ -601,11 +601,11 @@
 							}
 						},
 						{
-							"name": "Stored procedure1_copy1_copy1_copy2",
+							"name": "ribpibweb-req-sp",
 							"type": "SqlServerStoredProcedure",
 							"dependsOn": [
 								{
-									"activity": "Notebook2_copy2_copy1_copy2",
+									"activity": "ribpibweb-req-db",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -624,7 +624,7 @@
 								"storedProcedureParameters": {
 									"SQL": {
 										"value": {
-											"value": "@activity('Notebook2').output.runOutput",
+											"value": "@activity('ribpibweb-req-db').output.runOutput",
 											"type": "Expression"
 										},
 										"type": "String"
@@ -683,7 +683,7 @@
 					"batchCount": 20,
 					"activities": [
 						{
-							"name": "Notebook2_copy2_copy1_copy2_copy1",
+							"name": "ribpibweb-res-db",
 							"type": "DatabricksNotebook",
 							"dependsOn": [],
 							"policy": {
@@ -709,11 +709,11 @@
 							}
 						},
 						{
-							"name": "Stored procedure1_copy1_copy1_copy2_copy1",
+							"name": "ribpibweb-res-sp",
 							"type": "SqlServerStoredProcedure",
 							"dependsOn": [
 								{
-									"activity": "Notebook2_copy2_copy1_copy2_copy1",
+									"activity": "ribpibweb-res-db",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -732,7 +732,7 @@
 								"storedProcedureParameters": {
 									"SQL": {
 										"value": {
-											"value": "@activity('Notebook2').output.runOutput",
+											"value": "@activity('ribpibweb-res-db').output.runOutput",
 											"type": "Expression"
 										},
 										"type": "String"

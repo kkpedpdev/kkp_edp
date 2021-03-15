@@ -1501,7 +1501,7 @@
 								"type": "DatasetReference",
 								"parameters": {
 									"ServerRelativeUrl": {
-										"value": "@concat('/sites/EDPFileCenterUAT/ShareCenter/Landing/', pipeline().parameters.P_PRCS_OBJ.PTH, '/', pipeline().parameters.P_PRCS_OBJ.CALC_DATA_DT, '/', activity('Lookup1').output.firstrow.FI_NM)",
+										"value": "@concat('/sites/',pipeline().globalParameters.P_GLBL_SHAREPOINT_SITE,'/ShareCenter/Landing/', pipeline().parameters.P_PRCS_OBJ.PTH, '/', pipeline().parameters.P_PRCS_OBJ.CALC_DATA_DT, '/', activity('Lookup1').output.firstrow.FI_NM)",
 										"type": "Expression"
 									}
 								}
@@ -1544,6 +1544,10 @@
 							"url": {
 								"value": "@pipeline().globalParameters.P_GLBL_BEARER_TOKEN",
 								"type": "Expression"
+							},
+							"connectVia": {
+								"referenceName": "shir-kkpb-edp",
+								"type": "IntegrationRuntimeReference"
 							},
 							"method": "POST",
 							"headers": {
@@ -1636,7 +1640,7 @@
 								"type": "DatasetReference",
 								"parameters": {
 									"ServerRelativeUrl": {
-										"value": "@concat('/sites/EDPFileCenterUAT/ShareCenter/Landing/', pipeline().parameters.P_PRCS_OBJ.PTH, '/', activity('Lookup1').output.firstrow.FI_NM)",
+										"value": "@concat('/sites/',pipeline().globalParameters.P_GLBL_SHAREPOINT_SITE,'/ShareCenter/Landing/', pipeline().parameters.P_PRCS_OBJ.PTH, '/', activity('Lookup1').output.firstrow.FI_NM)",
 										"type": "Expression"
 									}
 								}
@@ -1959,6 +1963,10 @@
 							"url": {
 								"value": "@pipeline().globalParameters.P_GLBL_BEARER_TOKEN",
 								"type": "Expression"
+							},
+							"connectVia": {
+								"referenceName": "shir-kkpb-edp",
+								"type": "IntegrationRuntimeReference"
 							},
 							"method": "POST",
 							"headers": {
@@ -2644,11 +2652,11 @@
 						}
 					},
 					{
-						"name": "ForEach1",
+						"name": "kkpmobile-req-for",
 						"type": "ForEach",
 						"dependsOn": [
 							{
-								"activity": "Filter1",
+								"activity": "kkpmobile-request",
 								"dependencyConditions": [
 									"Succeeded"
 								]
@@ -2657,14 +2665,14 @@
 						"userProperties": [],
 						"typeProperties": {
 							"items": {
-								"value": "@activity('Lookup1').output.value",
+								"value": "@activity('kkpmobile-request').output.value",
 								"type": "Expression"
 							},
 							"isSequential": false,
 							"batchCount": 20,
 							"activities": [
 								{
-									"name": "Notebook2",
+									"name": "kkpmobile-req-db",
 									"type": "DatabricksNotebook",
 									"dependsOn": [],
 									"policy": {
@@ -2690,11 +2698,11 @@
 									}
 								},
 								{
-									"name": "Stored procedure1",
+									"name": "kkpmobile-req-sp",
 									"type": "SqlServerStoredProcedure",
 									"dependsOn": [
 										{
-											"activity": "Notebook2",
+											"activity": "kkpmobile-req-db",
 											"dependencyConditions": [
 												"Succeeded"
 											]
@@ -2713,7 +2721,7 @@
 										"storedProcedureParameters": {
 											"SQL": {
 												"value": {
-													"value": "@activity('Notebook2').output.runOutput",
+													"value": "@activity('kkpmobile-req-db').output.runOutput",
 													"type": "Expression"
 												},
 												"type": "String"
@@ -2787,7 +2795,7 @@
 						}
 					},
 					{
-						"name": "Filter1",
+						"name": "kkpmobile-request",
 						"type": "Filter",
 						"dependsOn": [
 							{
@@ -2800,11 +2808,551 @@
 						"userProperties": [],
 						"typeProperties": {
 							"items": {
-								"value": "@item().Prop_0",
+								"value": "@activity('Lookup1').output.value",
 								"type": "Expression"
 							},
 							"condition": {
 								"value": "@equals(item().Prop_0,'kkp-kkpmobile-tracking-request')",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "kkpmobile-res-for",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "kkpmobile-response",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('kkpmobile-response').output.value",
+								"type": "Expression"
+							},
+							"isSequential": false,
+							"batchCount": 20,
+							"activities": [
+								{
+									"name": "kkpmobile-res-db",
+									"type": "DatabricksNotebook",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 5,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"notebookPath": "/DEV/00_Common/edp/adf/dbn-gen-script-rib",
+										"baseParameters": {
+											"PARAMS": {
+												"value": "@concat(item().Prop_0,'^|',item().Prop_1,'^|',item().Prop_2)\n",
+												"type": "Expression"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "link_dbw_edp",
+										"type": "LinkedServiceReference"
+									}
+								},
+								{
+									"name": "kkpmobile-res-sp",
+									"type": "SqlServerStoredProcedure",
+									"dependsOn": [
+										{
+											"activity": "kkpmobile-res-db",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"storedProcedureName": "[[dbo].[CREATE_EXTERNAL_TABLE]",
+										"storedProcedureParameters": {
+											"SQL": {
+												"value": {
+													"value": "@activity('kkpmobile-res-db').output.runOutput",
+													"type": "Expression"
+												},
+												"type": "String"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "link_syn_kkpb_edp",
+										"type": "LinkedServiceReference"
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "kkpmobile-response",
+						"type": "Filter",
+						"dependsOn": [
+							{
+								"activity": "Lookup1",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('Lookup1').output.value",
+								"type": "Expression"
+							},
+							"condition": {
+								"value": "@equals(item().Prop_0,'kkp-kkpmobile-tracking-response')",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "ribmobile-req",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "ribmobile-request",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('ribmobile-request').output.value",
+								"type": "Expression"
+							},
+							"isSequential": false,
+							"batchCount": 20,
+							"activities": [
+								{
+									"name": "ribmobile-req-db",
+									"type": "DatabricksNotebook",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 5,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"notebookPath": "/DEV/00_Common/edp/adf/dbn-gen-script-rib",
+										"baseParameters": {
+											"PARAMS": {
+												"value": "@concat(item().Prop_0,'^|',item().Prop_1,'^|',item().Prop_2)\n",
+												"type": "Expression"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "link_dbw_edp",
+										"type": "LinkedServiceReference"
+									}
+								},
+								{
+									"name": "rib-mobile-req-sp",
+									"type": "SqlServerStoredProcedure",
+									"dependsOn": [
+										{
+											"activity": "ribmobile-req-db",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"storedProcedureName": "[[dbo].[CREATE_EXTERNAL_TABLE]",
+										"storedProcedureParameters": {
+											"SQL": {
+												"value": {
+													"value": "@activity('ribmobile-req-db').output.runOutput",
+													"type": "Expression"
+												},
+												"type": "String"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "link_syn_kkpb_edp",
+										"type": "LinkedServiceReference"
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "ribmobile-request",
+						"type": "Filter",
+						"dependsOn": [
+							{
+								"activity": "Lookup1",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('Lookup1').output.value",
+								"type": "Expression"
+							},
+							"condition": {
+								"value": "@equals(item().Prop_0,'kkp-ribmobile-tracking-request')",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "ribmobile-res",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "ribmobile-response",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('ribmobile-response').output.value",
+								"type": "Expression"
+							},
+							"isSequential": false,
+							"batchCount": 20,
+							"activities": [
+								{
+									"name": "ribmobile-res-db",
+									"type": "DatabricksNotebook",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 5,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"notebookPath": "/DEV/00_Common/edp/adf/dbn-gen-script-rib",
+										"baseParameters": {
+											"PARAMS": {
+												"value": "@concat(item().Prop_0,'^|',item().Prop_1,'^|',item().Prop_2)\n",
+												"type": "Expression"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "link_dbw_edp",
+										"type": "LinkedServiceReference"
+									}
+								},
+								{
+									"name": "ribmobile-res-sp",
+									"type": "SqlServerStoredProcedure",
+									"dependsOn": [
+										{
+											"activity": "ribmobile-res-db",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"storedProcedureName": "[[dbo].[CREATE_EXTERNAL_TABLE]",
+										"storedProcedureParameters": {
+											"SQL": {
+												"value": {
+													"value": "@activity('ribmobile-res-db').output.runOutput",
+													"type": "Expression"
+												},
+												"type": "String"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "link_syn_kkpb_edp",
+										"type": "LinkedServiceReference"
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "ribmobile-response",
+						"type": "Filter",
+						"dependsOn": [
+							{
+								"activity": "Lookup1",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('Lookup1').output.value",
+								"type": "Expression"
+							},
+							"condition": {
+								"value": "@equals(item().Prop_0,'kkp-ribmobile-tracking-response')",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "ribpibweb-req",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "ribpibweb-request",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('ribpibweb-request').output.value",
+								"type": "Expression"
+							},
+							"isSequential": false,
+							"batchCount": 20,
+							"activities": [
+								{
+									"name": "ribpibweb-req-db",
+									"type": "DatabricksNotebook",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 5,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"notebookPath": "/DEV/00_Common/edp/adf/dbn-gen-script-rib",
+										"baseParameters": {
+											"PARAMS": {
+												"value": "@concat(item().Prop_0,'^|',item().Prop_1,'^|',item().Prop_2)\n",
+												"type": "Expression"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "link_dbw_edp",
+										"type": "LinkedServiceReference"
+									}
+								},
+								{
+									"name": "ribpibweb-req-sp",
+									"type": "SqlServerStoredProcedure",
+									"dependsOn": [
+										{
+											"activity": "ribpibweb-req-db",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"storedProcedureName": "[[dbo].[CREATE_EXTERNAL_TABLE]",
+										"storedProcedureParameters": {
+											"SQL": {
+												"value": {
+													"value": "@activity('ribpibweb-req-db').output.runOutput",
+													"type": "Expression"
+												},
+												"type": "String"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "link_syn_kkpb_edp",
+										"type": "LinkedServiceReference"
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "ribpibweb-request",
+						"type": "Filter",
+						"dependsOn": [
+							{
+								"activity": "Lookup1",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('Lookup1').output.value",
+								"type": "Expression"
+							},
+							"condition": {
+								"value": "@equals(item().Prop_0,'kkp-ribpibweb-tracking-request')",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "ribpibweb-res",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "ribpibweb-response",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('ribpibweb-response').output.value",
+								"type": "Expression"
+							},
+							"isSequential": false,
+							"batchCount": 20,
+							"activities": [
+								{
+									"name": "ribpibweb-res-db",
+									"type": "DatabricksNotebook",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 5,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"notebookPath": "/DEV/00_Common/edp/adf/dbn-gen-script-rib",
+										"baseParameters": {
+											"PARAMS": {
+												"value": "@concat(item().Prop_0,'^|',item().Prop_1,'^|',item().Prop_2)\n",
+												"type": "Expression"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "link_dbw_edp",
+										"type": "LinkedServiceReference"
+									}
+								},
+								{
+									"name": "ribpibweb-res-sp",
+									"type": "SqlServerStoredProcedure",
+									"dependsOn": [
+										{
+											"activity": "ribpibweb-res-db",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"storedProcedureName": "[[dbo].[CREATE_EXTERNAL_TABLE]",
+										"storedProcedureParameters": {
+											"SQL": {
+												"value": {
+													"value": "@activity('ribpibweb-res-db').output.runOutput",
+													"type": "Expression"
+												},
+												"type": "String"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "link_syn_kkpb_edp",
+										"type": "LinkedServiceReference"
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "ribpibweb-response",
+						"type": "Filter",
+						"dependsOn": [
+							{
+								"activity": "Lookup1",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('Lookup1').output.value",
+								"type": "Expression"
+							},
+							"condition": {
+								"value": "@equals(item().Prop_0,'kkp-ribpibweb-tracking-request')",
 								"type": "Expression"
 							}
 						}
@@ -2875,11 +3423,11 @@
 						"userProperties": [],
 						"typeProperties": {
 							"items": {
-								"value": "@activity('Lookup1').output.value.Prop_0",
+								"value": "@activity('Lookup1').output.value",
 								"type": "Expression"
 							},
 							"condition": {
-								"value": "@equals(item(),'kkp-kkpmobile-tracking-request')",
+								"value": "@equals(item().Prop_0,'kkp-kkpmobile-tracking-request')",
 								"type": "Expression"
 							}
 						}

@@ -8972,11 +8972,11 @@
 						"userProperties": [],
 						"typeProperties": {
 							"items": {
-								"value": "@activity('Lookup1').output.value.Prop_0",
+								"value": "@item().Prop_0",
 								"type": "Expression"
 							},
 							"condition": {
-								"value": "@equals(activity('Lookup1').output.value.Prop_0,'kkp-kkpmobile-tracking-request')",
+								"value": "@equals(item().Prop_0,'kkp-kkpmobile-tracking-request')",
 								"type": "Expression"
 							}
 						}

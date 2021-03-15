@@ -51,11 +51,11 @@
 				"userProperties": [],
 				"typeProperties": {
 					"items": {
-						"value": "@activity('Lookup1').output.value.Prop_0",
+						"value": "@activity('Lookup1').output.value",
 						"type": "Expression"
 					},
 					"condition": {
-						"value": "@equals(item(),'kkp-kkpmobile-tracking-request')",
+						"value": "@equals(item().Prop_0,'kkp-kkpmobile-tracking-request')",
 						"type": "Expression"
 					}
 				}

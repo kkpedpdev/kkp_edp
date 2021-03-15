@@ -8820,7 +8820,7 @@
 						"type": "ForEach",
 						"dependsOn": [
 							{
-								"activity": "Lookup1",
+								"activity": "Filter1",
 								"dependencyConditions": [
 									"Succeeded"
 								]
@@ -8954,6 +8954,29 @@
 							},
 							"body": {
 								"value": "@concat('{\"Message\": \"',activity('Notebook2_copy1').output.runOutput.RESULT_SET,'\",\"EmailTo\":\"pran.inteltion@gmail.com\",\n}')",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "Filter1",
+						"type": "Filter",
+						"dependsOn": [
+							{
+								"activity": "Lookup1",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('Lookup1').output.value.Prop0",
+								"type": "Expression"
+							},
+							"condition": {
+								"value": "@equals(activity('Lookup1').output.value.Prop0,'kkp-kkpmobile-tracking-request')",
 								"type": "Expression"
 							}
 						}

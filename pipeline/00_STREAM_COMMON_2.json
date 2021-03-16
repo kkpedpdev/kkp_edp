@@ -1,102 +1,7 @@
 {
-	"name": "00_STREAM_COMMON_copy2",
+	"name": "00_STREAM_COMMON",
 	"properties": {
 		"activities": [
-			{
-				"name": "GET PROCESS GROUP LIST",
-				"type": "Lookup",
-				"dependsOn": [
-					{
-						"activity": "START STREAM",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"timeout": "7.00:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"source": {
-						"type": "SqlServerSource",
-						"sqlReaderStoredProcedureName": {
-							"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA,'.PROC_GET_PRCS_GRP_BY_STREM')",
-							"type": "Expression"
-						},
-						"storedProcedureParameters": {
-							"P_STREM_NM": {
-								"type": "String",
-								"value": {
-									"value": "@pipeline().parameters.P_STREM_NM",
-									"type": "Expression"
-								}
-							}
-						},
-						"queryTimeout": "02:00:00",
-						"partitionOption": "None"
-					},
-					"dataset": {
-						"referenceName": "mssql_cntl_ds",
-						"type": "DatasetReference"
-					},
-					"firstRowOnly": false
-				}
-			},
-			{
-				"name": "FOR EACH PROCESS GROUP",
-				"type": "ForEach",
-				"dependsOn": [
-					{
-						"activity": "GET PROCESS GROUP LIST",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"userProperties": [],
-				"typeProperties": {
-					"items": {
-						"value": "@activity('GET PROCESS GROUP LIST').output.value",
-						"type": "Expression"
-					},
-					"isSequential": false,
-					"batchCount": 20,
-					"activities": [
-						{
-							"name": "Run Each Process Group",
-							"type": "ExecutePipeline",
-							"dependsOn": [],
-							"userProperties": [],
-							"typeProperties": {
-								"pipeline": {
-									"referenceName": "10_COMMON_RUN_PCS_GRP",
-									"type": "PipelineReference"
-								},
-								"waitOnCompletion": true,
-								"parameters": {
-									"P_PRCS_GRP": {
-										"value": "@item().PRCS_GRP",
-										"type": "Expression"
-									},
-									"P_RUN_MODE": {
-										"value": "@pipeline().parameters.P_RUN_MODE",
-										"type": "Expression"
-									},
-									"P_STREM_ID": {
-										"value": "@activity('START STREAM').output.FIRSTROW.STREM_ID",
-										"type": "Expression"
-									}
-								}
-							}
-						}
-					]
-				}
-			},
 			{
 				"name": "STREAM RESULT",
 				"type": "Lookup",
@@ -154,9 +59,9 @@
 				"type": "Lookup",
 				"dependsOn": [
 					{
-						"activity": "FOR EACH PROCESS GROUP",
+						"activity": "Until1",
 						"dependencyConditions": [
-							"Completed"
+							"Succeeded"
 						]
 					}
 				],
@@ -392,6 +297,198 @@
 					"referenceName": "link_sqldb_kkpb_edp",
 					"type": "LinkedServiceReference"
 				}
+			},
+			{
+				"name": "Until1",
+				"type": "Until",
+				"dependsOn": [
+					{
+						"activity": "Get Max Priority",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@equals(variables('V_LOOP'),activity('Get Max Priority').output.firstrow.prir)",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "Set variable1",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "Set variable2",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "V_LOOP",
+								"value": {
+									"value": "@string(ADD(int(variables('V_TMP')),1))",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "Set variable2",
+							"type": "SetVariable",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "V_TMP",
+								"value": {
+									"value": "@variables('V_LOOP')",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "GET PROCESS GROUP LIST",
+							"type": "Lookup",
+							"dependsOn": [
+								{
+									"activity": "Set variable2",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "SqlServerSource",
+									"sqlReaderStoredProcedureName": {
+										"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA,'.PROC_GET_PRCS_GRP_BY_STREM')",
+										"type": "Expression"
+									},
+									"storedProcedureParameters": {
+										"P_PRIR": {
+											"type": "String",
+											"value": {
+												"value": "@variables('V_TMP')",
+												"type": "Expression"
+											}
+										},
+										"P_STREM_NM": {
+											"type": "String",
+											"value": {
+												"value": "@pipeline().parameters.P_STREM_NM",
+												"type": "Expression"
+											}
+										}
+									},
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"dataset": {
+									"referenceName": "mssql_cntl_ds",
+									"type": "DatasetReference"
+								},
+								"firstRowOnly": false
+							}
+						},
+						{
+							"name": "FOR EACH PROCESS GROUP",
+							"type": "ForEach",
+							"dependsOn": [
+								{
+									"activity": "GET PROCESS GROUP LIST",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"userProperties": [],
+							"typeProperties": {
+								"items": {
+									"value": "@activity('GET PROCESS GROUP LIST').output.value",
+									"type": "Expression"
+								},
+								"isSequential": false,
+								"batchCount": 20,
+								"activities": [
+									{
+										"name": "Run Each Process Group",
+										"type": "ExecutePipeline",
+										"dependsOn": [],
+										"userProperties": [],
+										"typeProperties": {
+											"pipeline": {
+												"referenceName": "10_COMMON_RUN_PCS_GRP",
+												"type": "PipelineReference"
+											},
+											"waitOnCompletion": true,
+											"parameters": {
+												"P_PRCS_GRP": {
+													"value": "@item().PRCS_GRP",
+													"type": "Expression"
+												},
+												"P_RUN_MODE": {
+													"value": "@pipeline().parameters.P_RUN_MODE",
+													"type": "Expression"
+												},
+												"P_STREM_ID": {
+													"value": "@activity('START STREAM').output.FIRSTROW.STREM_ID",
+													"type": "Expression"
+												}
+											}
+										}
+									}
+								]
+							}
+						}
+					],
+					"timeout": "7.00:00:00"
+				}
+			},
+			{
+				"name": "Get Max Priority",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "START STREAM",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "@concat('SELECT MAX(PRIR) PRIR\nFROM [CNTL].[CNTL_CFG_PRCS_GRP]\nWHERE STREM_NM = ''', pipeline().parameters.P_STREM_NM, '''')",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "mssql_cntl_ds",
+						"type": "DatasetReference"
+					}
+				}
 			}
 		],
 		"parameters": {
@@ -405,13 +502,17 @@
 			}
 		},
 		"variables": {
-			"V_STREAM_RESULT": {
+			"V_LOOP": {
 				"type": "String",
-				"defaultValue": "-999"
+				"defaultValue": "0"
+			},
+			"V_TMP": {
+				"type": "String",
+				"defaultValue": "0"
 			}
 		},
 		"folder": {
-			"name": "BK"
+			"name": "COMMON JOB"
 		},
 		"annotations": [],
 		"lastPublishTime": "2021-02-24T05:06:51Z"

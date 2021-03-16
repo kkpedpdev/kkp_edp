@@ -1412,7 +1412,7 @@
 							"source": {
 								"type": "SqlServerSource",
 								"sqlReaderStoredProcedureName": {
-									"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA,'.PROC_GET_PRCS_GRP_BY_STREM')",
+									"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA,'.PROC_GET_PRCS_GRP_BY_STREM_2')",
 									"type": "Expression"
 								},
 								"storedProcedureParameters": {
@@ -1965,11 +1965,11 @@
 				"variables": {
 					"V_LOOP": {
 						"type": "String",
-						"defaultValue": "0"
+						"defaultValue": "1"
 					},
 					"V_TMP": {
 						"type": "String",
-						"defaultValue": "0"
+						"defaultValue": "1"
 					}
 				},
 				"folder": {

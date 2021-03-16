@@ -4412,7 +4412,20 @@
 													"type": "PipelineReference"
 												},
 												"waitOnCompletion": true,
-												"parameters": {}
+												"parameters": {
+													"P_LD_ID": {
+														"value": "@pipeline().parameters.P_LD_ID",
+														"type": "Expression"
+													},
+													"P_PRCS_NM": {
+														"value": "@pipeline().parameters.P_PRCS_NM",
+														"type": "Expression"
+													},
+													"P_PRCS_OBJ": {
+														"value": "@activity('GET PROCESS INFORMATION').output.FIRSTROW",
+														"type": "Expression"
+													}
+												}
 											}
 										}
 									]
@@ -6951,7 +6964,7 @@
 						"dependsOn": [],
 						"policy": {
 							"timeout": "7.00:00:00",
-							"retry": 1,
+							"retry": 3,
 							"retryIntervalInSeconds": 30,
 							"secureOutput": false,
 							"secureInput": false

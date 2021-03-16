@@ -7098,7 +7098,20 @@
 													"type": "PipelineReference"
 												},
 												"waitOnCompletion": true,
-												"parameters": {}
+												"parameters": {
+													"P_LD_ID": {
+														"value": "@pipeline().parameters.P_LD_ID",
+														"type": "Expression"
+													},
+													"P_PRCS_NM": {
+														"value": "@pipeline().parameters.P_PRCS_NM",
+														"type": "Expression"
+													},
+													"P_PRCS_OBJ": {
+														"value": "@activity('GET PROCESS INFORMATION').output.FIRSTROW",
+														"type": "Expression"
+													}
+												}
 											}
 										}
 									]

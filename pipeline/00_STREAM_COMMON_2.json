@@ -354,7 +354,7 @@
 							"type": "ExecutePipeline",
 							"dependsOn": [
 								{
-									"activity": "Set variable2",
+									"activity": "Set variable1",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -373,7 +373,7 @@
 										"type": "Expression"
 									},
 									"P_PRIR": {
-										"value": "@variables('V_TMP')",
+										"value": "@variables('V_LOOP')",
 										"type": "Expression"
 									},
 									"P_RUN_MODE": {
@@ -440,11 +440,11 @@
 		"variables": {
 			"V_LOOP": {
 				"type": "String",
-				"defaultValue": "1"
+				"defaultValue": "0"
 			},
 			"V_TMP": {
 				"type": "String",
-				"defaultValue": "1"
+				"defaultValue": "0"
 			}
 		},
 		"folder": {

@@ -1,0 +1,75 @@
+{
+	"name": "40_PCS_COMMON_TYPE9",
+	"properties": {
+		"description": "External Table Creation",
+		"activities": [
+			{
+				"name": "If Condition1",
+				"type": "IfCondition",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@equals(pipeline().parameters.P_PRCS_OBJ.STREM_NM,'EDP_RIB_CR')",
+						"type": "Expression"
+					},
+					"ifFalseActivities": [
+						{
+							"name": "EXT_TABLE",
+							"type": "ExecutePipeline",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"pipeline": {
+									"referenceName": "EXT_TABLE",
+									"type": "PipelineReference"
+								},
+								"waitOnCompletion": true,
+								"parameters": {
+									"P_STREAM": {
+										"value": "@pipeline().parameters.P_PRCS_OBJ.STREM_NM",
+										"type": "Expression"
+									}
+								}
+							}
+						}
+					],
+					"ifTrueActivities": [
+						{
+							"name": "RIB_EXT_TABLE",
+							"type": "ExecutePipeline",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"pipeline": {
+									"referenceName": "RIB_EXT_TABLE",
+									"type": "PipelineReference"
+								},
+								"waitOnCompletion": true
+							}
+						}
+					]
+				}
+			}
+		],
+		"parameters": {
+			"P_LD_ID": {
+				"type": "string",
+				"defaultValue": "-999"
+			},
+			"P_PRCS_NM": {
+				"type": "string",
+				"defaultValue": "GET_LOCATION_FACE_RECOGNITION_CustGeoInfo"
+			},
+			"P_PRCS_OBJ": {
+				"type": "object"
+			}
+		},
+		"folder": {
+			"name": "COMMON JOB"
+		},
+		"annotations": [],
+		"lastPublishTime": "2021-02-24T06:25:52Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

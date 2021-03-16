@@ -1081,6 +1081,24 @@
 									}
 								}
 							]
+						},
+						{
+							"value": "9",
+							"activities": [
+								{
+									"name": "40_PCS_COMMON_TYPE9",
+									"type": "ExecutePipeline",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "40_PCS_COMMON_TYPE9",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true
+									}
+								}
+							]
 						}
 					]
 				}

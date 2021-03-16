@@ -1,5 +1,5 @@
 {
-	"name": "00_STREAM_COMMON_copy2",
+	"name": "00_STREAM_COMMON",
 	"properties": {
 		"activities": [
 			{
@@ -411,7 +411,7 @@
 			}
 		},
 		"folder": {
-			"name": "BK"
+			"name": "COMMON JOB"
 		},
 		"annotations": [],
 		"lastPublishTime": "2021-02-24T05:06:51Z"

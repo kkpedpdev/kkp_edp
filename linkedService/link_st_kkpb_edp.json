@@ -6,7 +6,7 @@
 		"type": "AzureBlobFS",
 		"typeProperties": {
 			"url": "https://stkkpbdevtempedp.dfs.core.windows.net",
-			"encryptedCredential": "eyJDcmVkZW50aWFsSWQiOiJiYmFjNWY5NS0zNjY4LTQ1ZmYtYTQ1Yi1hMGU5NzdhYTczMzciLCJWZXJzaW9uIjoiMi4wIiwiQ2xhc3NUeXBlIjoiTWljcm9zb2Z0LkRhdGFQcm94eS5Db3JlLkludGVyU2VydmljZURhdGFDb250cmFjdC5DcmVkZW50aWFsU1UwNkNZMTQifQ=="
+			"encryptedCredential": "eyJDcmVkZW50aWFsSWQiOiIxYTE0OGFlMC0yNjI2LTQxYWEtYTdhOC1iZTc4ZDI0YTY1MTgiLCJWZXJzaW9uIjoiMi4wIiwiQ2xhc3NUeXBlIjoiTWljcm9zb2Z0LkRhdGFQcm94eS5Db3JlLkludGVyU2VydmljZURhdGFDb250cmFjdC5DcmVkZW50aWFsU1UwNkNZMTQifQ=="
 		},
 		"connectVia": {
 			"referenceName": "shir-kkpb-edp",

@@ -4397,6 +4397,25 @@
 											}
 										}
 									]
+								},
+								{
+									"value": "9",
+									"activities": [
+										{
+											"name": "40_PCS_COMMON_TYPE9",
+											"type": "ExecutePipeline",
+											"dependsOn": [],
+											"userProperties": [],
+											"typeProperties": {
+												"pipeline": {
+													"referenceName": "40_PCS_COMMON_TYPE9",
+													"type": "PipelineReference"
+												},
+												"waitOnCompletion": true,
+												"parameters": {}
+											}
+										}
+									]
 								}
 							]
 						}
@@ -4431,7 +4450,8 @@
 				"[concat(variables('factoryId'), '/pipelines/40_PCS_COMMON_TYPE4')]",
 				"[concat(variables('factoryId'), '/pipelines/40_PCS_COMMON_TYPE5')]",
 				"[concat(variables('factoryId'), '/pipelines/40_PCS_COMMON_TYPE6')]",
-				"[concat(variables('factoryId'), '/pipelines/40_PCS_COMMON_TYPE7')]"
+				"[concat(variables('factoryId'), '/pipelines/40_PCS_COMMON_TYPE7')]",
+				"[concat(variables('factoryId'), '/pipelines/40_PCS_COMMON_TYPE9')]"
 			]
 		},
 		{
@@ -8642,6 +8662,87 @@
 				"[concat(variables('factoryId'), '/datasets/dl_parquet_ds')]",
 				"[concat(variables('factoryId'), '/linkedServices/link_sqldb_kkpb_edp')]",
 				"[concat(variables('factoryId'), '/datasets/dl_json_ds')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/40_PCS_COMMON_TYPE9')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "External Table Creation",
+				"activities": [
+					{
+						"name": "If Condition1",
+						"type": "IfCondition",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"expression": {
+								"value": "@equals(pipeline().parameters.P_PRCS_OBJ.STREM_NM,'EDP_RIB_CR')",
+								"type": "Expression"
+							},
+							"ifFalseActivities": [
+								{
+									"name": "EXT_TABLE",
+									"type": "ExecutePipeline",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "EXT_TABLE",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {
+											"P_STREAM": {
+												"value": "@pipeline().parameters.P_PRCS_OBJ.STREM_NM",
+												"type": "Expression"
+											}
+										}
+									}
+								}
+							],
+							"ifTrueActivities": [
+								{
+									"name": "RIB_EXT_TABLE",
+									"type": "ExecutePipeline",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "RIB_EXT_TABLE",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {}
+									}
+								}
+							]
+						}
+					}
+				],
+				"parameters": {
+					"P_LD_ID": {
+						"type": "string",
+						"defaultValue": "-999"
+					},
+					"P_PRCS_NM": {
+						"type": "string",
+						"defaultValue": "GET_LOCATION_FACE_RECOGNITION_CustGeoInfo"
+					},
+					"P_PRCS_OBJ": {
+						"type": "object"
+					}
+				},
+				"folder": {
+					"name": "COMMON JOB"
+				},
+				"annotations": [],
+				"lastPublishTime": "2021-02-24T06:25:52Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/EXT_TABLE')]",
+				"[concat(variables('factoryId'), '/pipelines/RIB_EXT_TABLE')]"
 			]
 		},
 		{

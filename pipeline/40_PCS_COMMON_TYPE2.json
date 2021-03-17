@@ -546,6 +546,33 @@
 								"referenceName": "link_sqldb_kkpb_edp",
 								"type": "LinkedServiceReference"
 							}
+						},
+						{
+							"name": "Copy to Curated",
+							"type": "DatabricksNotebook",
+							"dependsOn": [
+								{
+									"activity": "Update Log Count",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"notebookPath": "/DEV/00_Common/edp/adf/dbn-adf-copy-table-to-curated"
+							},
+							"linkedServiceName": {
+								"referenceName": "link_dbw_edp",
+								"type": "LinkedServiceReference"
+							}
 						}
 					]
 				}

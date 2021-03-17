@@ -9499,6 +9499,9 @@
 						"defaultValue": "2018-06-01"
 					}
 				},
+				"folder": {
+					"name": "TEST"
+				},
 				"annotations": [],
 				"lastPublishTime": "2021-02-24T10:43:36Z"
 			},
@@ -9579,6 +9582,9 @@
 					"PARAMS": {
 						"type": "string"
 					}
+				},
+				"folder": {
+					"name": "TEST"
 				},
 				"annotations": [],
 				"lastPublishTime": "2021-02-24T05:06:42Z"
@@ -10483,6 +10489,9 @@
 						"type": "String"
 					}
 				},
+				"folder": {
+					"name": "TEST"
+				},
 				"annotations": []
 			},
 			"dependsOn": [
@@ -10727,6 +10736,9 @@
 						}
 					}
 				],
+				"folder": {
+					"name": "TEST"
+				},
 				"annotations": [],
 				"lastPublishTime": "2021-02-24T05:06:42Z"
 			},
@@ -10799,6 +10811,9 @@
 						}
 					}
 				],
+				"folder": {
+					"name": "TEST"
+				},
 				"annotations": []
 			},
 			"dependsOn": [
@@ -10864,6 +10879,9 @@
 						]
 					}
 				],
+				"folder": {
+					"name": "TEST"
+				},
 				"annotations": [],
 				"lastPublishTime": "2021-02-24T05:06:43Z"
 			},
@@ -11230,6 +11248,9 @@
 						}
 					}
 				],
+				"folder": {
+					"name": "TEST"
+				},
 				"annotations": []
 			},
 			"dependsOn": [
@@ -12176,6 +12197,26 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/integrationRuntimes/shir-kkpb-edp')]"
 			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/trigger1')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Stopped",
+				"pipelines": [],
+				"type": "ScheduleTrigger",
+				"typeProperties": {
+					"recurrence": {
+						"frequency": "Minute",
+						"interval": 15,
+						"startTime": "2021-03-16T10:52:00Z",
+						"timeZone": "UTC"
+					}
+				}
+			},
+			"dependsOn": []
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/shir-kkpb-edp')]",

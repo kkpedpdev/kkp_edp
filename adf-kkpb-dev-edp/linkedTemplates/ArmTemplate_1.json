@@ -6,12 +6,46 @@
 			"type": "string",
 			"metadata": "Data Factory name",
 			"defaultValue": "adf-kkpb-dev-edp"
+		},
+		"linkedService2_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'linkedService2'"
+		},
+		"linkedService2_properties_typeProperties_host": {
+			"type": "string",
+			"defaultValue": "D:Landing"
+		},
+		"linkedService2_properties_typeProperties_userId": {
+			"type": "string",
+			"defaultValue": "kkpbvmshiredpadm"
 		}
 	},
 	"variables": {
 		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
 	},
 	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/linkedService2')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "FileServer",
+				"typeProperties": {
+					"host": "[parameters('linkedService2_properties_typeProperties_host')]",
+					"userId": "[parameters('linkedService2_properties_typeProperties_userId')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('linkedService2_password')]"
+					}
+				},
+				"connectVia": {
+					"referenceName": "shir-kkpb-edp",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": []
+		},
 		{
 			"name": "[concat(parameters('factoryName'), '/40_PCS_COMMON_TYPE1')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
@@ -866,6 +900,9 @@
 						"type": "string"
 					}
 				},
+				"folder": {
+					"name": "TEST"
+				},
 				"annotations": [],
 				"lastPublishTime": "2021-02-24T05:06:42Z"
 			},
@@ -1102,6 +1139,9 @@
 						}
 					}
 				],
+				"folder": {
+					"name": "TEST"
+				},
 				"annotations": [],
 				"lastPublishTime": "2021-02-24T05:06:42Z"
 			},
@@ -1476,46 +1516,6 @@
 						}
 					}
 				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/dl_parquet_ds')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "link_st_kkpb_edp",
-					"type": "LinkedServiceReference"
-				},
-				"parameters": {
-					"P_CONTAINER": {
-						"type": "string"
-					},
-					"P_PATH": {
-						"type": "string"
-					},
-					"P_FILENAME": {
-						"type": "string"
-					}
-				},
-				"annotations": [],
-				"type": "Parquet",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobFSLocation",
-						"folderPath": {
-							"value": "@dataset().P_PATH",
-							"type": "Expression"
-						},
-						"fileSystem": {
-							"value": "@dataset().P_CONTAINER",
-							"type": "Expression"
-						}
-					},
-					"compressionCodec": "snappy"
-				},
-				"schema": []
 			},
 			"dependsOn": []
 		}

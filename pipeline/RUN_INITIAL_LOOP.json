@@ -103,6 +103,9 @@
 				"type": "String"
 			}
 		},
+		"folder": {
+			"name": "TEST"
+		},
 		"annotations": []
 	}
 }

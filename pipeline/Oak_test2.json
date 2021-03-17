@@ -57,6 +57,9 @@
 				"defaultValue": "2018-06-01"
 			}
 		},
+		"folder": {
+			"name": "TEST"
+		},
 		"annotations": [],
 		"lastPublishTime": "2021-02-24T10:43:36Z"
 	},

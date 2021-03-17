@@ -27,6 +27,9 @@
 				}
 			}
 		],
+		"folder": {
+			"name": "TEST"
+		},
 		"annotations": [],
 		"lastPublishTime": "2021-02-24T05:06:42Z"
 	},

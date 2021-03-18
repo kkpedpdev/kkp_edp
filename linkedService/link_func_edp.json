@@ -6,7 +6,7 @@
 		"type": "AzureFunction",
 		"typeProperties": {
 			"functionAppUrl": "https://func-kkpb-temp-edp.azurewebsites.net",
-			"encryptedCredential": "eyJDcmVkZW50aWFsSWQiOiI1Nzc1NDYxZC1kODBlLTQ4NGEtOTA0Ny05NmRhOGMwNDM2ODQiLCJWZXJzaW9uIjoiMi4wIiwiQ2xhc3NUeXBlIjoiTWljcm9zb2Z0LkRhdGFQcm94eS5Db3JlLkludGVyU2VydmljZURhdGFDb250cmFjdC5DcmVkZW50aWFsU1UwNkNZMTQifQ=="
+			"encryptedCredential": "eyJDcmVkZW50aWFsSWQiOiIwYzlhN2IxNi1jNjY5LTRmYTMtODFhNS0wYzNjMzdjNGI2Y2UiLCJWZXJzaW9uIjoiMi4wIiwiQ2xhc3NUeXBlIjoiTWljcm9zb2Z0LkRhdGFQcm94eS5Db3JlLkludGVyU2VydmljZURhdGFDb250cmFjdC5DcmVkZW50aWFsU1UwNkNZMTQifQ=="
 		},
 		"connectVia": {
 			"referenceName": "shir-kkpb-edp",

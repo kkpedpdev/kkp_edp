@@ -5,9 +5,9 @@
 		"annotations": [],
 		"type": "AzureDatabricks",
 		"typeProperties": {
-			"domain": "https://adb-4668344029063629.9.azuredatabricks.net",
-			"existingClusterId": "0112-023856-dare238",
-			"encryptedCredential": "eyJDcmVkZW50aWFsSWQiOiI0YjliNDViZi1jMjljLTRlNGItYmM1ZS03ODUzMGZjYTQ0ZGEiLCJWZXJzaW9uIjoiMi4wIiwiQ2xhc3NUeXBlIjoiTWljcm9zb2Z0LkRhdGFQcm94eS5Db3JlLkludGVyU2VydmljZURhdGFDb250cmFjdC5DcmVkZW50aWFsU1UwNkNZMTQifQ=="
+			"domain": "https://adb-7319711022966882.2.azuredatabricks.net",
+			"existingClusterId": "0318-054844-rely456",
+			"encryptedCredential": "eyJDcmVkZW50aWFsSWQiOiJlOWVhYmVkMC00MWRhLTQzMTQtYTU0Zi1lZGU0MDNmMmU0OTkiLCJWZXJzaW9uIjoiMi4wIiwiQ2xhc3NUeXBlIjoiTWljcm9zb2Z0LkRhdGFQcm94eS5Db3JlLkludGVyU2VydmljZURhdGFDb250cmFjdC5DcmVkZW50aWFsU1UwNkNZMTQifQ=="
 		},
 		"connectVia": {
 			"referenceName": "shir-kkpb-edp",

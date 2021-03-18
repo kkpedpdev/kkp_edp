@@ -309,7 +309,7 @@
 									"parameters": {
 										"P_PATH": "TMP/SOURCE/",
 										"P_FILENAME": {
-											"value": "@activity('Lookup1').output.firstrow.FI_NM",
+											"value": "@replace(activity('Lookup1').output.firstrow.SCHM_FI,'.json', '.txt')",
 											"type": "Expression"
 										},
 										"P_DELIMITER": {

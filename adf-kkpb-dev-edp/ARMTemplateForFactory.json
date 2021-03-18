@@ -161,7 +161,7 @@
 								"value": "@activity('GET PROCESS GROUP LIST').output.value",
 								"type": "Expression"
 							},
-							"isSequential": true,
+							"isSequential": false,
 							"activities": [
 								{
 									"name": "Run Each Process Group",

@@ -6652,7 +6652,7 @@
 											"parameters": {
 												"P_PATH": "TMP/SOURCE/",
 												"P_FILENAME": {
-													"value": "@activity('Lookup1').output.firstrow.FI_NM",
+													"value": "@replace(activity('Lookup1').output.firstrow.SCHM_FI,'.json', '.txt')",
 													"type": "Expression"
 												},
 												"P_DELIMITER": {
@@ -11474,9 +11474,9 @@
 								"referenceName": "dl_parquet_ds",
 								"type": "DatasetReference",
 								"parameters": {
-									"P_CONTAINER": "working",
-									"P_PATH": "TEST",
-									"P_FILENAME": "CFPARX.json"
+									"P_CONTAINER": "staging",
+									"P_PATH": " internal/CBS/SIBS_LNMAST/DATA_DT=20210310",
+									"P_FILENAME": "LNMAST_20210310.parquet"
 								}
 							}
 						]

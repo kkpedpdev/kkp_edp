@@ -1404,6 +1404,180 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/00_STREAM_COMMON_temp')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "GET PROCESS GROUP LIST",
+						"type": "Lookup",
+						"dependsOn": [
+							{
+								"activity": "START STREAM",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "SqlServerSource",
+								"sqlReaderStoredProcedureName": {
+									"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA,'.PROC_GET_PRCS_GRP_BY_STREM')",
+									"type": "Expression"
+								},
+								"storedProcedureParameters": {
+									"P_STREM_NM": {
+										"type": "String",
+										"value": {
+											"value": "@pipeline().parameters.P_STREM_NM",
+											"type": "Expression"
+										}
+									}
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "mssql_cntl_ds",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "FOR EACH PROCESS GROUP",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "GET PROCESS GROUP LIST",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('GET PROCESS GROUP LIST').output.value",
+								"type": "Expression"
+							},
+							"isSequential": false,
+							"activities": [
+								{
+									"name": "10_COMMON_RUN_PCS_GRP_temp",
+									"type": "ExecutePipeline",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "10_COMMON_RUN_PCS_GRP_temp",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {
+											"P_PRCS_GRP": {
+												"value": "@item().PRCS_GRP",
+												"type": "Expression"
+											},
+											"P_RUN_MODE": {
+												"value": "@pipeline().parameters.P_RUN_MODE",
+												"type": "Expression"
+											},
+											"P_STREM_ID": {
+												"value": "@activity('START STREAM').output.FIRSTROW.STREM_ID",
+												"type": "Expression"
+											}
+										}
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "START STREAM",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "SqlServerSource",
+								"sqlReaderStoredProcedureName": {
+									"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA,'.PROC_STRT_STREM')",
+									"type": "Expression"
+								},
+								"storedProcedureParameters": {
+									"P_RUN_MODE": {
+										"type": "String",
+										"value": {
+											"value": "@pipeline().parameters.P_RUN_MODE",
+											"type": "Expression"
+										}
+									},
+									"P_STREM_NM": {
+										"type": "String",
+										"value": {
+											"value": "@pipeline().parameters.P_STREM_NM",
+											"type": "Expression"
+										}
+									}
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "mssql_cntl_ds",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						}
+					}
+				],
+				"parameters": {
+					"P_STREM_NM": {
+						"type": "string",
+						"defaultValue": "EDP_SET"
+					},
+					"P_RUN_MODE": {
+						"type": "string",
+						"defaultValue": "R"
+					}
+				},
+				"variables": {
+					"V_STREAM_RESULT": {
+						"type": "String",
+						"defaultValue": "-999"
+					}
+				},
+				"folder": {
+					"name": "COMMON JOB"
+				},
+				"annotations": [],
+				"lastPublishTime": "2021-02-24T05:06:51Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/mssql_cntl_ds')]",
+				"[concat(variables('factoryId'), '/pipelines/10_COMMON_RUN_PCS_GRP_temp')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/05_COMMON_RUN_PCS_GRP_BY PRIR')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -1876,6 +2050,235 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/mssql_cntl_ds')]",
 				"[concat(variables('factoryId'), '/pipelines/20_PCS_COMMON_START')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/10_COMMON_RUN_PCS_GRP_temp')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "GET PROCESS LIST",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "SqlServerSource",
+								"sqlReaderStoredProcedureName": {
+									"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA,'.PROC_GET_PRCS_BY_GRP')",
+									"type": "Expression"
+								},
+								"storedProcedureParameters": {
+									"P_PRCS_GRP": {
+										"type": "String",
+										"value": {
+											"value": "@pipeline().parameters.P_PRCS_GRP",
+											"type": "Expression"
+										}
+									}
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "mssql_cntl_ds",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "ForEach1",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "GET PROCESS LIST",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('GET PROCESS LIST').output.value",
+								"type": "Expression"
+							},
+							"isSequential": true,
+							"activities": [
+								{
+									"name": "GET PROCESS INFORMATION",
+									"type": "Lookup",
+									"dependsOn": [
+										{
+											"activity": "START PROCESS",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "SqlServerSource",
+											"sqlReaderStoredProcedureName": {
+												"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA, '.[PROC_GET_PRCS]')",
+												"type": "Expression"
+											},
+											"storedProcedureParameters": {
+												"P_PRCS_NM": {
+													"type": "String",
+													"value": {
+														"value": "@item().PRCS_NM",
+														"type": "Expression"
+													}
+												}
+											},
+											"queryTimeout": "02:00:00",
+											"partitionOption": "None"
+										},
+										"dataset": {
+											"referenceName": "mssql_cntl_ds",
+											"type": "DatasetReference",
+											"parameters": {}
+										}
+									}
+								},
+								{
+									"name": "Execute Pipeline Type 3",
+									"type": "ExecutePipeline",
+									"dependsOn": [
+										{
+											"activity": "GET PROCESS INFORMATION",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "40_PCS_COMMON_TYPE3",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {
+											"P_LD_ID": {
+												"value": "@activity('START PROCESS').output.FIRSTROW.LD_ID",
+												"type": "Expression"
+											},
+											"P_PRCS_NM": {
+												"value": "@item().PRCS_NM",
+												"type": "Expression"
+											},
+											"P_PRCS_OBJ": {
+												"value": "@activity('GET PROCESS INFORMATION').output.FIRSTROW",
+												"type": "Expression"
+											}
+										}
+									}
+								},
+								{
+									"name": "START PROCESS",
+									"type": "Lookup",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "SqlServerSource",
+											"sqlReaderStoredProcedureName": {
+												"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA, '.[PROC_STRT_PRCS]')",
+												"type": "Expression"
+											},
+											"storedProcedureParameters": {
+												"P_PRCS_NM": {
+													"type": "String",
+													"value": {
+														"value": "@item().PRCS_NM",
+														"type": "Expression"
+													}
+												},
+												"P_RUN_MODE": {
+													"type": "String",
+													"value": {
+														"value": "@pipeline().parameters.P_RUN_MODE",
+														"type": "Expression"
+													}
+												},
+												"P_STREM_ID": {
+													"type": "String",
+													"value": {
+														"value": "@pipeline().parameters.P_STREM_ID",
+														"type": "Expression"
+													}
+												},
+												"P_ADF_RUN_ID": {
+													"type": "String",
+													"value": {
+														"value": "@pipeline().RunId",
+														"type": "Expression"
+													}
+												}
+											},
+											"queryTimeout": "02:00:00",
+											"partitionOption": "None"
+										},
+										"dataset": {
+											"referenceName": "mssql_cntl_ds",
+											"type": "DatasetReference",
+											"parameters": {}
+										},
+										"firstRowOnly": true
+									}
+								}
+							]
+						}
+					}
+				],
+				"parameters": {
+					"P_PRCS_GRP": {
+						"type": "string"
+					},
+					"P_RUN_MODE": {
+						"type": "string"
+					},
+					"P_STREM_ID": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "COMMON JOB"
+				},
+				"annotations": [],
+				"lastPublishTime": "2021-02-24T05:06:49Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/mssql_cntl_ds')]",
+				"[concat(variables('factoryId'), '/pipelines/40_PCS_COMMON_TYPE3')]"
 			]
 		},
 		{
@@ -12133,12 +12536,12 @@
 				"annotations": [],
 				"type": "AzureDatabricks",
 				"typeProperties": {
-					"domain": "https://adb-4668344029063629.9.azuredatabricks.net",
+					"domain": "https://adb-7319711022966882.2.azuredatabricks.net",
 					"accessToken": {
 						"type": "SecureString",
 						"value": "[parameters('link_dbw_edp_accessToken')]"
 					},
-					"existingClusterId": "0112-023856-dare238"
+					"existingClusterId": "0318-054844-rely456"
 				},
 				"connectVia": {
 					"referenceName": "shir-kkpb-edp",
@@ -12191,9 +12594,15 @@
 						"type": "SecureString",
 						"value": "[parameters('link_func_edp_functionKey')]"
 					}
+				},
+				"connectVia": {
+					"referenceName": "shir-kkpb-edp",
+					"type": "IntegrationRuntimeReference"
 				}
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/shir-kkpb-edp')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/link_kv_edp')]",

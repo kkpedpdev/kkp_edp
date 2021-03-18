@@ -7,10 +7,6 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "adf-kkpb-dev-edp"
 		},
-		"link_func_edp_functionKey": {
-			"type": "secureString",
-			"metadata": "Secure string for 'functionKey' of 'link_func_edp'"
-		},
 		"link_adls_onprim_edp_accountKey": {
 			"type": "secureString",
 			"metadata": "Secure string for 'accountKey' of 'link_adls_onprim_edp'"
@@ -27,6 +23,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'accessToken' of 'link_dbw_edp'"
 		},
+		"link_func_edp_functionKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'functionKey' of 'link_func_edp'"
+		},
 		"link_sqldb_kkpb_edp_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'link_sqldb_kkpb_edp'"
@@ -42,10 +42,6 @@
 		"AzureDataLakeStorage1_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://stkkpbdevtempedp.dfs.core.windows.net"
-		},
-		"link_func_edp_properties_typeProperties_functionAppUrl": {
-			"type": "string",
-			"defaultValue": "https://func-kkpb-temp-edp.azurewebsites.net"
 		},
 		"link_kv_edp_properties_typeProperties_baseUrl": {
 			"type": "string",
@@ -71,6 +67,10 @@
 			"type": "string",
 			"defaultValue": "administrator"
 		},
+		"link_func_edp_properties_typeProperties_functionAppUrl": {
+			"type": "string",
+			"defaultValue": "https://func-kkpb-temp-edp.azurewebsites.net"
+		},
 		"link_st_kkpb_edp_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://stkkpbdevtempedp.dfs.core.windows.net"
@@ -89,23 +89,6 @@
 				"type": "AzureBlobFS",
 				"typeProperties": {
 					"url": "[parameters('AzureDataLakeStorage1_properties_typeProperties_url')]"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/link_func_edp')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureFunction",
-				"typeProperties": {
-					"functionAppUrl": "[parameters('link_func_edp_properties_typeProperties_functionAppUrl')]",
-					"functionKey": {
-						"type": "SecureString",
-						"value": "[parameters('link_func_edp_functionKey')]"
-					}
 				}
 			},
 			"dependsOn": []
@@ -480,12 +463,12 @@
 				"annotations": [],
 				"type": "AzureDatabricks",
 				"typeProperties": {
-					"domain": "https://adb-4668344029063629.9.azuredatabricks.net",
+					"domain": "https://adb-7319711022966882.2.azuredatabricks.net",
 					"accessToken": {
 						"type": "SecureString",
 						"value": "[parameters('link_dbw_edp_accessToken')]"
 					},
-					"existingClusterId": "0112-023856-dare238"
+					"existingClusterId": "0318-054844-rely456"
 				},
 				"connectVia": {
 					"referenceName": "shir-kkpb-edp",
@@ -523,6 +506,29 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/integrationRuntimes/shir-onprim-kkbp-edp')]",
 				"[concat(variables('factoryId'), '/linkedServices/link_kv_edp')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/link_func_edp')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureFunction",
+				"typeProperties": {
+					"functionAppUrl": "[parameters('link_func_edp_properties_typeProperties_functionAppUrl')]",
+					"functionKey": {
+						"type": "SecureString",
+						"value": "[parameters('link_func_edp_functionKey')]"
+					}
+				},
+				"connectVia": {
+					"referenceName": "shir-kkpb-edp",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/shir-kkpb-edp')]"
 			]
 		},
 		{

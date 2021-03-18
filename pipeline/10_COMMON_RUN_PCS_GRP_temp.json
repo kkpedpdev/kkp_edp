@@ -1,0 +1,221 @@
+{
+	"name": "10_COMMON_RUN_PCS_GRP_temp",
+	"properties": {
+		"activities": [
+			{
+				"name": "GET PROCESS LIST",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "SqlServerSource",
+						"sqlReaderStoredProcedureName": {
+							"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA,'.PROC_GET_PRCS_BY_GRP')",
+							"type": "Expression"
+						},
+						"storedProcedureParameters": {
+							"P_PRCS_GRP": {
+								"type": "String",
+								"value": {
+									"value": "@pipeline().parameters.P_PRCS_GRP",
+									"type": "Expression"
+								}
+							}
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "mssql_cntl_ds",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "ForEach1",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "GET PROCESS LIST",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('GET PROCESS LIST').output.value",
+						"type": "Expression"
+					},
+					"isSequential": true,
+					"activities": [
+						{
+							"name": "GET PROCESS INFORMATION",
+							"type": "Lookup",
+							"dependsOn": [
+								{
+									"activity": "START PROCESS",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "SqlServerSource",
+									"sqlReaderStoredProcedureName": {
+										"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA, '.[PROC_GET_PRCS]')",
+										"type": "Expression"
+									},
+									"storedProcedureParameters": {
+										"P_PRCS_NM": {
+											"type": "String",
+											"value": {
+												"value": "@item().PRCS_NM",
+												"type": "Expression"
+											}
+										}
+									},
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"dataset": {
+									"referenceName": "mssql_cntl_ds",
+									"type": "DatasetReference"
+								}
+							}
+						},
+						{
+							"name": "Execute Pipeline Type 3",
+							"type": "ExecutePipeline",
+							"dependsOn": [
+								{
+									"activity": "GET PROCESS INFORMATION",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"userProperties": [],
+							"typeProperties": {
+								"pipeline": {
+									"referenceName": "40_PCS_COMMON_TYPE3",
+									"type": "PipelineReference"
+								},
+								"waitOnCompletion": true,
+								"parameters": {
+									"P_LD_ID": {
+										"value": "@activity('START PROCESS').output.FIRSTROW.LD_ID",
+										"type": "Expression"
+									},
+									"P_PRCS_NM": {
+										"value": "@item().PRCS_NM",
+										"type": "Expression"
+									},
+									"P_PRCS_OBJ": {
+										"value": "@activity('GET PROCESS INFORMATION').output.FIRSTROW",
+										"type": "Expression"
+									}
+								}
+							}
+						},
+						{
+							"name": "START PROCESS",
+							"type": "Lookup",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "SqlServerSource",
+									"sqlReaderStoredProcedureName": {
+										"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA, '.[PROC_STRT_PRCS]')",
+										"type": "Expression"
+									},
+									"storedProcedureParameters": {
+										"P_PRCS_NM": {
+											"type": "String",
+											"value": {
+												"value": "@item().PRCS_NM",
+												"type": "Expression"
+											}
+										},
+										"P_RUN_MODE": {
+											"type": "String",
+											"value": {
+												"value": "@pipeline().parameters.P_RUN_MODE",
+												"type": "Expression"
+											}
+										},
+										"P_STREM_ID": {
+											"type": "String",
+											"value": {
+												"value": "@pipeline().parameters.P_STREM_ID",
+												"type": "Expression"
+											}
+										},
+										"P_ADF_RUN_ID": {
+											"type": "String",
+											"value": {
+												"value": "@pipeline().RunId",
+												"type": "Expression"
+											}
+										}
+									},
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"dataset": {
+									"referenceName": "mssql_cntl_ds",
+									"type": "DatasetReference"
+								},
+								"firstRowOnly": true
+							}
+						}
+					]
+				}
+			}
+		],
+		"parameters": {
+			"P_PRCS_GRP": {
+				"type": "string"
+			},
+			"P_RUN_MODE": {
+				"type": "string"
+			},
+			"P_STREM_ID": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "COMMON JOB"
+		},
+		"annotations": [],
+		"lastPublishTime": "2021-02-24T05:06:49Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

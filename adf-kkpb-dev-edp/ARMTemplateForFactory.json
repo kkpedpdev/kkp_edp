@@ -6640,6 +6640,20 @@
 											}
 										},
 										"enableStaging": false,
+										"logSettings": {
+											"enableCopyActivityLog": true,
+											"copyActivityLogSettings": {
+												"logLevel": "Warning",
+												"enableReliableLogging": false
+											},
+											"logLocationSettings": {
+												"linkedServiceName": {
+													"referenceName": "link_st_kkpb_edp",
+													"type": "LinkedServiceReference"
+												},
+												"path": "logs/ADF"
+											}
+										},
 										"translator": {
 											"value": "@activity('Lookup Schema').output.firstRow",
 											"type": "Expression"
@@ -6953,7 +6967,8 @@
 				"[concat(variables('factoryId'), '/datasets/dl_json_ds')]",
 				"[concat(variables('factoryId'), '/linkedServices/link_sqldb_kkpb_edp')]",
 				"[concat(variables('factoryId'), '/datasets/dl_csv_ds')]",
-				"[concat(variables('factoryId'), '/datasets/dl_parquet_ds')]"
+				"[concat(variables('factoryId'), '/datasets/dl_parquet_ds')]",
+				"[concat(variables('factoryId'), '/linkedServices/link_st_kkpb_edp')]"
 			]
 		},
 		{

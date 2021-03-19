@@ -13393,19 +13393,30 @@
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"annotations": [],
-				"runtimeState": "Stopped",
-				"pipelines": [],
+				"runtimeState": "Started",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "Test DBW",
+							"type": "PipelineReference"
+						},
+						"parameters": {}
+					}
+				],
 				"type": "ScheduleTrigger",
 				"typeProperties": {
 					"recurrence": {
-						"frequency": "Minute",
-						"interval": 15,
-						"startTime": "2021-03-16T10:52:00Z",
-						"timeZone": "UTC"
+						"frequency": "Month",
+						"interval": 1,
+						"startTime": "2021-03-19T15:30:00",
+						"timeZone": "SE Asia Standard Time",
+						"schedule": {}
 					}
 				}
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/Test DBW')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/shir-kkpb-edp')]",

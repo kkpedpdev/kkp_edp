@@ -39,6 +39,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'link_syn_kkpb_edp'"
 		},
+		"linkedService2_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'linkedService2'"
+		},
 		"AzureDataLakeStorage1_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://stkkpbdevtempedp.dfs.core.windows.net"
@@ -74,6 +78,14 @@
 		"link_st_kkpb_edp_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://stkkpbdevtempedp.dfs.core.windows.net"
+		},
+		"linkedService2_properties_typeProperties_host": {
+			"type": "string",
+			"defaultValue": "D:Landing"
+		},
+		"linkedService2_properties_typeProperties_userId": {
+			"type": "string",
+			"defaultValue": "kkpbvmshiredpadm"
 		}
 	},
 	"variables": {
@@ -117,26 +129,6 @@
 					"url": "[parameters('link_spo_http_properties_typeProperties_url')]",
 					"enableServerCertificateValidation": true,
 					"authenticationType": "Anonymous"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/trigger1')]",
-			"type": "Microsoft.DataFactory/factories/triggers",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"runtimeState": "Stopped",
-				"pipelines": [],
-				"type": "ScheduleTrigger",
-				"typeProperties": {
-					"recurrence": {
-						"frequency": "Minute",
-						"interval": 15,
-						"startTime": "2021-03-16T10:52:00Z",
-						"timeZone": "UTC"
-					}
 				}
 			},
 			"dependsOn": []
@@ -582,6 +574,30 @@
 				"type": "AzureSqlDW",
 				"typeProperties": {
 					"connectionString": "[parameters('link_syn_kkpb_edp_connectionString')]"
+				},
+				"connectVia": {
+					"referenceName": "shir-kkpb-edp",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/shir-kkpb-edp')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/linkedService2')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "FileServer",
+				"typeProperties": {
+					"host": "[parameters('linkedService2_properties_typeProperties_host')]",
+					"userId": "[parameters('linkedService2_properties_typeProperties_userId')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('linkedService2_password')]"
+					}
 				},
 				"connectVia": {
 					"referenceName": "shir-kkpb-edp",

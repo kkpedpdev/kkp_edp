@@ -13,46 +13,6 @@
 	},
 	"resources": [
 		{
-			"name": "[concat(parameters('factoryName'), '/dl_parquet_ds')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "link_st_kkpb_edp",
-					"type": "LinkedServiceReference"
-				},
-				"parameters": {
-					"P_CONTAINER": {
-						"type": "string"
-					},
-					"P_PATH": {
-						"type": "string"
-					},
-					"P_FILENAME": {
-						"type": "string"
-					}
-				},
-				"annotations": [],
-				"type": "Parquet",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobFSLocation",
-						"folderPath": {
-							"value": "@dataset().P_PATH",
-							"type": "Expression"
-						},
-						"fileSystem": {
-							"value": "@dataset().P_CONTAINER",
-							"type": "Expression"
-						}
-					},
-					"compressionCodec": "snappy"
-				},
-				"schema": []
-			},
-			"dependsOn": []
-		},
-		{
 			"name": "[concat(parameters('factoryName'), '/dl_sql_ds')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -1046,8 +1006,7 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/onprim_bin_ds')]",
-				"[concat(variables('factoryId'), '/datasets/mssql_cntl_ds')]",
-				"[concat(variables('factoryId'), '/datasets/dl_parquet_ds')]"
+				"[concat(variables('factoryId'), '/datasets/mssql_cntl_ds')]"
 			]
 		},
 		{
@@ -1549,8 +1508,7 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/onprim_bin_ds')]",
-				"[concat(variables('factoryId'), '/datasets/mssql_cntl_ds')]",
-				"[concat(variables('factoryId'), '/datasets/dl_parquet_ds')]"
+				"[concat(variables('factoryId'), '/datasets/mssql_cntl_ds')]"
 			]
 		},
 		{
@@ -2199,8 +2157,7 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/onprim_bin_ds')]",
-				"[concat(variables('factoryId'), '/datasets/mssql_cntl_ds')]",
-				"[concat(variables('factoryId'), '/datasets/dl_parquet_ds')]"
+				"[concat(variables('factoryId'), '/datasets/mssql_cntl_ds')]"
 			]
 		},
 		{
@@ -3041,8 +2998,7 @@
 				"lastPublishTime": "2021-02-24T06:50:32Z"
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/mssql_cntl_ds')]",
-				"[concat(variables('factoryId'), '/datasets/dl_parquet_ds')]"
+				"[concat(variables('factoryId'), '/datasets/mssql_cntl_ds')]"
 			]
 		},
 		{
@@ -3425,8 +3381,7 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/onprim_bin_ds')]",
-				"[concat(variables('factoryId'), '/datasets/mssql_cntl_ds')]",
-				"[concat(variables('factoryId'), '/datasets/dl_parquet_ds')]"
+				"[concat(variables('factoryId'), '/datasets/mssql_cntl_ds')]"
 			]
 		},
 		{
@@ -4818,9 +4773,7 @@
 				},
 				"annotations": []
 			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/dl_parquet_ds')]"
-			]
+			"dependsOn": []
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/testAPI')]",
@@ -4863,6 +4816,35 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/mssql_cntl_ds')]"
 			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/trigger1')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Started",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "Test DBW",
+							"type": "PipelineReference"
+						},
+						"parameters": {}
+					}
+				],
+				"type": "ScheduleTrigger",
+				"typeProperties": {
+					"recurrence": {
+						"frequency": "Month",
+						"interval": 1,
+						"startTime": "2021-03-19T15:30:00",
+						"timeZone": "SE Asia Standard Time",
+						"schedule": {}
+					}
+				}
+			},
+			"dependsOn": []
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/00_STREAM_COMMON_temp')]",

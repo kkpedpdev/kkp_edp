@@ -297,6 +297,20 @@
 									}
 								},
 								"enableStaging": false,
+								"logSettings": {
+									"enableCopyActivityLog": true,
+									"copyActivityLogSettings": {
+										"logLevel": "Warning",
+										"enableReliableLogging": false
+									},
+									"logLocationSettings": {
+										"linkedServiceName": {
+											"referenceName": "link_st_kkpb_edp",
+											"type": "LinkedServiceReference"
+										},
+										"path": "logs/ADF"
+									}
+								},
 								"translator": {
 									"value": "@activity('Lookup Schema').output.firstRow",
 									"type": "Expression"

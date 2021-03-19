@@ -519,6 +519,12 @@
 								"notebookPath": {
 									"value": "@pipeline().parameters.P_PRCS_OBJ.ADB_NM",
 									"type": "Expression"
+								},
+								"baseParameters": {
+									"PARAMS": {
+										"value": "@pipeline().parameters.P_PRCS_OBJ.ADB_PARM",
+										"type": "Expression"
+									}
 								}
 							},
 							"linkedServiceName": {

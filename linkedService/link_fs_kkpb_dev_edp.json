@@ -14,10 +14,6 @@
 				},
 				"secretName": "shir-on-prim-password"
 			}
-		},
-		"connectVia": {
-			"referenceName": "shir-onprim-kkbp-edp",
-			"type": "IntegrationRuntimeReference"
 		}
 	},
 	"type": "Microsoft.DataFactory/factories/linkedservices"

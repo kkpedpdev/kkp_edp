@@ -9,12 +9,6 @@
 					"referenceName": "Test DBW",
 					"type": "PipelineReference"
 				}
-			},
-			{
-				"pipelineReference": {
-					"referenceName": "MAIN_BATCH_SP1",
-					"type": "PipelineReference"
-				}
 			}
 		],
 		"type": "ScheduleTrigger",

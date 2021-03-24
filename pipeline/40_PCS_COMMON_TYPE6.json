@@ -87,10 +87,6 @@
 						"value": "@concat('https://kiatnakin365.sharepoint.com/sites/',pipeline().globalParameters.P_GLBL_SHAREPOINT_SITE,'/_api/web/GetFolderByServerRelativeUrl(''ShareCenter/Landing/', pipeline().parameters.P_PRCS_OBJ.PTH, '/', pipeline().parameters.P_PRCS_OBJ.CALC_DATA_DT, ''')/Files')",
 						"type": "Expression"
 					},
-					"connectVia": {
-						"referenceName": "shir-kkpb-edp",
-						"type": "IntegrationRuntimeReference"
-					},
 					"method": "GET",
 					"headers": {
 						"Accept": "application/json;odata=verbose",

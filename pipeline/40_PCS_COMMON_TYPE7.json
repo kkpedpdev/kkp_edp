@@ -381,10 +381,6 @@
 						"value": "@pipeline().globalParameters.P_GLBL_BEARER_TOKEN",
 						"type": "Expression"
 					},
-					"connectVia": {
-						"referenceName": "shir-kkpb-edp",
-						"type": "IntegrationRuntimeReference"
-					},
 					"method": "POST",
 					"headers": {
 						"Content-Type": "application/x-www-form-urlencoded"

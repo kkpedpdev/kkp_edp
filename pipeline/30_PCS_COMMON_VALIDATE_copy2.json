@@ -1,5 +1,5 @@
 {
-	"name": "30_PCS_COMMON_VALIDATE",
+	"name": "30_PCS_COMMON_VALIDATE_copy2",
 	"properties": {
 		"activities": [
 			{
@@ -132,6 +132,52 @@
 				}
 			},
 			{
+				"name": "CHECK DNDP",
+				"type": "IfCondition",
+				"dependsOn": [
+					{
+						"activity": "GET DNDP",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@equals(activity('GET DNDP').output.FIRSTROW.DPND_F,'1')",
+						"type": "Expression"
+					},
+					"ifFalseActivities": [
+						{
+							"name": "ABORT CHECK DNDP",
+							"type": "Lookup",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "SqlServerSource",
+									"sqlReaderQuery": "SELECT 1/0",
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"dataset": {
+									"referenceName": "mssql_cntl_ds",
+									"type": "DatasetReference"
+								}
+							}
+						}
+					]
+				}
+			},
+			{
 				"name": "GET LATEST LOG",
 				"type": "Lookup",
 				"dependsOn": [
@@ -176,6 +222,64 @@
 								"type": "String",
 								"value": {
 									"value": "@pipeline().parameters.P_RUN_MODE",
+									"type": "Expression"
+								}
+							}
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "mssql_cntl_ds",
+						"type": "DatasetReference"
+					}
+				}
+			},
+			{
+				"name": "GET DNDP",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "CHECK LATEST LOG",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "SqlServerSource",
+						"sqlReaderStoredProcedureName": {
+							"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA, '.[PROC_CHK_DPND_PRCS]')",
+							"type": "Expression"
+						},
+						"storedProcedureParameters": {
+							"P_DATA_DT": {
+								"type": "String",
+								"value": {
+									"value": "@activity('GET PROCESS INFORMATION').output.firstrow.DATA_DT",
+									"type": "Expression"
+								}
+							},
+							"P_LD_ID": {
+								"type": "String",
+								"value": {
+									"value": "@pipeline().parameters.P_LD_ID",
+									"type": "Expression"
+								}
+							},
+							"P_PRCS_NM": {
+								"type": "String",
+								"value": {
+									"value": "@pipeline().parameters.P_PRCS_NM",
 									"type": "Expression"
 								}
 							}
@@ -342,7 +446,7 @@
 				"type": "SqlServerStoredProcedure",
 				"dependsOn": [
 					{
-						"activity": "Until1",
+						"activity": "CHECK DNDP",
 						"dependencyConditions": [
 							"Failed"
 						]
@@ -741,7 +845,7 @@
 				"type": "Switch",
 				"dependsOn": [
 					{
-						"activity": "CHECK DNDP_FINAL",
+						"activity": "CHECK DNDP",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -1012,238 +1116,6 @@
 						}
 					]
 				}
-			},
-			{
-				"name": "Until1",
-				"type": "Until",
-				"dependsOn": [
-					{
-						"activity": "CHECK LATEST LOG",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"userProperties": [],
-				"typeProperties": {
-					"expression": {
-						"value": "@OR(equals(variables('V_DPDN_FLG'),'Y'), equals(variables('V_DPDN_FLG'),'N'))",
-						"type": "Expression"
-					},
-					"activities": [
-						{
-							"name": "GET DNDP",
-							"type": "Lookup",
-							"dependsOn": [],
-							"policy": {
-								"timeout": "7.00:00:00",
-								"retry": 0,
-								"retryIntervalInSeconds": 30,
-								"secureOutput": false,
-								"secureInput": false
-							},
-							"userProperties": [],
-							"typeProperties": {
-								"source": {
-									"type": "SqlServerSource",
-									"sqlReaderStoredProcedureName": {
-										"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA, '.[PROC_CHK_DPND_PRCS]')",
-										"type": "Expression"
-									},
-									"storedProcedureParameters": {
-										"P_DATA_DT": {
-											"type": "String",
-											"value": {
-												"value": "@activity('GET PROCESS INFORMATION').output.firstrow.DATA_DT",
-												"type": "Expression"
-											}
-										},
-										"P_LD_ID": {
-											"type": "String",
-											"value": {
-												"value": "@pipeline().parameters.P_LD_ID",
-												"type": "Expression"
-											}
-										},
-										"P_PRCS_NM": {
-											"type": "String",
-											"value": {
-												"value": "@pipeline().parameters.P_PRCS_NM",
-												"type": "Expression"
-											}
-										}
-									},
-									"queryTimeout": "02:00:00",
-									"partitionOption": "None"
-								},
-								"dataset": {
-									"referenceName": "mssql_cntl_ds",
-									"type": "DatasetReference"
-								}
-							}
-						},
-						{
-							"name": "CHECK DNDP",
-							"type": "IfCondition",
-							"dependsOn": [
-								{
-									"activity": "GET DNDP",
-									"dependencyConditions": [
-										"Succeeded"
-									]
-								}
-							],
-							"userProperties": [],
-							"typeProperties": {
-								"expression": {
-									"value": "@equals(activity('GET DNDP').output.FIRSTROW.DPND_F,'1')",
-									"type": "Expression"
-								},
-								"ifFalseActivities": [
-									{
-										"name": "Wait1",
-										"type": "Wait",
-										"dependsOn": [],
-										"userProperties": [],
-										"typeProperties": {
-											"waitTimeInSeconds": 300
-										}
-									},
-									{
-										"name": "Set variable1_copy1",
-										"type": "SetVariable",
-										"dependsOn": [
-											{
-												"activity": "Wait1",
-												"dependencyConditions": [
-													"Succeeded"
-												]
-											}
-										],
-										"userProperties": [],
-										"typeProperties": {
-											"variableName": "V_TMP",
-											"value": {
-												"value": "@variables('V_LOOP')",
-												"type": "Expression"
-											}
-										}
-									},
-									{
-										"name": "Set variable2",
-										"type": "SetVariable",
-										"dependsOn": [
-											{
-												"activity": "Set variable1_copy1",
-												"dependencyConditions": [
-													"Succeeded"
-												]
-											}
-										],
-										"userProperties": [],
-										"typeProperties": {
-											"variableName": "V_LOOP",
-											"value": {
-												"value": "@string(ADD(int(variables('V_TMP')),300))",
-												"type": "Expression"
-											}
-										}
-									}
-								],
-								"ifTrueActivities": [
-									{
-										"name": "Set variable1",
-										"type": "SetVariable",
-										"dependsOn": [],
-										"userProperties": [],
-										"typeProperties": {
-											"variableName": "V_DPDN_FLG",
-											"value": "Y"
-										}
-									}
-								]
-							}
-						},
-						{
-							"name": "If Condition1",
-							"type": "IfCondition",
-							"dependsOn": [
-								{
-									"activity": "CHECK DNDP",
-									"dependencyConditions": [
-										"Succeeded"
-									]
-								}
-							],
-							"userProperties": [],
-							"typeProperties": {
-								"expression": {
-									"value": "@less(Int(variables('V_LOOP')),3600)",
-									"type": "Expression"
-								},
-								"ifTrueActivities": [
-									{
-										"name": "Set variable3",
-										"type": "SetVariable",
-										"dependsOn": [],
-										"userProperties": [],
-										"typeProperties": {
-											"variableName": "V_DPDN_FLG",
-											"value": "N"
-										}
-									}
-								]
-							}
-						}
-					],
-					"timeout": "7.00:00:00"
-				}
-			},
-			{
-				"name": "CHECK DNDP_FINAL",
-				"type": "IfCondition",
-				"dependsOn": [
-					{
-						"activity": "Until1",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"userProperties": [],
-				"typeProperties": {
-					"expression": {
-						"value": "@equals(variables('V_DPDN_FLG'),'Y')",
-						"type": "Expression"
-					},
-					"ifFalseActivities": [
-						{
-							"name": "ABORT CHECK DNDP_copy1",
-							"type": "Lookup",
-							"dependsOn": [],
-							"policy": {
-								"timeout": "7.00:00:00",
-								"retry": 0,
-								"retryIntervalInSeconds": 30,
-								"secureOutput": false,
-								"secureInput": false
-							},
-							"userProperties": [],
-							"typeProperties": {
-								"source": {
-									"type": "SqlServerSource",
-									"sqlReaderQuery": "SELECT 1/0",
-									"queryTimeout": "02:00:00",
-									"partitionOption": "None"
-								},
-								"dataset": {
-									"referenceName": "mssql_cntl_ds",
-									"type": "DatasetReference"
-								}
-							}
-						}
-					]
-				}
 			}
 		],
 		"parameters": {
@@ -1260,20 +1132,8 @@
 				"defaultValue": "999"
 			}
 		},
-		"variables": {
-			"V_DPDN_FLG": {
-				"type": "String",
-				"defaultValue": "N/A"
-			},
-			"V_TMP": {
-				"type": "String"
-			},
-			"V_LOOP": {
-				"type": "String"
-			}
-		},
 		"folder": {
-			"name": "COMMON JOB"
+			"name": "BK"
 		},
 		"annotations": [],
 		"lastPublishTime": "2021-02-24T06:46:04Z"

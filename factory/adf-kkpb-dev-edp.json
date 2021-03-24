@@ -5,6 +5,10 @@
 			"P_GLBL_CNTL_SCHEMA": {
 				"type": "string",
 				"value": "CNTL"
+			},
+			"P_GLBL_SHAREPOINT_SITE": {
+				"type": "string",
+				"value": "EDPFileCenterUAT"
 			}
 		}
 	},

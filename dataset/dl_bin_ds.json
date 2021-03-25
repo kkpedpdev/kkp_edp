@@ -1,6 +1,7 @@
 {
 	"name": "dl_bin_ds",
 	"properties": {
+		"description": "  ",
 		"linkedServiceName": {
 			"referenceName": "link_adls_onprim_edp",
 			"type": "LinkedServiceReference"

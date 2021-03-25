@@ -1,6 +1,7 @@
 {
 	"name": "dl_parquet_ds",
 	"properties": {
+		"description": "  ",
 		"linkedServiceName": {
 			"referenceName": "link_st_kkpb_edp",
 			"type": "LinkedServiceReference"

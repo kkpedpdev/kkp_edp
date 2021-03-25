@@ -1,6 +1,7 @@
 {
 	"name": "dl_bin_ds2",
 	"properties": {
+		"description": "  ",
 		"linkedServiceName": {
 			"referenceName": "AzureDataLakeStorage1",
 			"type": "LinkedServiceReference"

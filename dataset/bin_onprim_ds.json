@@ -1,6 +1,7 @@
 {
 	"name": "bin_onprim_ds",
 	"properties": {
+		"description": "  ",
 		"linkedServiceName": {
 			"referenceName": "link_fs_kkpb_dev_edp",
 			"type": "LinkedServiceReference"

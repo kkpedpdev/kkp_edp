@@ -1,6 +1,7 @@
 {
 	"name": "bin_blob_ds_copy1",
 	"properties": {
+		"description": "  ",
 		"linkedServiceName": {
 			"referenceName": "link_adls_onprim_edp",
 			"type": "LinkedServiceReference"

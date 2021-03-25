@@ -1,6 +1,7 @@
 {
 	"name": "mssql_cntl_ds",
 	"properties": {
+		"description": "  ",
 		"linkedServiceName": {
 			"referenceName": "link_sqldb_kkpb_edp",
 			"type": "LinkedServiceReference"

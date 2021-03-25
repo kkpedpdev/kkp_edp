@@ -1,6 +1,7 @@
 {
 	"name": "sp_bin_ds",
 	"properties": {
+		"description": "  ",
 		"linkedServiceName": {
 			"referenceName": "link_spo_http",
 			"type": "LinkedServiceReference"

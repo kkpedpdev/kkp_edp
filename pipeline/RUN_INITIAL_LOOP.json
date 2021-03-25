@@ -20,7 +20,7 @@
 							"userProperties": [],
 							"typeProperties": {
 								"pipeline": {
-									"referenceName": "00_STREAM_COMMON_2",
+									"referenceName": "00_STREAM_COMMON_2_bk",
 									"type": "PipelineReference"
 								},
 								"waitOnCompletion": true,

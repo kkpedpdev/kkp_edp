@@ -1,6 +1,7 @@
 {
 	"name": "RIB_EXT_TABLE",
 	"properties": {
+		"description": " ",
 		"activities": [
 			{
 				"name": "Notebook1",

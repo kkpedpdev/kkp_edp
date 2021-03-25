@@ -16,7 +16,7 @@
 			"location": {
 				"type": "HttpServerLocation",
 				"relativeUrl": {
-					"value": "@concat('/sites/EDPFileCenterUAT/_api/web/GetFileByServerRelativeUrl(''',dataset().ServerRelativeUrl,''')/$value')",
+					"value": "@concat('/sites/EDPFileCenterUAT/_api/web/GetFileByServerRelativeUrl(''',dataset().ServerRelativeUrl,''')/$value')  ",
 					"type": "Expression"
 				}
 			}

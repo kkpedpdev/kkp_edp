@@ -17,6 +17,7 @@
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
+				"description": " ",
 				"activities": [
 					{
 						"name": "Notebook1",
@@ -1376,6 +1377,7 @@
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
+				"description": "  ",
 				"linkedServiceName": {
 					"referenceName": "link_fs_kkpb_dev_edp",
 					"type": "LinkedServiceReference"
@@ -1411,6 +1413,7 @@
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
+				"description": "  ",
 				"linkedServiceName": {
 					"referenceName": "link_fs_kkpb_dev_edp",
 					"type": "LinkedServiceReference"
@@ -1430,6 +1433,7 @@
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
+				"description": "  ",
 				"linkedServiceName": {
 					"referenceName": "link_fs_kkpb_dev_edp",
 					"type": "LinkedServiceReference"
@@ -1715,6 +1719,7 @@
 					},
 					{
 						"name": "Lookup1",
+						"description": "  ",
 						"type": "Lookup",
 						"dependsOn": [],
 						"policy": {
@@ -3526,6 +3531,7 @@
 					},
 					{
 						"name": "Lookup1",
+						"description": "  ",
 						"type": "Lookup",
 						"dependsOn": [],
 						"policy": {
@@ -3682,6 +3688,7 @@
 					},
 					{
 						"name": "Lookup1",
+						"description": "  ",
 						"type": "Lookup",
 						"dependsOn": [],
 						"policy": {
@@ -3989,6 +3996,7 @@
 				"activities": [
 					{
 						"name": "If Condition1",
+						"description": "  ",
 						"type": "IfCondition",
 						"dependsOn": [],
 						"userProperties": [],

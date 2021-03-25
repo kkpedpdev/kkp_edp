@@ -188,6 +188,7 @@
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
 			"properties": {
+				"description": "  ",
 				"annotations": [],
 				"type": "AzureBlobFS",
 				"typeProperties": {
@@ -201,6 +202,7 @@
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
 			"properties": {
+				"description": "  ",
 				"annotations": [],
 				"type": "AzureBlobFS",
 				"typeProperties": {
@@ -231,7 +233,7 @@
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
 			"properties": {
-				"description": " ",
+				"description": "   ",
 				"annotations": [],
 				"type": "AzureDatabricks",
 				"typeProperties": {
@@ -250,7 +252,7 @@
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
 			"properties": {
-				"description": " ",
+				"description": "   ",
 				"annotations": [],
 				"type": "AzureFunction",
 				"typeProperties": {
@@ -733,6 +735,7 @@
 				"activities": [
 					{
 						"name": "Notebook1",
+						"description": "  ",
 						"type": "DatabricksNotebook",
 						"dependsOn": [],
 						"policy": {

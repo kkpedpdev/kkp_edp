@@ -25,6 +25,7 @@
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
+				"description": "  ",
 				"linkedServiceName": {
 					"referenceName": "link_st_kkpb_edp",
 					"type": "LinkedServiceReference"
@@ -51,6 +52,7 @@
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
+				"description": "  ",
 				"linkedServiceName": {
 					"referenceName": "link_st_kkpb_edp",
 					"type": "LinkedServiceReference"
@@ -93,6 +95,7 @@
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
+				"description": "  ",
 				"linkedServiceName": {
 					"referenceName": "link_adls_onprim_edp",
 					"type": "LinkedServiceReference"
@@ -135,6 +138,7 @@
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
+				"description": "  ",
 				"linkedServiceName": {
 					"referenceName": "link_adls_onprim_edp",
 					"type": "LinkedServiceReference"
@@ -170,6 +174,7 @@
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
+				"description": "  ",
 				"linkedServiceName": {
 					"referenceName": "link_adls_onprim_edp",
 					"type": "LinkedServiceReference"
@@ -212,6 +217,7 @@
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
+				"description": "  ",
 				"linkedServiceName": {
 					"referenceName": "AzureDataLakeStorage1",
 					"type": "LinkedServiceReference"
@@ -254,6 +260,7 @@
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
+				"description": "  ",
 				"linkedServiceName": {
 					"referenceName": "AzureDataLakeStorage1",
 					"type": "LinkedServiceReference"
@@ -276,6 +283,7 @@
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
+				"description": "  ",
 				"linkedServiceName": {
 					"referenceName": "link_st_kkpb_edp",
 					"type": "LinkedServiceReference"
@@ -342,6 +350,7 @@
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
+				"description": "  ",
 				"linkedServiceName": {
 					"referenceName": "link_st_kkpb_edp",
 					"type": "LinkedServiceReference"
@@ -407,6 +416,7 @@
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
+				"description": "  ",
 				"linkedServiceName": {
 					"referenceName": "link_st_kkpb_edp",
 					"type": "LinkedServiceReference"
@@ -447,6 +457,7 @@
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
+				"description": "  ",
 				"linkedServiceName": {
 					"referenceName": "link_st_kkpb_edp",
 					"type": "LinkedServiceReference"
@@ -488,6 +499,7 @@
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
+				"description": "  ",
 				"linkedServiceName": {
 					"referenceName": "link_st_kkpb_edp",
 					"type": "LinkedServiceReference"
@@ -538,6 +550,7 @@
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
+				"description": "  ",
 				"linkedServiceName": {
 					"referenceName": "link_sqldb_kkpb_edp",
 					"type": "LinkedServiceReference"
@@ -554,6 +567,7 @@
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
+				"description": "  ",
 				"linkedServiceName": {
 					"referenceName": "link_spo_http",
 					"type": "LinkedServiceReference"
@@ -582,6 +596,7 @@
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
 			"properties": {
+				"description": "  ",
 				"annotations": [],
 				"type": "FileServer",
 				"typeProperties": {
@@ -872,6 +887,7 @@
 					},
 					{
 						"name": "Lookup1",
+						"description": "  ",
 						"type": "Lookup",
 						"dependsOn": [],
 						"policy": {
@@ -1097,6 +1113,7 @@
 					},
 					{
 						"name": "GetBearerToken",
+						"description": "  ",
 						"type": "WebActivity",
 						"dependsOn": [],
 						"policy": {
@@ -1639,6 +1656,7 @@
 					},
 					{
 						"name": "GetBearerToken",
+						"description": "  ",
 						"type": "WebActivity",
 						"dependsOn": [],
 						"policy": {
@@ -1695,6 +1713,7 @@
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
+				"description": " ",
 				"activities": [
 					{
 						"name": "ForEach1",

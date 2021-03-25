@@ -6,6 +6,7 @@
 		"type": "AzureBlobFS",
 		"typeProperties": {
 			"url": "https://stkkpbdevtempedp.dfs.core.windows.net"
-		}
+		},
+		"description": "  "
 	}
 }

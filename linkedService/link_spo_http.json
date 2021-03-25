@@ -8,6 +8,7 @@
 			"url": "https://kiatnakin365.sharepoint.com",
 			"enableServerCertificateValidation": true,
 			"authenticationType": "Anonymous"
-		}
+		},
+		"description": " "
 	}
 }

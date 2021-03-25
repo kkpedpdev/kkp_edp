@@ -6,1113 +6,20 @@
 			"type": "string",
 			"metadata": "Data Factory name",
 			"defaultValue": "adf-kkpb-dev-edp"
+		},
+		"link_fs_kkpb_dev_edp_properties_typeProperties_host": {
+			"type": "string",
+			"defaultValue": "E:\\Landing"
+		},
+		"link_fs_kkpb_dev_edp_properties_typeProperties_userId": {
+			"type": "string",
+			"defaultValue": "administrator"
 		}
 	},
 	"variables": {
 		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
 	},
 	"resources": [
-		{
-			"name": "[concat(parameters('factoryName'), '/40_PCS_COMMON_TYPE1')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"description": "Load from external website to STG",
-				"activities": [
-					{
-						"name": "Azure Function1",
-						"type": "AzureFunctionActivity",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 2,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"functionName": {
-								"value": "@pipeline().parameters.P_PRCS_OBJ.FUNC_NM",
-								"type": "Expression"
-							},
-							"method": "POST",
-							"headers": {},
-							"body": {
-								"value": "@pipeline().parameters.P_PRCS_OBJ.FUNC_PARM",
-								"type": "Expression"
-							}
-						},
-						"linkedServiceName": {
-							"referenceName": "link_func_edp",
-							"type": "LinkedServiceReference"
-						}
-					},
-					{
-						"name": "EDW UPDATE COUNT TARGET",
-						"type": "SqlServerStoredProcedure",
-						"dependsOn": [
-							{
-								"activity": "Azure Function1",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"storedProcedureName": {
-								"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA, '.[PROC_UPDT_PRCS]')",
-								"type": "Expression"
-							},
-							"storedProcedureParameters": {
-								"P_CNT_FI_SRC": {
-									"value": {
-										"value": "@activity('Azure Function1').output.NumberOfFiles",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"P_CNT_FI_TGT": {
-									"value": {
-										"value": "@activity('Azure Function1').output.NumberOfFiles",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"P_CNT_REC_SRC": {
-									"value": null,
-									"type": "String"
-								},
-								"P_CNT_REC_TGT": {
-									"value": null,
-									"type": "String"
-								},
-								"P_LD_ID": {
-									"value": {
-										"value": "@pipeline().parameters.P_LD_ID",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"P_PRCS_NM": {
-									"value": {
-										"value": "@pipeline().parameters.P_PRCS_NM",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"P_RMRK": {
-									"value": {
-										"value": "@if(and(equals(activity('Azure Function1').output.statusCode, 200),equals(activity('Azure Function1').output.NumberOfFiles,  0)),'File not found','')",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"P_ST": {
-									"value": "RUNNING",
-									"type": "String"
-								},
-								"P_CNT_REC_CNTL": {
-									"value": null,
-									"type": "String"
-								}
-							}
-						},
-						"linkedServiceName": {
-							"referenceName": "link_sqldb_kkpb_edp",
-							"type": "LinkedServiceReference"
-						}
-					},
-					{
-						"name": "If Condition1",
-						"type": "IfCondition",
-						"dependsOn": [
-							{
-								"activity": "EDW UPDATE COUNT TARGET",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"expression": {
-								"value": "@not(equals(pipeline().parameters.P_PRCS_OBJ.ADB_NM,null))",
-								"type": "Expression"
-							},
-							"ifTrueActivities": [
-								{
-									"name": "Notebook1",
-									"type": "DatabricksNotebook",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "7.00:00:00",
-										"retry": 1,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"notebookPath": {
-											"value": "@pipeline().parameters.P_PRCS_OBJ.ADB_NM",
-											"type": "Expression"
-										},
-										"baseParameters": {
-											"PARAMS": {
-												"value": "@pipeline().parameters.P_PRCS_OBJ.ADB_PARM",
-												"type": "Expression"
-											}
-										}
-									},
-									"linkedServiceName": {
-										"referenceName": "link_dbw_edp",
-										"type": "LinkedServiceReference"
-									}
-								}
-							]
-						}
-					}
-				],
-				"parameters": {
-					"P_LD_ID": {
-						"type": "string"
-					},
-					"P_PRCS_NM": {
-						"type": "string"
-					},
-					"P_PRCS_OBJ": {
-						"type": "object"
-					}
-				},
-				"folder": {
-					"name": "COMMON JOB"
-				},
-				"annotations": [],
-				"lastPublishTime": "2021-02-24T06:46:02Z"
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/40_PCS_COMMON_TYPE1_copy1')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Azure Function1",
-						"type": "AzureFunctionActivity",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"functionName": {
-								"value": "@pipeline().parameters.P_PCS_OBJ.FUNC_NM",
-								"type": "Expression"
-							},
-							"method": "POST",
-							"headers": {},
-							"body": {
-								"value": "@pipeline().parameters.P_PCS_OBJ.FUNC_PARAMS",
-								"type": "Expression"
-							}
-						},
-						"linkedServiceName": {
-							"referenceName": "link_func_edp",
-							"type": "LinkedServiceReference"
-						}
-					},
-					{
-						"name": "EDW UPDATE COUNT TARGET",
-						"type": "SqlServerStoredProcedure",
-						"dependsOn": [
-							{
-								"activity": "Azure Function1",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"storedProcedureName": "[[CNTL].[PROC_UDT_PCS]",
-							"storedProcedureParameters": {
-								"P_CNT_FI_SRC": {
-									"value": {
-										"value": "@activity('Azure Function1').output.NumberOfFiles",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"P_CNT_FI_TGT": {
-									"value": {
-										"value": "@activity('Azure Function1').output.NumberOfFiles",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"P_CNT_REC_SRC": {
-									"value": null,
-									"type": "String"
-								},
-								"P_CNT_REC_TGT": {
-									"value": null,
-									"type": "String"
-								},
-								"P_LOAD_ID": {
-									"value": {
-										"value": "@pipeline().parameters.P_LOAD_ID",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"P_PCS_NM": {
-									"value": {
-										"value": "@pipeline().parameters.P_PCS_NM",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"P_RMRK": {
-									"value": "",
-									"type": "String"
-								},
-								"P_ST": {
-									"value": "RUNNING",
-									"type": "String"
-								}
-							}
-						},
-						"linkedServiceName": {
-							"referenceName": "link_sqldb_kkpb_edp",
-							"type": "LinkedServiceReference"
-						}
-					},
-					{
-						"name": "If Condition1",
-						"type": "IfCondition",
-						"dependsOn": [
-							{
-								"activity": "EDW UPDATE COUNT TARGET",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"expression": {
-								"value": "@not(equals(pipeline().parameters.P_PCS_OBJ.ADB_NM,null))",
-								"type": "Expression"
-							},
-							"ifTrueActivities": [
-								{
-									"name": "Notebook1",
-									"type": "DatabricksNotebook",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "7.00:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"notebookPath": {
-											"value": "@pipeline().parameters.P_PCS_OBJ.ADB_NM",
-											"type": "Expression"
-										},
-										"baseParameters": {
-											"PARAMS": {
-												"value": "@pipeline().parameters.P_PCS_OBJ.ADB_PARAMS",
-												"type": "Expression"
-											}
-										}
-									},
-									"linkedServiceName": {
-										"referenceName": "link_dbw_edp",
-										"type": "LinkedServiceReference"
-									}
-								}
-							]
-						}
-					}
-				],
-				"parameters": {
-					"P_LOAD_ID": {
-						"type": "string"
-					},
-					"P_PCS_NM": {
-						"type": "string"
-					},
-					"P_PCS_OBJ": {
-						"type": "object"
-					}
-				},
-				"folder": {
-					"name": "BK"
-				},
-				"annotations": [],
-				"lastPublishTime": "2021-02-24T05:06:42Z"
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/40_PCS_COMMON_TYPE3')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"description": "Transform via databricks ",
-				"activities": [
-					{
-						"name": "Notebook1",
-						"type": "DatabricksNotebook",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 3,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"notebookPath": {
-								"value": "@pipeline().parameters.P_PRCS_OBJ.ADB_NM",
-								"type": "Expression"
-							},
-							"baseParameters": {
-								"PARAMS": {
-									"value": "@pipeline().parameters.P_PRCS_OBJ.ADB_PARM",
-									"type": "Expression"
-								}
-							}
-						},
-						"linkedServiceName": {
-							"referenceName": "link_dbw_edp",
-							"type": "LinkedServiceReference"
-						}
-					}
-				],
-				"parameters": {
-					"P_LD_ID": {
-						"type": "string"
-					},
-					"P_PRCS_NM": {
-						"type": "string"
-					},
-					"P_PRCS_OBJ": {
-						"type": "object"
-					}
-				},
-				"folder": {
-					"name": "COMMON JOB"
-				},
-				"annotations": [],
-				"lastPublishTime": "2021-02-24T06:46:02Z"
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/40_PCS_COMMON_TYPE4_bk')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Notebook1",
-						"type": "DatabricksNotebook",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"notebookPath": {
-								"value": "@pipeline().parameters.P_PCS_OBJ.ADB_NM",
-								"type": "Expression"
-							},
-							"baseParameters": {
-								"PARAMS": {
-									"value": "@pipeline().parameters.P_PCS_OBJ.ADB_PARAMS",
-									"type": "Expression"
-								}
-							}
-						},
-						"linkedServiceName": {
-							"referenceName": "link_dbw_edp",
-							"type": "LinkedServiceReference"
-						}
-					}
-				],
-				"parameters": {
-					"P_LOAD_ID": {
-						"type": "string"
-					},
-					"P_PCS_NM": {
-						"type": "string"
-					},
-					"P_PCS_OBJ": {
-						"type": "object"
-					}
-				},
-				"folder": {
-					"name": "BK"
-				},
-				"annotations": [],
-				"lastPublishTime": "2021-02-24T05:06:42Z"
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/40_PCS_COMMON_TYPE5_copy1')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "EDW UPDATE COUNT TARGET",
-						"type": "SqlServerStoredProcedure",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"storedProcedureName": "[[CNTL].[COMMOM_SNAPSHOT_PROCESS]",
-							"storedProcedureParameters": {
-								"P_AS_AT_DT": {
-									"value": {
-										"value": "@pipeline().parameters.P_PCS_OBJ.asat_dt",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"P_PCS_ID": {
-									"value": {
-										"value": "@pipeline().parameters.P_PCS_OBJ.pcs_id",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"P_PCS_NM": {
-									"value": {
-										"value": "@pipeline().parameters.P_PCS_NM",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"P_TABLE_NM": {
-									"value": {
-										"value": "@pipeline().parameters.P_PCS_OBJ.table_name",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"P_TXN_V_NM": {
-									"value": {
-										"value": "@pipeline().parameters.P_PCS_OBJ.view_name",
-										"type": "Expression"
-									},
-									"type": "String"
-								}
-							}
-						},
-						"linkedServiceName": {
-							"referenceName": "link_syn_kkpb_edp",
-							"type": "LinkedServiceReference"
-						}
-					}
-				],
-				"parameters": {
-					"P_LOAD_ID": {
-						"type": "string",
-						"defaultValue": "-999"
-					},
-					"P_PCS_NM": {
-						"type": "string",
-						"defaultValue": "GET_LOCATION_FACE_RECOGNITION_CustGeoInfo"
-					},
-					"P_PCS_OBJ": {
-						"type": "object"
-					}
-				},
-				"folder": {
-					"name": "BK"
-				},
-				"annotations": [],
-				"lastPublishTime": "2021-02-24T05:06:40Z"
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/40_PCS_COMMON_TYPE6')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"description": "Copy binary sharepoints by folder to STG",
-				"activities": [
-					{
-						"name": "Notebook1",
-						"type": "DatabricksNotebook",
-						"dependsOn": [
-							{
-								"activity": "ForEach1",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 1,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"notebookPath": {
-								"value": "@pipeline().parameters.P_PRCS_OBJ.ADB_NM",
-								"type": "Expression"
-							},
-							"baseParameters": {
-								"PARAMS": {
-									"value": "@pipeline().parameters.P_PRCS_OBJ.ADB_PARM",
-									"type": "Expression"
-								}
-							}
-						},
-						"linkedServiceName": {
-							"referenceName": "link_dbw_edp",
-							"type": "LinkedServiceReference"
-						}
-					},
-					{
-						"name": "GetBearerToken",
-						"type": "WebActivity",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"url": {
-								"value": "@pipeline().globalParameters.P_GLBL_BEARER_TOKEN",
-								"type": "Expression"
-							},
-							"method": "POST",
-							"headers": {
-								"Content-Type": "application/x-www-form-urlencoded"
-							},
-							"body": "grant_type=client_credentials&client_id=8578d84d-db28-449a-9c11-a8bae5465c04@9fce0284-1a8c-4368-85b0-571bbad0df08&client_secret=mVbWh~igL5kKkzFVXEg6BLOw86--_G4.cd&resource=00000003-0000-0ff1-ce00-000000000000/kiatnakin365.sharepoint.com@9fce0284-1a8c-4368-85b0-571bbad0df08"
-						}
-					},
-					{
-						"name": "List file in path",
-						"type": "WebActivity",
-						"dependsOn": [
-							{
-								"activity": "GetBearerToken",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"url": {
-								"value": "@concat('https://kiatnakin365.sharepoint.com/sites/',pipeline().globalParameters.P_GLBL_SHAREPOINT_SITE,'/_api/web/GetFolderByServerRelativeUrl(''ShareCenter/Landing/', pipeline().parameters.P_PRCS_OBJ.PTH, '/', pipeline().parameters.P_PRCS_OBJ.CALC_DATA_DT, ''')/Files')",
-								"type": "Expression"
-							},
-							"connectVia": {
-								"referenceName": "shir-kkpb-edp",
-								"type": "IntegrationRuntimeReference"
-							},
-							"method": "GET",
-							"headers": {
-								"Accept": "application/json;odata=verbose",
-								"Authorization": {
-									"value": "@{concat('Bearer ', activity('GetBearerToken').output.access_token)}",
-									"type": "Expression"
-								}
-							}
-						}
-					},
-					{
-						"name": "ForEach1",
-						"type": "ForEach",
-						"dependsOn": [
-							{
-								"activity": "List file in path",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@activity('List file in path').output.d.results",
-								"type": "Expression"
-							},
-							"isSequential": false,
-							"batchCount": 10,
-							"activities": [
-								{
-									"name": "Copy Raw",
-									"type": "Copy",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "7.00:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"source": {
-											"type": "BinarySource",
-											"storeSettings": {
-												"type": "HttpReadSettings",
-												"requestMethod": "GET",
-												"additionalHeaders": {
-													"value": "@{concat('Authorization: Bearer ', activity('GetBearerToken').output.access_token)}",
-													"type": "Expression"
-												},
-												"requestTimeout": ""
-											},
-											"formatSettings": {
-												"type": "BinaryReadSettings"
-											}
-										},
-										"sink": {
-											"type": "BinarySink",
-											"storeSettings": {
-												"type": "AzureBlobFSWriteSettings"
-											}
-										},
-										"enableStaging": false
-									},
-									"inputs": [
-										{
-											"referenceName": "sp_bin_ds",
-											"type": "DatasetReference",
-											"parameters": {
-												"ServerRelativeUrl": {
-													"value": "@item().ServerRelativeUrl",
-													"type": "Expression"
-												}
-											}
-										}
-									],
-									"outputs": [
-										{
-											"referenceName": "dl_bin_ds2",
-											"type": "DatasetReference",
-											"parameters": {
-												"P_CONTAINER": {
-													"value": "@pipeline().parameters.P_PRCS_OBJ.CNTNR",
-													"type": "Expression"
-												},
-												"P_PATH": {
-													"value": "@concat(pipeline().parameters.P_PRCS_OBJ.PTH, '/',pipeline().parameters.P_PRCS_OBJ.CALC_DATA_DT)",
-													"type": "Expression"
-												},
-												"P_FILENAME": {
-													"value": "@item().Name",
-													"type": "Expression"
-												}
-											}
-										}
-									]
-								}
-							]
-						}
-					}
-				],
-				"parameters": {
-					"P_LD_ID": {
-						"type": "string"
-					},
-					"P_PRCS_NM": {
-						"type": "string"
-					},
-					"P_PRCS_OBJ": {
-						"type": "object"
-					}
-				},
-				"folder": {
-					"name": "COMMON JOB"
-				},
-				"annotations": [],
-				"lastPublishTime": "2021-02-24T06:23:25Z"
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/RIB_EXT')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Notebook2",
-						"type": "DatabricksNotebook",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"notebookPath": "/00_Common/edp/adf/dbn-gen-script-rib",
-							"baseParameters": {
-								"PARAMS": {
-									"value": "@pipeline().parameters.PARAMS",
-									"type": "Expression"
-								}
-							}
-						},
-						"linkedServiceName": {
-							"referenceName": "link_dbw_edp",
-							"type": "LinkedServiceReference"
-						}
-					},
-					{
-						"name": "Stored procedure1",
-						"type": "SqlServerStoredProcedure",
-						"dependsOn": [
-							{
-								"activity": "Notebook2",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"storedProcedureName": "[[dbo].[CREATE_EXTERNAL_TABLE]",
-							"storedProcedureParameters": {
-								"SQL": {
-									"value": {
-										"value": "@activity('Notebook2').output.runOutput",
-										"type": "Expression"
-									},
-									"type": "String"
-								}
-							}
-						},
-						"linkedServiceName": {
-							"referenceName": "link_syn_kkpb_edp",
-							"type": "LinkedServiceReference"
-						}
-					}
-				],
-				"parameters": {
-					"PARAMS": {
-						"type": "string"
-					}
-				},
-				"folder": {
-					"name": "TEST"
-				},
-				"annotations": [],
-				"lastPublishTime": "2021-02-24T05:06:42Z"
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/TEST SHAREPOINTS')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"description": "Copy sharepoints to ref",
-				"activities": [
-					{
-						"name": "Copy Raw",
-						"type": "Copy",
-						"dependsOn": [
-							{
-								"activity": "GetBearerToken",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "BinarySource",
-								"storeSettings": {
-									"type": "HttpReadSettings",
-									"requestMethod": "GET",
-									"additionalHeaders": {
-										"value": "@{concat('Authorization: Bearer ', activity('GetBearerToken').output.access_token)}",
-										"type": "Expression"
-									},
-									"requestTimeout": ""
-								},
-								"formatSettings": {
-									"type": "BinaryReadSettings"
-								}
-							},
-							"sink": {
-								"type": "BinarySink",
-								"storeSettings": {
-									"type": "AzureBlobFSWriteSettings"
-								}
-							},
-							"enableStaging": false
-						},
-						"inputs": [
-							{
-								"referenceName": "sp_bin_ds",
-								"type": "DatasetReference",
-								"parameters": {
-									"ServerRelativeUrl": "/sites/EDPFileCenterUAT/ShareCenter/Landing/internal/manualfile/real_estate/20201231/BMR_202012.xlsx"
-								}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "dl_bin_ds3",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						]
-					},
-					{
-						"name": "GetBearerToken",
-						"type": "WebActivity",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"url": {
-								"value": "@pipeline().globalParameters.P_GLBL_BEARER_TOKEN",
-								"type": "Expression"
-							},
-							"method": "POST",
-							"headers": {
-								"Content-Type": "application/x-www-form-urlencoded"
-							},
-							"body": "grant_type=client_credentials&client_id=8578d84d-db28-449a-9c11-a8bae5465c04@9fce0284-1a8c-4368-85b0-571bbad0df08&client_secret=mVbWh~igL5kKkzFVXEg6BLOw86--_G4.cd&resource=00000003-0000-0ff1-ce00-000000000000/kiatnakin365.sharepoint.com@9fce0284-1a8c-4368-85b0-571bbad0df08"
-						}
-					}
-				],
-				"folder": {
-					"name": "TEST"
-				},
-				"annotations": [],
-				"lastPublishTime": "2021-02-25T03:32:43Z"
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/TEST SHAREPOINTS_copy1')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"description": "Copy sharepoints to ref",
-				"activities": [
-					{
-						"name": "Copy Raw",
-						"type": "Copy",
-						"dependsOn": [
-							{
-								"activity": "GetBearerToken",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "BinarySource",
-								"storeSettings": {
-									"type": "HttpReadSettings",
-									"requestMethod": "GET",
-									"additionalHeaders": {
-										"value": "@{concat('Authorization: Bearer ', activity('GetBearerToken').output.access_token)}",
-										"type": "Expression"
-									},
-									"requestTimeout": ""
-								},
-								"formatSettings": {
-									"type": "BinaryReadSettings"
-								}
-							},
-							"sink": {
-								"type": "BinarySink",
-								"storeSettings": {
-									"type": "AzureBlobFSWriteSettings"
-								}
-							},
-							"enableStaging": false
-						},
-						"inputs": [
-							{
-								"referenceName": "sp_bin_ds",
-								"type": "DatasetReference",
-								"parameters": {
-									"ServerRelativeUrl": "/sites/EDPFileCenterUAT/ShareCenter/Landing/internal/manualfile/real_estate/RE_Code_Zone_Mapping.csv"
-								}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "dl_bin_ds3",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						]
-					},
-					{
-						"name": "GetBearerToken",
-						"type": "WebActivity",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"url": {
-								"value": "@pipeline().globalParameters.P_GLBL_BEARER_TOKEN",
-								"type": "Expression"
-							},
-							"method": "POST",
-							"headers": {
-								"Content-Type": "application/x-www-form-urlencoded"
-							},
-							"body": "grant_type=client_credentials&client_id=8578d84d-db28-449a-9c11-a8bae5465c04@9fce0284-1a8c-4368-85b0-571bbad0df08&client_secret=mVbWh~igL5kKkzFVXEg6BLOw86--_G4.cd&resource=00000003-0000-0ff1-ce00-000000000000/kiatnakin365.sharepoint.com@9fce0284-1a8c-4368-85b0-571bbad0df08"
-						}
-					}
-				],
-				"folder": {
-					"name": "TEST"
-				},
-				"annotations": [],
-				"lastPublishTime": "2021-02-25T03:32:43Z"
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Test DBW')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Notebook1",
-						"type": "DatabricksNotebook",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"notebookPath": "/Users/pran@inteltion.com/tes",
-							"baseParameters": {
-								"Date": "20210115",
-								"Source": "kkp-kkpmobile-tracking-request"
-							}
-						},
-						"linkedServiceName": {
-							"referenceName": "link_dbw_edp",
-							"type": "LinkedServiceReference"
-						}
-					}
-				],
-				"folder": {
-					"name": "TEST"
-				},
-				"annotations": [],
-				"lastPublishTime": "2021-02-24T05:06:42Z"
-			},
-			"dependsOn": []
-		},
 		{
 			"name": "[concat(parameters('factoryName'), '/adls_csv_ds')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
@@ -1259,60 +166,6 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/bin_onprim_ds')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "link_fs_kkpb_dev_edp",
-					"type": "LinkedServiceReference"
-				},
-				"parameters": {
-					"P_PATH": {
-						"type": "string"
-					},
-					"P_FILENAME": {
-						"type": "string"
-					}
-				},
-				"annotations": [],
-				"type": "Binary",
-				"typeProperties": {
-					"location": {
-						"type": "FileServerLocation",
-						"fileName": {
-							"value": "@dataset().P_FILENAME",
-							"type": "Expression"
-						},
-						"folderPath": {
-							"value": "@dataset().P_PATH",
-							"type": "Expression"
-						}
-					}
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/bin_onprim_ds_copy1')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "link_fs_kkpb_dev_edp",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "Binary",
-				"typeProperties": {
-					"location": {
-						"type": "FileServerLocation"
-					}
-				}
-			},
-			"dependsOn": []
-		},
-		{
 			"name": "[concat(parameters('factoryName'), '/dl_bin_ds')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -1349,6 +202,70 @@
 							"value": "@dataset().P_CONTAINER",
 							"type": "Expression"
 						}
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/dl_bin_ds2')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureDataLakeStorage1",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"P_CONTAINER": {
+						"type": "string"
+					},
+					"P_PATH": {
+						"type": "string"
+					},
+					"P_FILENAME": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": {
+							"value": "@dataset().P_FILENAME",
+							"type": "Expression"
+						},
+						"folderPath": {
+							"value": "@dataset().P_PATH",
+							"type": "Expression"
+						},
+						"fileSystem": {
+							"value": "@dataset().P_CONTAINER",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/dl_bin_ds3')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureDataLakeStorage1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "Korat_202012.xlsx",
+						"folderPath": "internal/manualfile/real_estate",
+						"fileSystem": "raw"
 					}
 				}
 			},
@@ -1524,6 +441,1455 @@
 				"schema": []
 			},
 			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/dl_sql_ds')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "link_st_kkpb_edp",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"P_FILEPATH": {
+						"type": "string"
+					},
+					"P_FILENAME": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": {
+							"value": "@dataset().P_FILENAME",
+							"type": "Expression"
+						},
+						"folderPath": {
+							"value": "@dataset().P_FILEPATH",
+							"type": "Expression"
+						},
+						"fileSystem": "working"
+					},
+					"columnDelimiter": "#",
+					"rowDelimiter": "#",
+					"escapeChar": "#",
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/dl_work_ds')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "link_st_kkpb_edp",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"P_FILEPATH": {
+						"type": "string"
+					},
+					"P_FILENAME": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": {
+							"value": "@dataset().P_FILENAME",
+							"type": "Expression"
+						},
+						"folderPath": {
+							"value": "@dataset().P_FILEPATH",
+							"type": "Expression"
+						},
+						"fileSystem": "working"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/mssql_cntl_ds')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "link_sqldb_kkpb_edp",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/sp_bin_ds')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "link_spo_http",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"ServerRelativeUrl": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "HttpServerLocation",
+						"relativeUrl": {
+							"value": "@concat('/sites/EDPFileCenterUAT/_api/web/GetFileByServerRelativeUrl(''',dataset().ServerRelativeUrl,''')/$value')",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/link_fs_kkpb_dev_edp')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "FileServer",
+				"typeProperties": {
+					"host": "[parameters('link_fs_kkpb_dev_edp_properties_typeProperties_host')]",
+					"userId": "[parameters('link_fs_kkpb_dev_edp_properties_typeProperties_userId')]",
+					"password": {
+						"type": "AzureKeyVaultSecret",
+						"store": {
+							"referenceName": "link_kv_edp",
+							"type": "LinkedServiceReference"
+						},
+						"secretName": "shir-on-prim-password"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/10_COMMON_RUN_PCS_GRP_temp')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "GET PROCESS LIST",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "SqlServerSource",
+								"sqlReaderStoredProcedureName": {
+									"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA,'.PROC_GET_PRCS_BY_GRP')",
+									"type": "Expression"
+								},
+								"storedProcedureParameters": {
+									"P_PRCS_GRP": {
+										"type": "String",
+										"value": {
+											"value": "@pipeline().parameters.P_PRCS_GRP",
+											"type": "Expression"
+										}
+									}
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "mssql_cntl_ds",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "ForEach1",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "GET PROCESS LIST",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('GET PROCESS LIST').output.value",
+								"type": "Expression"
+							},
+							"isSequential": true,
+							"activities": [
+								{
+									"name": "GET PROCESS INFORMATION",
+									"type": "Lookup",
+									"dependsOn": [
+										{
+											"activity": "START PROCESS",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "SqlServerSource",
+											"sqlReaderStoredProcedureName": {
+												"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA, '.[PROC_GET_PRCS]')",
+												"type": "Expression"
+											},
+											"storedProcedureParameters": {
+												"P_PRCS_NM": {
+													"type": "String",
+													"value": {
+														"value": "@item().PRCS_NM",
+														"type": "Expression"
+													}
+												}
+											},
+											"queryTimeout": "02:00:00",
+											"partitionOption": "None"
+										},
+										"dataset": {
+											"referenceName": "mssql_cntl_ds",
+											"type": "DatasetReference",
+											"parameters": {}
+										}
+									}
+								},
+								{
+									"name": "Execute Pipeline Type 3",
+									"type": "ExecutePipeline",
+									"dependsOn": [
+										{
+											"activity": "GET PROCESS INFORMATION",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "40_PCS_COMMON_TYPE3",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {
+											"P_LD_ID": {
+												"value": "@activity('START PROCESS').output.FIRSTROW.LD_ID",
+												"type": "Expression"
+											},
+											"P_PRCS_NM": {
+												"value": "@item().PRCS_NM",
+												"type": "Expression"
+											},
+											"P_PRCS_OBJ": {
+												"value": "@activity('GET PROCESS INFORMATION').output.FIRSTROW",
+												"type": "Expression"
+											}
+										}
+									}
+								},
+								{
+									"name": "START PROCESS",
+									"type": "Lookup",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "SqlServerSource",
+											"sqlReaderStoredProcedureName": {
+												"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA, '.[PROC_STRT_PRCS]')",
+												"type": "Expression"
+											},
+											"storedProcedureParameters": {
+												"P_PRCS_NM": {
+													"type": "String",
+													"value": {
+														"value": "@item().PRCS_NM",
+														"type": "Expression"
+													}
+												},
+												"P_RUN_MODE": {
+													"type": "String",
+													"value": {
+														"value": "@pipeline().parameters.P_RUN_MODE",
+														"type": "Expression"
+													}
+												},
+												"P_STREM_ID": {
+													"type": "String",
+													"value": {
+														"value": "@pipeline().parameters.P_STREM_ID",
+														"type": "Expression"
+													}
+												},
+												"P_ADF_RUN_ID": {
+													"type": "String",
+													"value": {
+														"value": "@pipeline().RunId",
+														"type": "Expression"
+													}
+												}
+											},
+											"queryTimeout": "02:00:00",
+											"partitionOption": "None"
+										},
+										"dataset": {
+											"referenceName": "mssql_cntl_ds",
+											"type": "DatasetReference",
+											"parameters": {}
+										},
+										"firstRowOnly": true
+									}
+								}
+							]
+						}
+					}
+				],
+				"parameters": {
+					"P_PRCS_GRP": {
+						"type": "string"
+					},
+					"P_RUN_MODE": {
+						"type": "string"
+					},
+					"P_STREM_ID": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "COMMON JOB"
+				},
+				"annotations": [],
+				"lastPublishTime": "2021-02-24T05:06:49Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/mssql_cntl_ds')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/40_PCS_COMMON_TYPE5')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Copy binary sharepoints to STG",
+				"activities": [
+					{
+						"name": "Notebook1",
+						"type": "DatabricksNotebook",
+						"dependsOn": [
+							{
+								"activity": "Copy Raw",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 1,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": {
+								"value": "@pipeline().parameters.P_PRCS_OBJ.ADB_NM",
+								"type": "Expression"
+							},
+							"baseParameters": {
+								"PARAMS": {
+									"value": "@pipeline().parameters.P_PRCS_OBJ.ADB_PARM",
+									"type": "Expression"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "link_dbw_edp",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Lookup1",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "SqlServerSource",
+								"sqlReaderStoredProcedureName": {
+									"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA, '.[PROC_GET_FI]')",
+									"type": "Expression"
+								},
+								"storedProcedureParameters": {
+									"P_DATA_DT": {
+										"type": "String",
+										"value": {
+											"value": "@pipeline().parameters.P_PRCS_OBJ.CALC_DATA_DT",
+											"type": "Expression"
+										}
+									},
+									"P_FI_ID": {
+										"type": "Int32",
+										"value": {
+											"value": "@pipeline().parameters.P_PRCS_OBJ.FI_ID",
+											"type": "Expression"
+										}
+									},
+									"P_PRCS_NM": {
+										"type": "String",
+										"value": {
+											"value": "@pipeline().parameters.P_PRCS_NM",
+											"type": "Expression"
+										}
+									}
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "mssql_cntl_ds",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						}
+					},
+					{
+						"name": "Copy Raw",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "GetBearerToken",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "Lookup1",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "BinarySource",
+								"storeSettings": {
+									"type": "HttpReadSettings",
+									"requestMethod": "GET",
+									"additionalHeaders": {
+										"value": "@{concat('Authorization: Bearer ', activity('GetBearerToken').output.access_token)}",
+										"type": "Expression"
+									},
+									"requestTimeout": ""
+								},
+								"formatSettings": {
+									"type": "BinaryReadSettings"
+								}
+							},
+							"sink": {
+								"type": "BinarySink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								}
+							},
+							"enableStaging": false
+						},
+						"inputs": [
+							{
+								"referenceName": "sp_bin_ds",
+								"type": "DatasetReference",
+								"parameters": {
+									"ServerRelativeUrl": {
+										"value": "@concat('/sites/',pipeline().globalParameters.P_GLBL_SHAREPOINT_SITE,'/ShareCenter/Landing/', pipeline().parameters.P_PRCS_OBJ.PTH, '/', pipeline().parameters.P_PRCS_OBJ.CALC_DATA_DT, '/', activity('Lookup1').output.firstrow.FI_NM)",
+										"type": "Expression"
+									}
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "dl_bin_ds2",
+								"type": "DatasetReference",
+								"parameters": {
+									"P_CONTAINER": {
+										"value": "@pipeline().parameters.P_PRCS_OBJ.CNTNR",
+										"type": "Expression"
+									},
+									"P_PATH": {
+										"value": "@concat(pipeline().parameters.P_PRCS_OBJ.PTH, '/',pipeline().parameters.P_PRCS_OBJ.CALC_DATA_DT)",
+										"type": "Expression"
+									},
+									"P_FILENAME": {
+										"value": "@activity('Lookup1').output.firstrow.FI_NM",
+										"type": "Expression"
+									}
+								}
+							}
+						]
+					},
+					{
+						"name": "GetBearerToken",
+						"type": "WebActivity",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"url": {
+								"value": "@pipeline().globalParameters.P_GLBL_BEARER_TOKEN",
+								"type": "Expression"
+							},
+							"method": "POST",
+							"headers": {
+								"Content-Type": "application/x-www-form-urlencoded"
+							},
+							"body": "grant_type=client_credentials&client_id=8578d84d-db28-449a-9c11-a8bae5465c04@9fce0284-1a8c-4368-85b0-571bbad0df08&client_secret=mVbWh~igL5kKkzFVXEg6BLOw86--_G4.cd&resource=00000003-0000-0ff1-ce00-000000000000/kiatnakin365.sharepoint.com@9fce0284-1a8c-4368-85b0-571bbad0df08"
+						}
+					}
+				],
+				"parameters": {
+					"P_LD_ID": {
+						"type": "string"
+					},
+					"P_PRCS_NM": {
+						"type": "string"
+					},
+					"P_PRCS_OBJ": {
+						"type": "object"
+					}
+				},
+				"folder": {
+					"name": "COMMON JOB"
+				},
+				"annotations": [],
+				"lastPublishTime": "2021-02-24T06:46:02Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/mssql_cntl_ds')]",
+				"[concat(variables('factoryId'), '/datasets/sp_bin_ds')]",
+				"[concat(variables('factoryId'), '/datasets/dl_bin_ds2')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/40_PCS_COMMON_TYPE6')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Copy binary sharepoints by folder to STG",
+				"activities": [
+					{
+						"name": "Notebook1",
+						"type": "DatabricksNotebook",
+						"dependsOn": [
+							{
+								"activity": "ForEach1",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 1,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": {
+								"value": "@pipeline().parameters.P_PRCS_OBJ.ADB_NM",
+								"type": "Expression"
+							},
+							"baseParameters": {
+								"PARAMS": {
+									"value": "@pipeline().parameters.P_PRCS_OBJ.ADB_PARM",
+									"type": "Expression"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "link_dbw_edp",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "GetBearerToken",
+						"type": "WebActivity",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"url": {
+								"value": "@pipeline().globalParameters.P_GLBL_BEARER_TOKEN",
+								"type": "Expression"
+							},
+							"method": "POST",
+							"headers": {
+								"Content-Type": "application/x-www-form-urlencoded"
+							},
+							"body": "grant_type=client_credentials&client_id=8578d84d-db28-449a-9c11-a8bae5465c04@9fce0284-1a8c-4368-85b0-571bbad0df08&client_secret=mVbWh~igL5kKkzFVXEg6BLOw86--_G4.cd&resource=00000003-0000-0ff1-ce00-000000000000/kiatnakin365.sharepoint.com@9fce0284-1a8c-4368-85b0-571bbad0df08"
+						}
+					},
+					{
+						"name": "List file in path",
+						"type": "WebActivity",
+						"dependsOn": [
+							{
+								"activity": "GetBearerToken",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"url": {
+								"value": "@concat('https://kiatnakin365.sharepoint.com/sites/',pipeline().globalParameters.P_GLBL_SHAREPOINT_SITE,'/_api/web/GetFolderByServerRelativeUrl(''ShareCenter/Landing/', pipeline().parameters.P_PRCS_OBJ.PTH, '/', pipeline().parameters.P_PRCS_OBJ.CALC_DATA_DT, ''')/Files')",
+								"type": "Expression"
+							},
+							"method": "GET",
+							"headers": {
+								"Accept": "application/json;odata=verbose",
+								"Authorization": {
+									"value": "@{concat('Bearer ', activity('GetBearerToken').output.access_token)}",
+									"type": "Expression"
+								}
+							}
+						}
+					},
+					{
+						"name": "ForEach1",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "List file in path",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('List file in path').output.d.results",
+								"type": "Expression"
+							},
+							"isSequential": false,
+							"batchCount": 10,
+							"activities": [
+								{
+									"name": "Copy Raw",
+									"type": "Copy",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "BinarySource",
+											"storeSettings": {
+												"type": "HttpReadSettings",
+												"requestMethod": "GET",
+												"additionalHeaders": {
+													"value": "@{concat('Authorization: Bearer ', activity('GetBearerToken').output.access_token)}",
+													"type": "Expression"
+												},
+												"requestTimeout": ""
+											},
+											"formatSettings": {
+												"type": "BinaryReadSettings"
+											}
+										},
+										"sink": {
+											"type": "BinarySink",
+											"storeSettings": {
+												"type": "AzureBlobFSWriteSettings"
+											}
+										},
+										"enableStaging": false
+									},
+									"inputs": [
+										{
+											"referenceName": "sp_bin_ds",
+											"type": "DatasetReference",
+											"parameters": {
+												"ServerRelativeUrl": {
+													"value": "@item().ServerRelativeUrl",
+													"type": "Expression"
+												}
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "dl_bin_ds2",
+											"type": "DatasetReference",
+											"parameters": {
+												"P_CONTAINER": {
+													"value": "@pipeline().parameters.P_PRCS_OBJ.CNTNR",
+													"type": "Expression"
+												},
+												"P_PATH": {
+													"value": "@concat(pipeline().parameters.P_PRCS_OBJ.PTH, '/',pipeline().parameters.P_PRCS_OBJ.CALC_DATA_DT)",
+													"type": "Expression"
+												},
+												"P_FILENAME": {
+													"value": "@item().Name",
+													"type": "Expression"
+												}
+											}
+										}
+									]
+								}
+							]
+						}
+					}
+				],
+				"parameters": {
+					"P_LD_ID": {
+						"type": "string"
+					},
+					"P_PRCS_NM": {
+						"type": "string"
+					},
+					"P_PRCS_OBJ": {
+						"type": "object"
+					}
+				},
+				"folder": {
+					"name": "COMMON JOB"
+				},
+				"annotations": [],
+				"lastPublishTime": "2021-02-24T06:23:25Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/sp_bin_ds')]",
+				"[concat(variables('factoryId'), '/datasets/dl_bin_ds2')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/40_PCS_COMMON_TYPE7')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Copy sharepoints to ref",
+				"activities": [
+					{
+						"name": "Copy Raw",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Lookup1",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "GetBearerToken",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "BinarySource",
+								"storeSettings": {
+									"type": "HttpReadSettings",
+									"requestMethod": "GET",
+									"additionalHeaders": {
+										"value": "@{concat('Authorization: Bearer ', activity('GetBearerToken').output.access_token)}",
+										"type": "Expression"
+									},
+									"requestTimeout": ""
+								},
+								"formatSettings": {
+									"type": "BinaryReadSettings"
+								}
+							},
+							"sink": {
+								"type": "BinarySink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								}
+							},
+							"enableStaging": false
+						},
+						"inputs": [
+							{
+								"referenceName": "sp_bin_ds",
+								"type": "DatasetReference",
+								"parameters": {
+									"ServerRelativeUrl": {
+										"value": "@concat('/sites/',pipeline().globalParameters.P_GLBL_SHAREPOINT_SITE,'/ShareCenter/Landing/', pipeline().parameters.P_PRCS_OBJ.PTH, '/', activity('Lookup1').output.firstrow.FI_NM)",
+										"type": "Expression"
+									}
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "dl_bin_ds2",
+								"type": "DatasetReference",
+								"parameters": {
+									"P_CONTAINER": {
+										"value": "@pipeline().parameters.P_PRCS_OBJ.CNTNR",
+										"type": "Expression"
+									},
+									"P_PATH": {
+										"value": "@concat(pipeline().parameters.P_PRCS_OBJ.PTH, '/')",
+										"type": "Expression"
+									},
+									"P_FILENAME": {
+										"value": "@activity('Lookup1').output.firstrow.FI_NM",
+										"type": "Expression"
+									}
+								}
+							}
+						]
+					},
+					{
+						"name": "Lookup1",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "SqlServerSource",
+								"sqlReaderStoredProcedureName": {
+									"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA, '.[PROC_GET_FI]')",
+									"type": "Expression"
+								},
+								"storedProcedureParameters": {
+									"P_DATA_DT": {
+										"type": "String",
+										"value": {
+											"value": "@pipeline().parameters.P_PRCS_OBJ.CALC_DATA_DT",
+											"type": "Expression"
+										}
+									},
+									"P_FI_ID": {
+										"type": "Int32",
+										"value": {
+											"value": "@pipeline().parameters.P_PRCS_OBJ.FI_ID",
+											"type": "Expression"
+										}
+									},
+									"P_PRCS_NM": {
+										"type": "String",
+										"value": {
+											"value": "@pipeline().parameters.P_PRCS_NM",
+											"type": "Expression"
+										}
+									}
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "mssql_cntl_ds",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						}
+					},
+					{
+						"name": "Copy STG",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Copy Raw",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "Lookup Schema",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "DelimitedTextSource",
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"recursive": true,
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "DelimitedTextReadSettings"
+								}
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"value": "@activity('Lookup Schema').output",
+								"type": "Expression"
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "dl_csv_ds",
+								"type": "DatasetReference",
+								"parameters": {
+									"P_PATH": {
+										"value": "@concat(pipeline().parameters.P_PRCS_OBJ.PTH,'/')",
+										"type": "Expression"
+									},
+									"P_FILENAME": {
+										"value": "@activity('Lookup1').output.firstrow.FI_NM",
+										"type": "Expression"
+									},
+									"P_DELIMITER": {
+										"value": "@activity('Lookup1').output.firstrow.DLM_STRNG",
+										"type": "Expression"
+									},
+									"P_ENCODING": {
+										"value": "@activity('Lookup1').output.firstrow.ENCDNG",
+										"type": "Expression"
+									},
+									"P_FIRSTROW_HDR": {
+										"value": "@activity('Lookup1').output.firstrow.FRST_ROW_HD",
+										"type": "Expression"
+									},
+									"P_CONTAINER": {
+										"value": "@activity('Lookup1').output.firstrow.CNTNR",
+										"type": "Expression"
+									}
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "dl_parquet_ds",
+								"type": "DatasetReference",
+								"parameters": {
+									"P_CONTAINER": {
+										"value": "@pipeline().parameters.P_PRCS_OBJ.TGT_CNTNR",
+										"type": "Expression"
+									},
+									"P_PATH": {
+										"value": "@concat(pipeline().parameters.P_PRCS_OBJ.TGT_PTH)",
+										"type": "Expression"
+									},
+									"P_FILENAME": {
+										"value": "@activity('Lookup1').output.firstrow.FI_NM",
+										"type": "Expression"
+									}
+								}
+							}
+						]
+					},
+					{
+						"name": "Lookup Schema",
+						"type": "Lookup",
+						"dependsOn": [
+							{
+								"activity": "Lookup1",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "JsonSource",
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"recursive": true,
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "JsonReadSettings"
+								}
+							},
+							"dataset": {
+								"referenceName": "dl_json_ds",
+								"type": "DatasetReference",
+								"parameters": {
+									"P_FILENAME": {
+										"value": "@activity('Lookup1').output.firstrow.SCHM_FI",
+										"type": "Expression"
+									}
+								}
+							}
+						}
+					},
+					{
+						"name": "Update Log Count",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "Copy STG",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": {
+								"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA, '.[PROC_UPDT_PRCS]')",
+								"type": "Expression"
+							},
+							"storedProcedureParameters": {
+								"P_CNT_FI_SRC": {
+									"value": null,
+									"type": "String"
+								},
+								"P_CNT_FI_TGT": {
+									"value": null,
+									"type": "String"
+								},
+								"P_CNT_REC_SRC": {
+									"value": {
+										"value": "@activity('Copy STG').output.rowsRead",
+										"type": "Expression"
+									},
+									"type": "String"
+								},
+								"P_CNT_REC_TGT": {
+									"value": {
+										"value": "@activity('Copy STG').output.rowsCopied",
+										"type": "Expression"
+									},
+									"type": "String"
+								},
+								"P_LD_ID": {
+									"value": {
+										"value": "@pipeline().parameters.P_LD_ID",
+										"type": "Expression"
+									},
+									"type": "String"
+								},
+								"P_PRCS_NM": {
+									"value": {
+										"value": "@pipeline().parameters.P_PRCS_NM",
+										"type": "Expression"
+									},
+									"type": "String"
+								},
+								"P_RMRK": {
+									"value": "Complete Copy to Staging",
+									"type": "String"
+								},
+								"P_ST": {
+									"value": "Running",
+									"type": "String"
+								},
+								"P_CNT_REC_CNTL": {
+									"value": null,
+									"type": "String"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "link_sqldb_kkpb_edp",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "GetBearerToken",
+						"type": "WebActivity",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"url": {
+								"value": "@pipeline().globalParameters.P_GLBL_BEARER_TOKEN",
+								"type": "Expression"
+							},
+							"method": "POST",
+							"headers": {
+								"Content-Type": "application/x-www-form-urlencoded"
+							},
+							"body": "grant_type=client_credentials&client_id=8578d84d-db28-449a-9c11-a8bae5465c04@9fce0284-1a8c-4368-85b0-571bbad0df08&client_secret=mVbWh~igL5kKkzFVXEg6BLOw86--_G4.cd&resource=00000003-0000-0ff1-ce00-000000000000/kiatnakin365.sharepoint.com@9fce0284-1a8c-4368-85b0-571bbad0df08"
+						}
+					}
+				],
+				"parameters": {
+					"P_LD_ID": {
+						"type": "string",
+						"defaultValue": "-999"
+					},
+					"P_PRCS_NM": {
+						"type": "string",
+						"defaultValue": "GET_LOCATION_FACE_RECOGNITION_CustGeoInfo"
+					},
+					"P_PRCS_OBJ": {
+						"type": "object"
+					}
+				},
+				"folder": {
+					"name": "COMMON JOB"
+				},
+				"annotations": [],
+				"lastPublishTime": "2021-02-24T06:50:32Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/sp_bin_ds')]",
+				"[concat(variables('factoryId'), '/datasets/dl_bin_ds2')]",
+				"[concat(variables('factoryId'), '/datasets/mssql_cntl_ds')]",
+				"[concat(variables('factoryId'), '/datasets/dl_csv_ds')]",
+				"[concat(variables('factoryId'), '/datasets/dl_parquet_ds')]",
+				"[concat(variables('factoryId'), '/datasets/dl_json_ds')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/EXT_TABLE')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "ForEach1",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "Get Metadata1",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "Lookup2",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('Get Metadata1').output.childItems",
+								"type": "Expression"
+							},
+							"isSequential": false,
+							"batchCount": 20,
+							"activities": [
+								{
+									"name": "Stored procedure1",
+									"type": "SqlServerStoredProcedure",
+									"dependsOn": [
+										{
+											"activity": "Lookup1",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"storedProcedureName": "[[dbo].[CREATE_EXTERNAL_TABLE]",
+										"storedProcedureParameters": {
+											"SQL": {
+												"value": {
+													"value": "@replace(activity('Lookup1').output.firstrow.prop_0,'%DATA_DT%',activity('Lookup2').output.firstrow.DATA_DT)",
+													"type": "Expression"
+												},
+												"type": "String"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "link_syn_kkpb_edp",
+										"type": "LinkedServiceReference"
+									}
+								},
+								{
+									"name": "Lookup1",
+									"type": "Lookup",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "DelimitedTextSource",
+											"storeSettings": {
+												"type": "AzureBlobFSReadSettings",
+												"recursive": true,
+												"enablePartitionDiscovery": false
+											},
+											"formatSettings": {
+												"type": "DelimitedTextReadSettings"
+											}
+										},
+										"dataset": {
+											"referenceName": "dl_sql_ds",
+											"type": "DatasetReference",
+											"parameters": {
+												"P_FILEPATH": {
+													"value": "@concat('TMP/STOREDSCRIPT/',pipeline().parameters.P_STREAM)",
+													"type": "Expression"
+												},
+												"P_FILENAME": {
+													"value": "@item().name",
+													"type": "Expression"
+												}
+											}
+										},
+										"firstRowOnly": true
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "Get Metadata1",
+						"type": "GetMetadata",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataset": {
+								"referenceName": "dl_work_ds",
+								"type": "DatasetReference",
+								"parameters": {
+									"P_FILEPATH": {
+										"value": "@concat('TMP/STOREDSCRIPT/',pipeline().parameters.P_STREAM)",
+										"type": "Expression"
+									},
+									"P_FILENAME": "*.*"
+								}
+							},
+							"fieldList": [
+								"childItems"
+							],
+							"storeSettings": {
+								"type": "AzureBlobFSReadSettings",
+								"recursive": true,
+								"enablePartitionDiscovery": false
+							},
+							"formatSettings": {
+								"type": "DelimitedTextReadSettings"
+							}
+						}
+					},
+					{
+						"name": "Lookup2",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "@concat('SELECT  CONVERT(VARCHAR, [CALC_DATA_DT], 112) AS DATA_DT FROM ',pipeline().globalParameters.P_GLBL_CNTL_SCHEMA,'.[CNTL_CFG_STREM] WHERE STREM_NM = ''' , pipeline().parameters.P_STREAM, '''')",
+									"type": "Expression"
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "mssql_cntl_ds",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						}
+					}
+				],
+				"parameters": {
+					"P_STREAM": {
+						"type": "string"
+					}
+				},
+				"variables": {
+					"p_file": {
+						"type": "String"
+					}
+				},
+				"folder": {
+					"name": "UTILS"
+				},
+				"annotations": [],
+				"lastPublishTime": "2021-02-24T05:06:43Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/dl_work_ds')]",
+				"[concat(variables('factoryId'), '/datasets/mssql_cntl_ds')]",
+				"[concat(variables('factoryId'), '/datasets/dl_sql_ds')]"
+			]
 		}
 	]
 }

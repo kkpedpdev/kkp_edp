@@ -11,10 +11,6 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'accountKey' of 'link_adls_onprim_edp'"
 		},
-		"link_adls_onprim_kkpb_edp_accountKey": {
-			"type": "secureString",
-			"metadata": "Secure string for 'accountKey' of 'link_adls_onprim_kkpb_edp'"
-		},
 		"link_blob_test_edp_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'link_blob_test_edp'"
@@ -39,10 +35,6 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'link_syn_kkpb_edp'"
 		},
-		"linkedService2_password": {
-			"type": "secureString",
-			"metadata": "Secure string for 'password' of 'linkedService2'"
-		},
 		"AzureDataLakeStorage1_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://stkkpbdevtempedp.dfs.core.windows.net"
@@ -50,10 +42,6 @@
 		"link_adls_onprim_edp_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://stkkpbdevtempedp.dfs.core.windows.net"
-		},
-		"link_adls_onprim_kkpb_edp_properties_typeProperties_url": {
-			"type": "string",
-			"defaultValue": "https://stkkpbdevtempedp.dfs.core.windows.net/"
 		},
 		"link_fs_kkpb_dev_edp_properties_typeProperties_host": {
 			"type": "string",
@@ -65,7 +53,7 @@
 		},
 		"link_func_edp_properties_typeProperties_functionAppUrl": {
 			"type": "string",
-			"defaultValue": "https://func-kkpb-temp-edp.azurewebsites.net"
+			"defaultValue": "https://func-kkpb-test-edp.azurewebsites.net"
 		},
 		"link_kv_edp_properties_typeProperties_baseUrl": {
 			"type": "string",
@@ -77,15 +65,7 @@
 		},
 		"link_st_kkpb_edp_properties_typeProperties_url": {
 			"type": "string",
-			"defaultValue": "https://stkkpbdevtempedp.dfs.core.windows.net"
-		},
-		"linkedService2_properties_typeProperties_host": {
-			"type": "string",
-			"defaultValue": "D:Landing"
-		},
-		"linkedService2_properties_typeProperties_userId": {
-			"type": "string",
-			"defaultValue": "kkpbvmshiredpadm"
+			"defaultValue": "https://stkkpbdevedp.dfs.core.windows.net"
 		},
 		"containerUri": {
 			"type": "string",
@@ -117,9 +97,6 @@
 					"link_adls_onprim_edp_accountKey": {
 						"value": "[parameters('link_adls_onprim_edp_accountKey')]"
 					},
-					"link_adls_onprim_kkpb_edp_accountKey": {
-						"value": "[parameters('link_adls_onprim_kkpb_edp_accountKey')]"
-					},
 					"link_blob_test_edp_connectionString": {
 						"value": "[parameters('link_blob_test_edp_connectionString')]"
 					},
@@ -138,11 +115,14 @@
 					"link_syn_kkpb_edp_connectionString": {
 						"value": "[parameters('link_syn_kkpb_edp_connectionString')]"
 					},
-					"linkedService2_password": {
-						"value": "[parameters('linkedService2_password')]"
-					},
 					"AzureDataLakeStorage1_properties_typeProperties_url": {
 						"value": "[parameters('AzureDataLakeStorage1_properties_typeProperties_url')]"
+					},
+					"link_adls_onprim_edp_properties_typeProperties_url": {
+						"value": "[parameters('link_adls_onprim_edp_properties_typeProperties_url')]"
+					},
+					"link_func_edp_properties_typeProperties_functionAppUrl": {
+						"value": "[parameters('link_func_edp_properties_typeProperties_functionAppUrl')]"
 					},
 					"link_kv_edp_properties_typeProperties_baseUrl": {
 						"value": "[parameters('link_kv_edp_properties_typeProperties_baseUrl')]"
@@ -150,29 +130,8 @@
 					"link_spo_http_properties_typeProperties_url": {
 						"value": "[parameters('link_spo_http_properties_typeProperties_url')]"
 					},
-					"link_adls_onprim_edp_properties_typeProperties_url": {
-						"value": "[parameters('link_adls_onprim_edp_properties_typeProperties_url')]"
-					},
-					"link_adls_onprim_kkpb_edp_properties_typeProperties_url": {
-						"value": "[parameters('link_adls_onprim_kkpb_edp_properties_typeProperties_url')]"
-					},
-					"link_fs_kkpb_dev_edp_properties_typeProperties_host": {
-						"value": "[parameters('link_fs_kkpb_dev_edp_properties_typeProperties_host')]"
-					},
-					"link_fs_kkpb_dev_edp_properties_typeProperties_userId": {
-						"value": "[parameters('link_fs_kkpb_dev_edp_properties_typeProperties_userId')]"
-					},
-					"link_func_edp_properties_typeProperties_functionAppUrl": {
-						"value": "[parameters('link_func_edp_properties_typeProperties_functionAppUrl')]"
-					},
 					"link_st_kkpb_edp_properties_typeProperties_url": {
 						"value": "[parameters('link_st_kkpb_edp_properties_typeProperties_url')]"
-					},
-					"linkedService2_properties_typeProperties_host": {
-						"value": "[parameters('linkedService2_properties_typeProperties_host')]"
-					},
-					"linkedService2_properties_typeProperties_userId": {
-						"value": "[parameters('linkedService2_properties_typeProperties_userId')]"
 					}
 				}
 			},
@@ -191,6 +150,12 @@
 				"parameters": {
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
+					},
+					"link_fs_kkpb_dev_edp_properties_typeProperties_host": {
+						"value": "[parameters('link_fs_kkpb_dev_edp_properties_typeProperties_host')]"
+					},
+					"link_fs_kkpb_dev_edp_properties_typeProperties_userId": {
+						"value": "[parameters('link_fs_kkpb_dev_edp_properties_typeProperties_userId')]"
 					}
 				}
 			},

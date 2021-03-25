@@ -14,7 +14,8 @@
 				},
 				"secretName": "shir-on-prim-password"
 			}
-		}
+		},
+		"description": "  "
 	},
 	"type": "Microsoft.DataFactory/factories/linkedservices"
 }

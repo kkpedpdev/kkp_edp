@@ -5,6 +5,7 @@
 		"activities": [
 			{
 				"name": "If Condition1",
+				"description": "  ",
 				"type": "IfCondition",
 				"dependsOn": [],
 				"userProperties": [],

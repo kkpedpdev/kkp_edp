@@ -366,6 +366,7 @@
 			},
 			{
 				"name": "GetBearerToken",
+				"description": "  ",
 				"type": "WebActivity",
 				"dependsOn": [],
 				"policy": {

@@ -5499,10 +5499,12 @@
 						"defaultValue": "N/A"
 					},
 					"V_TMP": {
-						"type": "String"
+						"type": "String",
+						"defaultValue": "0"
 					},
 					"V_LOOP": {
-						"type": "String"
+						"type": "String",
+						"defaultValue": "0"
 					}
 				},
 				"folder": {

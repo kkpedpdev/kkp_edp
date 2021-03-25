@@ -1179,7 +1179,7 @@
 							"userProperties": [],
 							"typeProperties": {
 								"expression": {
-									"value": "@less(Int(variables('V_LOOP')),3600)",
+									"value": "@greater(Int(variables('V_LOOP')),3600)",
 									"type": "Expression"
 								},
 								"ifTrueActivities": [

@@ -7781,6 +7781,7 @@
 				"activities": [
 					{
 						"name": "Azure Function1",
+						"description": "  ",
 						"type": "AzureFunctionActivity",
 						"dependsOn": [],
 						"policy": {

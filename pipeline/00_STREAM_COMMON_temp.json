@@ -1,6 +1,7 @@
 {
 	"name": "00_STREAM_COMMON_temp",
 	"properties": {
+		"description": " ",
 		"activities": [
 			{
 				"name": "GET PROCESS GROUP LIST",

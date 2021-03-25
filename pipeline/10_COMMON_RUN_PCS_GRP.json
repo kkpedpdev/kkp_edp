@@ -1,6 +1,7 @@
 {
 	"name": "10_COMMON_RUN_PCS_GRP",
 	"properties": {
+		"description": " ",
 		"activities": [
 			{
 				"name": "GET PROCESS LIST",

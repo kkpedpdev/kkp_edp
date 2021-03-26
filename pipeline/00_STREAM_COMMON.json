@@ -298,6 +298,7 @@
 			},
 			{
 				"name": "START STREAM",
+				"description": "     ",
 				"type": "Lookup",
 				"dependsOn": [],
 				"policy": {

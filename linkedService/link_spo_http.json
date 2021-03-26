@@ -1,7 +1,7 @@
 {
 	"name": "link_spo_http",
-	"type": "Microsoft.DataFactory/factories/linkedservices",
 	"properties": {
+		"description": " ",
 		"annotations": [],
 		"type": "HttpServer",
 		"typeProperties": {
@@ -9,6 +9,10 @@
 			"enableServerCertificateValidation": true,
 			"authenticationType": "Anonymous"
 		},
-		"description": " "
-	}
+		"connectVia": {
+			"referenceName": "shir-kkpb-edp",
+			"type": "IntegrationRuntimeReference"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/linkedservices"
 }

@@ -7,6 +7,10 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "adf-kkpb-dev-edp"
 		},
+		"link_fs_kkpb_dev_edp_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'link_fs_kkpb_dev_edp'"
+		},
 		"link_fs_kkpb_dev_edp_properties_typeProperties_host": {
 			"type": "string",
 			"defaultValue": "E:\\Landing"
@@ -603,13 +607,13 @@
 					"host": "[parameters('link_fs_kkpb_dev_edp_properties_typeProperties_host')]",
 					"userId": "[parameters('link_fs_kkpb_dev_edp_properties_typeProperties_userId')]",
 					"password": {
-						"type": "AzureKeyVaultSecret",
-						"store": {
-							"referenceName": "link_kv_edp",
-							"type": "LinkedServiceReference"
-						},
-						"secretName": "shir-on-prim-password"
+						"type": "SecureString",
+						"value": "[parameters('link_fs_kkpb_dev_edp_password')]"
 					}
+				},
+				"connectVia": {
+					"referenceName": "shir-onprim-kkbp-edp",
+					"type": "IntegrationRuntimeReference"
 				}
 			},
 			"dependsOn": []

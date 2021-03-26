@@ -19,6 +19,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'accessToken' of 'link_dbw_edp'"
 		},
+		"link_fs_kkpb_dev_edp_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'link_fs_kkpb_dev_edp'"
+		},
 		"link_func_edp_functionKey": {
 			"type": "secureString",
 			"metadata": "Secure string for 'functionKey' of 'link_func_edp'"
@@ -312,7 +316,7 @@
 						},
 						"userProperties": [],
 						"typeProperties": {
-							"url": "https://prod-27.southeastasia.logic.azure.com:443/workflows/ae3c11e07db340b39cd14f5b2ed0356a/triggers/manual/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=r1EYZIlJt1ptTTkCekMQHnkWORNI-YGcR5tvGIGDNsg",
+							"url": "https://prod-11.southeastasia.logic.azure.com:443/workflows/0c8fc5c0ef894032905ccf103cbe04a7/triggers/manual/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=agmp-_JAWWQboJJN9WzVGHrl7MuFv6UUDPuhdqhiqAM",
 							"method": "POST",
 							"headers": {
 								"Content-Type": "application/json"
@@ -647,7 +651,7 @@
 						},
 						"userProperties": [],
 						"typeProperties": {
-							"url": "https://prod-27.southeastasia.logic.azure.com:443/workflows/ae3c11e07db340b39cd14f5b2ed0356a/triggers/manual/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=r1EYZIlJt1ptTTkCekMQHnkWORNI-YGcR5tvGIGDNsg",
+							"url": "https://prod-11.southeastasia.logic.azure.com:443/workflows/0c8fc5c0ef894032905ccf103cbe04a7/triggers/manual/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=agmp-_JAWWQboJJN9WzVGHrl7MuFv6UUDPuhdqhiqAM",
 							"method": "POST",
 							"headers": {
 								"Content-Type": "application/json"
@@ -15017,17 +15021,17 @@
 					"host": "[parameters('link_fs_kkpb_dev_edp_properties_typeProperties_host')]",
 					"userId": "[parameters('link_fs_kkpb_dev_edp_properties_typeProperties_userId')]",
 					"password": {
-						"type": "AzureKeyVaultSecret",
-						"store": {
-							"referenceName": "link_kv_edp",
-							"type": "LinkedServiceReference"
-						},
-						"secretName": "shir-on-prim-password"
+						"type": "SecureString",
+						"value": "[parameters('link_fs_kkpb_dev_edp_password')]"
 					}
+				},
+				"connectVia": {
+					"referenceName": "shir-onprim-kkbp-edp",
+					"type": "IntegrationRuntimeReference"
 				}
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/link_kv_edp')]"
+				"[concat(variables('factoryId'), '/integrationRuntimes/shir-onprim-kkbp-edp')]"
 			]
 		},
 		{

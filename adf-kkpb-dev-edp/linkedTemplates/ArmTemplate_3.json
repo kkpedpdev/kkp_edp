@@ -2566,7 +2566,7 @@
 						},
 						"userProperties": [],
 						"typeProperties": {
-							"url": "https://prod-27.southeastasia.logic.azure.com:443/workflows/ae3c11e07db340b39cd14f5b2ed0356a/triggers/manual/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=r1EYZIlJt1ptTTkCekMQHnkWORNI-YGcR5tvGIGDNsg",
+							"url": "https://prod-11.southeastasia.logic.azure.com:443/workflows/0c8fc5c0ef894032905ccf103cbe04a7/triggers/manual/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=agmp-_JAWWQboJJN9WzVGHrl7MuFv6UUDPuhdqhiqAM",
 							"method": "POST",
 							"headers": {
 								"Content-Type": "application/json"
@@ -3026,7 +3026,7 @@
 						},
 						"userProperties": [],
 						"typeProperties": {
-							"url": "https://prod-27.southeastasia.logic.azure.com:443/workflows/ae3c11e07db340b39cd14f5b2ed0356a/triggers/manual/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=r1EYZIlJt1ptTTkCekMQHnkWORNI-YGcR5tvGIGDNsg",
+							"url": "https://prod-11.southeastasia.logic.azure.com:443/workflows/0c8fc5c0ef894032905ccf103cbe04a7/triggers/manual/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=agmp-_JAWWQboJJN9WzVGHrl7MuFv6UUDPuhdqhiqAM",
 							"method": "POST",
 							"headers": {
 								"Content-Type": "application/json"

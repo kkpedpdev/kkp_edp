@@ -19,6 +19,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'accessToken' of 'link_dbw_edp'"
 		},
+		"link_fs_kkpb_dev_edp_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'link_fs_kkpb_dev_edp'"
+		},
 		"link_func_edp_functionKey": {
 			"type": "secureString",
 			"metadata": "Secure string for 'functionKey' of 'link_func_edp'"
@@ -150,6 +154,9 @@
 				"parameters": {
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
+					},
+					"link_fs_kkpb_dev_edp_password": {
+						"value": "[parameters('link_fs_kkpb_dev_edp_password')]"
 					},
 					"link_fs_kkpb_dev_edp_properties_typeProperties_host": {
 						"value": "[parameters('link_fs_kkpb_dev_edp_properties_typeProperties_host')]"

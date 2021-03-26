@@ -7,6 +7,10 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "adf-kkpb-dev-edp"
 		},
+		"AzureDataLakeStorage1_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'AzureDataLakeStorage1'"
+		},
 		"link_adls_onprim_edp_accountKey": {
 			"type": "secureString",
 			"metadata": "Secure string for 'accountKey' of 'link_adls_onprim_edp'"
@@ -41,11 +45,11 @@
 		},
 		"AzureDataLakeStorage1_properties_typeProperties_url": {
 			"type": "string",
-			"defaultValue": "https://stkkpbdevtempedp.dfs.core.windows.net"
+			"defaultValue": "https://stkkpbdevedp.dfs.core.windows.net"
 		},
 		"link_adls_onprim_edp_properties_typeProperties_url": {
 			"type": "string",
-			"defaultValue": "https://stkkpbdevtempedp.dfs.core.windows.net"
+			"defaultValue": "https://stkkpbdevedp.dfs.core.windows.net"
 		},
 		"link_fs_kkpb_dev_edp_properties_typeProperties_host": {
 			"type": "string",
@@ -70,6 +74,10 @@
 		"link_st_kkpb_edp_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://stkkpbdevedp.dfs.core.windows.net"
+		},
+		"shir-kkpb-edp_properties_typeProperties_linkedInfo_resourceId": {
+			"type": "string",
+			"defaultValue": "/subscriptions/f3ef3afd-9903-4759-a715-dcd5523f3bbe/resourcegroups/rg-kkpb-test-edp/providers/Microsoft.DataFactory/factories/adf-kkpb-uat-edp/integrationruntimes/shir-kkpb-edp"
 		},
 		"containerUri": {
 			"type": "string",
@@ -98,14 +106,23 @@
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
 					},
-					"link_adls_onprim_edp_accountKey": {
-						"value": "[parameters('link_adls_onprim_edp_accountKey')]"
-					},
 					"link_blob_test_edp_connectionString": {
 						"value": "[parameters('link_blob_test_edp_connectionString')]"
 					},
 					"link_dbw_edp_accessToken": {
 						"value": "[parameters('link_dbw_edp_accessToken')]"
+					},
+					"link_syn_kkpb_edp_connectionString": {
+						"value": "[parameters('link_syn_kkpb_edp_connectionString')]"
+					},
+					"AzureDataLakeStorage1_accountKey": {
+						"value": "[parameters('AzureDataLakeStorage1_accountKey')]"
+					},
+					"link_adls_onprim_edp_accountKey": {
+						"value": "[parameters('link_adls_onprim_edp_accountKey')]"
+					},
+					"link_fs_kkpb_dev_edp_password": {
+						"value": "[parameters('link_fs_kkpb_dev_edp_password')]"
 					},
 					"link_func_edp_functionKey": {
 						"value": "[parameters('link_func_edp_functionKey')]"
@@ -116,8 +133,11 @@
 					"link_st_kkpb_edp_accountKey": {
 						"value": "[parameters('link_st_kkpb_edp_accountKey')]"
 					},
-					"link_syn_kkpb_edp_connectionString": {
-						"value": "[parameters('link_syn_kkpb_edp_connectionString')]"
+					"link_kv_edp_properties_typeProperties_baseUrl": {
+						"value": "[parameters('link_kv_edp_properties_typeProperties_baseUrl')]"
+					},
+					"shir-kkpb-edp_properties_typeProperties_linkedInfo_resourceId": {
+						"value": "[parameters('shir-kkpb-edp_properties_typeProperties_linkedInfo_resourceId')]"
 					},
 					"AzureDataLakeStorage1_properties_typeProperties_url": {
 						"value": "[parameters('AzureDataLakeStorage1_properties_typeProperties_url')]"
@@ -125,11 +145,14 @@
 					"link_adls_onprim_edp_properties_typeProperties_url": {
 						"value": "[parameters('link_adls_onprim_edp_properties_typeProperties_url')]"
 					},
+					"link_fs_kkpb_dev_edp_properties_typeProperties_host": {
+						"value": "[parameters('link_fs_kkpb_dev_edp_properties_typeProperties_host')]"
+					},
+					"link_fs_kkpb_dev_edp_properties_typeProperties_userId": {
+						"value": "[parameters('link_fs_kkpb_dev_edp_properties_typeProperties_userId')]"
+					},
 					"link_func_edp_properties_typeProperties_functionAppUrl": {
 						"value": "[parameters('link_func_edp_properties_typeProperties_functionAppUrl')]"
-					},
-					"link_kv_edp_properties_typeProperties_baseUrl": {
-						"value": "[parameters('link_kv_edp_properties_typeProperties_baseUrl')]"
 					},
 					"link_spo_http_properties_typeProperties_url": {
 						"value": "[parameters('link_spo_http_properties_typeProperties_url')]"
@@ -154,15 +177,6 @@
 				"parameters": {
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
-					},
-					"link_fs_kkpb_dev_edp_password": {
-						"value": "[parameters('link_fs_kkpb_dev_edp_password')]"
-					},
-					"link_fs_kkpb_dev_edp_properties_typeProperties_host": {
-						"value": "[parameters('link_fs_kkpb_dev_edp_properties_typeProperties_host')]"
-					},
-					"link_fs_kkpb_dev_edp_properties_typeProperties_userId": {
-						"value": "[parameters('link_fs_kkpb_dev_edp_properties_typeProperties_userId')]"
 					}
 				}
 			},

@@ -7,6 +7,10 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "adf-kkpb-dev-edp"
 		},
+		"AzureDataLakeStorage1_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'AzureDataLakeStorage1'"
+		},
 		"link_adls_onprim_edp_accountKey": {
 			"type": "secureString",
 			"metadata": "Secure string for 'accountKey' of 'link_adls_onprim_edp'"
@@ -41,11 +45,11 @@
 		},
 		"AzureDataLakeStorage1_properties_typeProperties_url": {
 			"type": "string",
-			"defaultValue": "https://stkkpbdevtempedp.dfs.core.windows.net"
+			"defaultValue": "https://stkkpbdevedp.dfs.core.windows.net"
 		},
 		"link_adls_onprim_edp_properties_typeProperties_url": {
 			"type": "string",
-			"defaultValue": "https://stkkpbdevtempedp.dfs.core.windows.net"
+			"defaultValue": "https://stkkpbdevedp.dfs.core.windows.net"
 		},
 		"link_fs_kkpb_dev_edp_properties_typeProperties_host": {
 			"type": "string",
@@ -70,6 +74,10 @@
 		"link_st_kkpb_edp_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://stkkpbdevedp.dfs.core.windows.net"
+		},
+		"shir-kkpb-edp_properties_typeProperties_linkedInfo_resourceId": {
+			"type": "string",
+			"defaultValue": "/subscriptions/f3ef3afd-9903-4759-a715-dcd5523f3bbe/resourcegroups/rg-kkpb-test-edp/providers/Microsoft.DataFactory/factories/adf-kkpb-uat-edp/integrationruntimes/shir-kkpb-edp"
 		}
 	},
 	"variables": {
@@ -382,6 +390,7 @@
 					},
 					{
 						"name": "START STREAM",
+						"description": "           ",
 						"type": "Lookup",
 						"dependsOn": [],
 						"policy": {
@@ -1501,419 +1510,6 @@
 				"[concat(variables('factoryId'), '/datasets/mssql_cntl_ds')]",
 				"[concat(variables('factoryId'), '/linkedServices/link_sqldb_kkpb_edp')]",
 				"[concat(variables('factoryId'), '/pipelines/05_COMMON_RUN_PCS_GRP_BY PRIR')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/00_STREAM_COMMON_copy1')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "GET PROCESS LIST",
-						"type": "Lookup",
-						"dependsOn": [
-							{
-								"activity": "START STREAM",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "SqlServerSource",
-								"sqlReaderStoredProcedureName": "[[CNTL].[PROC_GET_PCS_STREAM]",
-								"storedProcedureParameters": {
-									"P_STREAM_NM": {
-										"type": "String",
-										"value": {
-											"value": "@pipeline().parameters.P_STREAM_NM",
-											"type": "Expression"
-										}
-									}
-								},
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "mssql_cntl_ds",
-								"type": "DatasetReference",
-								"parameters": {}
-							},
-							"firstRowOnly": false
-						}
-					},
-					{
-						"name": "FOR EACH PROCESS",
-						"type": "ForEach",
-						"dependsOn": [
-							{
-								"activity": "GET PROCESS LIST",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@activity('GET PROCESS LIST').output.value",
-								"type": "Expression"
-							},
-							"isSequential": false,
-							"batchCount": 20,
-							"activities": [
-								{
-									"name": "RUN COMMON PROCESS",
-									"type": "ExecutePipeline",
-									"dependsOn": [],
-									"userProperties": [],
-									"typeProperties": {
-										"pipeline": {
-											"referenceName": "20_PCS_COMMON_START",
-											"type": "PipelineReference"
-										},
-										"waitOnCompletion": true,
-										"parameters": {
-											"P_PROCESS_NM": {
-												"value": "@item().PCS_NM",
-												"type": "Expression"
-											},
-											"P_RUN_MODE": {
-												"value": "@pipeline().parameters.P_RUN_MODE",
-												"type": "Expression"
-											},
-											"P_STREAM_SEQ_ID": {
-												"value": "@activity('START STREAM').output.FIRSTROW.STREAM_SEQ_ID",
-												"type": "Expression"
-											}
-										}
-									}
-								}
-							]
-						}
-					},
-					{
-						"name": "STREAM RESULT",
-						"type": "Lookup",
-						"dependsOn": [
-							{
-								"activity": "UPDATE STREAM",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "SqlServerSource",
-								"sqlReaderStoredProcedureName": "[[CNTL].[PROC_STREAM_RESULT]",
-								"storedProcedureParameters": {
-									"P_STREAM_NM": {
-										"type": "String",
-										"value": {
-											"value": "@pipeline().parameters.P_STREAM_NM",
-											"type": "Expression"
-										}
-									},
-									"P_STREAM_SEQ_ID": {
-										"type": "String",
-										"value": {
-											"value": "@activity('START STREAM').output.FIRSTROW.STREAM_SEQ_ID",
-											"type": "Expression"
-										}
-									}
-								},
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "mssql_cntl_ds",
-								"type": "DatasetReference",
-								"parameters": {}
-							},
-							"firstRowOnly": true
-						}
-					},
-					{
-						"name": "FINAL STREAM",
-						"type": "Lookup",
-						"dependsOn": [
-							{
-								"activity": "FOR EACH PROCESS",
-								"dependencyConditions": [
-									"Completed"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "SqlServerSource",
-								"sqlReaderStoredProcedureName": "[[CNTL].[PROC_FINAL_STREAM]",
-								"storedProcedureParameters": {
-									"P_AS_AT_DT": {
-										"type": "String",
-										"value": {
-											"value": "@activity('START STREAM').output.FIRSTROW.AS_AT_DT",
-											"type": "Expression"
-										}
-									},
-									"P_STREAM_NM": {
-										"type": "String",
-										"value": {
-											"value": "@pipeline().parameters.P_STREAM_NM",
-											"type": "Expression"
-										}
-									},
-									"P_STREAM_SEQ_ID": {
-										"type": "String",
-										"value": {
-											"value": "@activity('START STREAM').output.FIRSTROW.STREAM_SEQ_ID",
-											"type": "Expression"
-										}
-									}
-								},
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "mssql_cntl_ds",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						}
-					},
-					{
-						"name": "SEND EMAIL",
-						"type": "WebActivity",
-						"dependsOn": [
-							{
-								"activity": "GET EMAIL",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							},
-							{
-								"activity": "STREAM RESULT",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"url": "https://prod-05.southeastasia.logic.azure.com:443/workflows/87cb500b80b74094a5bea5f149f3b45a/triggers/manual/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=U4UdfX5WK2SF1bQKwro9Wmujq8RKOiGaTvcvclI17pw",
-							"method": "POST",
-							"headers": {
-								"Content-Type": "application/json"
-							},
-							"body": {
-								"value": "{\n\"Message\":\"@{activity('STREAM RESULT').output.firstrow.a}\",\n\"EmailTo\":\"@{activity('GET EMAIL').output.firstrow.EMAIL}\",\n\"Asat_dt\":\"@{activity('FINAL STREAM').output.firstrow.AS_AT_DT_FORMAT}\",\n\"StreamName\":\"@{pipeline().parameters.P_STREAM_NM}\"\n}",
-								"type": "Expression"
-							}
-						}
-					},
-					{
-						"name": "GET EMAIL",
-						"type": "Lookup",
-						"dependsOn": [
-							{
-								"activity": "FINAL STREAM",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "SqlServerSource",
-								"sqlReaderStoredProcedureName": "[[CNTL].[PROC_GET_EMAIL]",
-								"storedProcedureParameters": {
-									"P_STREAM_NM": {
-										"type": "String",
-										"value": {
-											"value": "@pipeline().parameters.P_STREAM_NM",
-											"type": "Expression"
-										}
-									},
-									"P_STREAM_RESULT": {
-										"type": "String",
-										"value": {
-											"value": "@activity('FINAL STREAM').output.FIRSTROW.STREAM_RESULT",
-											"type": "Expression"
-										}
-									}
-								},
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "mssql_cntl_ds",
-								"type": "DatasetReference",
-								"parameters": {}
-							},
-							"firstRowOnly": true
-						}
-					},
-					{
-						"name": "START STREAM",
-						"type": "Lookup",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "SqlServerSource",
-								"sqlReaderStoredProcedureName": "[[CNTL].[PROC_CNTL_ACTV_STREAM]",
-								"storedProcedureParameters": {
-									"P_RUN_MODE": {
-										"type": "String",
-										"value": {
-											"value": "@pipeline().parameters.P_RUN_MODE",
-											"type": "Expression"
-										}
-									},
-									"P_STREAM_NM": {
-										"type": "String",
-										"value": {
-											"value": "@pipeline().parameters.P_STREAM_NM",
-											"type": "Expression"
-										}
-									}
-								},
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "mssql_cntl_ds",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						}
-					},
-					{
-						"name": "UPDATE STREAM",
-						"type": "SqlServerStoredProcedure",
-						"dependsOn": [
-							{
-								"activity": "FINAL STREAM",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"storedProcedureName": "[[CNTL].[PROC_UDT_STREAM]",
-							"storedProcedureParameters": {
-								"P_STREAM_NM": {
-									"value": {
-										"value": "@pipeline().parameters.P_STREAM_NM",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"P_STREAM_RESULT": {
-									"value": {
-										"value": "@activity('FINAL STREAM').output.firstrow.STREAM_RESULT",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"P_STREAM_SEQ_ID": {
-									"value": {
-										"value": "@activity('START STREAM').output.FIRSTROW.STREAM_SEQ_ID",
-										"type": "Expression"
-									},
-									"type": "String"
-								}
-							}
-						},
-						"linkedServiceName": {
-							"referenceName": "link_sqldb_kkpb_edp",
-							"type": "LinkedServiceReference"
-						}
-					}
-				],
-				"parameters": {
-					"P_STREAM_NM": {
-						"type": "string",
-						"defaultValue": "EDP_FTP"
-					},
-					"P_RUN_MODE": {
-						"type": "string",
-						"defaultValue": "R"
-					}
-				},
-				"variables": {
-					"V_STREAM_RESULT": {
-						"type": "String",
-						"defaultValue": "-999"
-					}
-				},
-				"folder": {
-					"name": "BK"
-				},
-				"annotations": [],
-				"lastPublishTime": "2021-02-24T05:06:49Z"
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/mssql_cntl_ds')]",
-				"[concat(variables('factoryId'), '/linkedServices/link_sqldb_kkpb_edp')]",
-				"[concat(variables('factoryId'), '/pipelines/20_PCS_COMMON_START')]"
 			]
 		},
 		{
@@ -11957,484 +11553,6 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/MAIN_BATCH_SP1')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Stream TIDE Staging",
-						"type": "ExecutePipeline",
-						"dependsOn": [],
-						"userProperties": [],
-						"typeProperties": {
-							"pipeline": {
-								"referenceName": "00_STREAM_COMMON_2_bk",
-								"type": "PipelineReference"
-							},
-							"waitOnCompletion": true,
-							"parameters": {
-								"P_STREM_NM": "EDP_TIDE",
-								"P_RUN_MODE": "N"
-							}
-						}
-					},
-					{
-						"name": "Stream Tide Culated",
-						"type": "ExecutePipeline",
-						"dependsOn": [
-							{
-								"activity": "Stream TIDE Staging",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"pipeline": {
-								"referenceName": "00_STREAM_COMMON_2_bk",
-								"type": "PipelineReference"
-							},
-							"waitOnCompletion": true,
-							"parameters": {
-								"P_STREM_NM": "EDP_TIDE_CR",
-								"P_RUN_MODE": "N"
-							}
-						}
-					},
-					{
-						"name": "Stream DLT Staging",
-						"type": "ExecutePipeline",
-						"dependsOn": [],
-						"userProperties": [],
-						"typeProperties": {
-							"pipeline": {
-								"referenceName": "00_STREAM_COMMON_2_bk",
-								"type": "PipelineReference"
-							},
-							"waitOnCompletion": true,
-							"parameters": {
-								"P_STREM_NM": "EDP_DLT",
-								"P_RUN_MODE": "N"
-							}
-						}
-					},
-					{
-						"name": "Stream DLT Culated",
-						"type": "ExecutePipeline",
-						"dependsOn": [
-							{
-								"activity": "Stream DLT Staging",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"pipeline": {
-								"referenceName": "00_STREAM_COMMON_2_bk",
-								"type": "PipelineReference"
-							},
-							"waitOnCompletion": true,
-							"parameters": {
-								"P_STREM_NM": "EDP_DLT_CR",
-								"P_RUN_MODE": "N"
-							}
-						}
-					},
-					{
-						"name": "Stream KK Staging",
-						"type": "ExecutePipeline",
-						"dependsOn": [],
-						"userProperties": [],
-						"typeProperties": {
-							"pipeline": {
-								"referenceName": "00_STREAM_COMMON_2_bk",
-								"type": "PipelineReference"
-							},
-							"waitOnCompletion": true,
-							"parameters": {
-								"P_STREM_NM": "EDP_KK",
-								"P_RUN_MODE": "N"
-							}
-						}
-					},
-					{
-						"name": "Stream KK Culated",
-						"type": "ExecutePipeline",
-						"dependsOn": [
-							{
-								"activity": "Stream KK Staging",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"pipeline": {
-								"referenceName": "00_STREAM_COMMON_2_bk",
-								"type": "PipelineReference"
-							},
-							"waitOnCompletion": true,
-							"parameters": {
-								"P_STREM_NM": "EDP_KK_CR",
-								"P_RUN_MODE": "N"
-							}
-						}
-					},
-					{
-						"name": "Stream RIB Staging",
-						"type": "ExecutePipeline",
-						"dependsOn": [],
-						"userProperties": [],
-						"typeProperties": {
-							"pipeline": {
-								"referenceName": "00_STREAM_COMMON_2_bk",
-								"type": "PipelineReference"
-							},
-							"waitOnCompletion": true,
-							"parameters": {
-								"P_STREM_NM": "EDP_RIB",
-								"P_RUN_MODE": "N"
-							}
-						}
-					},
-					{
-						"name": "Stream RIB Culated",
-						"type": "ExecutePipeline",
-						"dependsOn": [
-							{
-								"activity": "Stream RIB Staging",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"pipeline": {
-								"referenceName": "00_STREAM_COMMON_2_bk",
-								"type": "PipelineReference"
-							},
-							"waitOnCompletion": true,
-							"parameters": {
-								"P_STREM_NM": "EDP_RIB_CR",
-								"P_RUN_MODE": "N"
-							}
-						}
-					},
-					{
-						"name": "Stream RBE Staging",
-						"type": "ExecutePipeline",
-						"dependsOn": [],
-						"userProperties": [],
-						"typeProperties": {
-							"pipeline": {
-								"referenceName": "00_STREAM_COMMON_2_bk",
-								"type": "PipelineReference"
-							},
-							"waitOnCompletion": true,
-							"parameters": {
-								"P_STREM_NM": "EDP_RBE",
-								"P_RUN_MODE": "N"
-							}
-						}
-					},
-					{
-						"name": "Stream RBE Culated",
-						"type": "ExecutePipeline",
-						"dependsOn": [
-							{
-								"activity": "Stream RBE Staging",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"pipeline": {
-								"referenceName": "00_STREAM_COMMON_2_bk",
-								"type": "PipelineReference"
-							},
-							"waitOnCompletion": true,
-							"parameters": {
-								"P_STREM_NM": "EDP_RBE_CR",
-								"P_RUN_MODE": "N"
-							}
-						}
-					},
-					{
-						"name": "Stream BOT Staging",
-						"type": "ExecutePipeline",
-						"dependsOn": [],
-						"userProperties": [],
-						"typeProperties": {
-							"pipeline": {
-								"referenceName": "00_STREAM_COMMON_2_bk",
-								"type": "PipelineReference"
-							},
-							"waitOnCompletion": true,
-							"parameters": {
-								"P_STREM_NM": "EDP_BOT",
-								"P_RUN_MODE": "N"
-							}
-						}
-					},
-					{
-						"name": "Stream BOT Culated",
-						"type": "ExecutePipeline",
-						"dependsOn": [
-							{
-								"activity": "Stream BOT Staging",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"pipeline": {
-								"referenceName": "00_STREAM_COMMON_2_bk",
-								"type": "PipelineReference"
-							},
-							"waitOnCompletion": true,
-							"parameters": {
-								"P_STREM_NM": "EDP_BOT_CR",
-								"P_RUN_MODE": "N"
-							}
-						}
-					},
-					{
-						"name": "Stream RE Staging",
-						"type": "ExecutePipeline",
-						"dependsOn": [],
-						"userProperties": [],
-						"typeProperties": {
-							"pipeline": {
-								"referenceName": "00_STREAM_COMMON_2_bk",
-								"type": "PipelineReference"
-							},
-							"waitOnCompletion": true,
-							"parameters": {
-								"P_STREM_NM": "EDP_RE",
-								"P_RUN_MODE": "N"
-							}
-						}
-					},
-					{
-						"name": "Stream RE Culated",
-						"type": "ExecutePipeline",
-						"dependsOn": [
-							{
-								"activity": "Stream RE Staging",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"pipeline": {
-								"referenceName": "00_STREAM_COMMON_2_bk",
-								"type": "PipelineReference"
-							},
-							"waitOnCompletion": true,
-							"parameters": {
-								"P_STREM_NM": "EDP_RE_CR",
-								"P_RUN_MODE": "N"
-							}
-						}
-					},
-					{
-						"name": "Stream SET Staging",
-						"type": "ExecutePipeline",
-						"dependsOn": [],
-						"userProperties": [],
-						"typeProperties": {
-							"pipeline": {
-								"referenceName": "00_STREAM_COMMON_2_bk",
-								"type": "PipelineReference"
-							},
-							"waitOnCompletion": true,
-							"parameters": {
-								"P_STREM_NM": "EDP_SET",
-								"P_RUN_MODE": "N"
-							}
-						}
-					},
-					{
-						"name": "Stream SET Culated",
-						"type": "ExecutePipeline",
-						"dependsOn": [
-							{
-								"activity": "Stream SET Staging",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"pipeline": {
-								"referenceName": "00_STREAM_COMMON_2_bk",
-								"type": "PipelineReference"
-							},
-							"waitOnCompletion": true,
-							"parameters": {
-								"P_STREM_NM": "EDP_SET_CR",
-								"P_RUN_MODE": "N"
-							}
-						}
-					},
-					{
-						"name": "Stream BANK Staging",
-						"type": "ExecutePipeline",
-						"dependsOn": [],
-						"userProperties": [],
-						"typeProperties": {
-							"pipeline": {
-								"referenceName": "00_STREAM_COMMON_2_bk",
-								"type": "PipelineReference"
-							},
-							"waitOnCompletion": true,
-							"parameters": {
-								"P_STREM_NM": "EDP_BANK",
-								"P_RUN_MODE": "N"
-							}
-						}
-					},
-					{
-						"name": "EXT_TABLE_KK",
-						"type": "ExecutePipeline",
-						"dependsOn": [
-							{
-								"activity": "Stream KK Culated",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"pipeline": {
-								"referenceName": "EXT_TABLE",
-								"type": "PipelineReference"
-							},
-							"waitOnCompletion": true,
-							"parameters": {
-								"P_STREAM": "EDP_KK_CR"
-							}
-						}
-					},
-					{
-						"name": "EXT_TABLE_BOT",
-						"type": "ExecutePipeline",
-						"dependsOn": [
-							{
-								"activity": "Stream BOT Culated",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"pipeline": {
-								"referenceName": "EXT_TABLE",
-								"type": "PipelineReference"
-							},
-							"waitOnCompletion": true,
-							"parameters": {
-								"P_STREAM": "EDP_BOT_CR"
-							}
-						}
-					},
-					{
-						"name": "EXT_TABLE_TIDE",
-						"type": "ExecutePipeline",
-						"dependsOn": [
-							{
-								"activity": "Stream Tide Culated",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"pipeline": {
-								"referenceName": "EXT_TABLE",
-								"type": "PipelineReference"
-							},
-							"waitOnCompletion": true,
-							"parameters": {
-								"P_STREAM": "EDP_TIDE_CR"
-							}
-						}
-					},
-					{
-						"name": "EXT_TABLE_RBE",
-						"type": "ExecutePipeline",
-						"dependsOn": [
-							{
-								"activity": "Stream RBE Culated",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"pipeline": {
-								"referenceName": "EXT_TABLE",
-								"type": "PipelineReference"
-							},
-							"waitOnCompletion": true,
-							"parameters": {
-								"P_STREAM": "EDP_RBE_CR"
-							}
-						}
-					},
-					{
-						"name": "EXT_TABLE_DLT",
-						"type": "ExecutePipeline",
-						"dependsOn": [
-							{
-								"activity": "Stream DLT Culated",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"pipeline": {
-								"referenceName": "EXT_TABLE",
-								"type": "PipelineReference"
-							},
-							"waitOnCompletion": true,
-							"parameters": {
-								"P_STREAM": "EDP_DLT_CR"
-							}
-						}
-					}
-				],
-				"folder": {
-					"name": "BATCH"
-				},
-				"annotations": [],
-				"lastPublishTime": "2021-03-05T04:52:16Z"
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/pipelines/00_STREAM_COMMON_2_bk')]",
-				"[concat(variables('factoryId'), '/pipelines/EXT_TABLE')]"
-			]
-		},
-		{
 			"name": "[concat(parameters('factoryName'), '/Oak_test2')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -14954,10 +14072,20 @@
 				"annotations": [],
 				"type": "AzureBlobFS",
 				"typeProperties": {
-					"url": "[parameters('AzureDataLakeStorage1_properties_typeProperties_url')]"
+					"url": "[parameters('AzureDataLakeStorage1_properties_typeProperties_url')]",
+					"accountKey": {
+						"type": "SecureString",
+						"value": "[parameters('AzureDataLakeStorage1_accountKey')]"
+					}
+				},
+				"connectVia": {
+					"referenceName": "shir-kkpb-edp",
+					"type": "IntegrationRuntimeReference"
 				}
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/shir-kkpb-edp')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/link_adls_onprim_edp')]",
@@ -14973,9 +14101,15 @@
 						"type": "SecureString",
 						"value": "[parameters('link_adls_onprim_edp_accountKey')]"
 					}
+				},
+				"connectVia": {
+					"referenceName": "shir-onprim-kkbp-edp",
+					"type": "IntegrationRuntimeReference"
 				}
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/shir-onprim-kkbp-edp')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/link_blob_test_edp')]",
@@ -15048,9 +14182,15 @@
 						"type": "SecureString",
 						"value": "[parameters('link_func_edp_functionKey')]"
 					}
+				},
+				"connectVia": {
+					"referenceName": "shir-kkpb-edp",
+					"type": "IntegrationRuntimeReference"
 				}
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/shir-kkpb-edp')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/link_kv_edp')]",
@@ -15078,9 +14218,15 @@
 					"url": "[parameters('link_spo_http_properties_typeProperties_url')]",
 					"enableServerCertificateValidation": true,
 					"authenticationType": "Anonymous"
+				},
+				"connectVia": {
+					"referenceName": "shir-kkpb-edp",
+					"type": "IntegrationRuntimeReference"
 				}
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/shir-kkpb-edp')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/link_sqldb_kkpb_edp')]",
@@ -15091,9 +14237,15 @@
 				"type": "AzureSqlDatabase",
 				"typeProperties": {
 					"connectionString": "[parameters('link_sqldb_kkpb_edp_connectionString')]"
+				},
+				"connectVia": {
+					"referenceName": "shir-kkpb-edp",
+					"type": "IntegrationRuntimeReference"
 				}
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/shir-kkpb-edp')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/link_st_kkpb_edp')]",
@@ -15109,9 +14261,15 @@
 						"type": "SecureString",
 						"value": "[parameters('link_st_kkpb_edp_accountKey')]"
 					}
+				},
+				"connectVia": {
+					"referenceName": "shir-kkpb-edp",
+					"type": "IntegrationRuntimeReference"
 				}
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/shir-kkpb-edp')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/link_syn_kkpb_edp')]",
@@ -15123,6 +14281,21 @@
 				"type": "AzureSqlDW",
 				"typeProperties": {
 					"connectionString": "[parameters('link_syn_kkpb_edp_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/shir-kkpb-edp')]",
+			"type": "Microsoft.DataFactory/factories/integrationRuntimes",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "SelfHosted",
+				"typeProperties": {
+					"linkedInfo": {
+						"resourceId": "[parameters('shir-kkpb-edp_properties_typeProperties_linkedInfo_resourceId')]",
+						"authorizationType": "Rbac"
+					}
 				}
 			},
 			"dependsOn": []

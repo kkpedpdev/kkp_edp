@@ -7,10 +7,6 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "adf-kkpb-dev-edp"
 		},
-		"link_adls_onprim_edp_accountKey": {
-			"type": "secureString",
-			"metadata": "Secure string for 'accountKey' of 'link_adls_onprim_edp'"
-		},
 		"link_blob_test_edp_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'link_blob_test_edp'"
@@ -18,6 +14,22 @@
 		"link_dbw_edp_accessToken": {
 			"type": "secureString",
 			"metadata": "Secure string for 'accessToken' of 'link_dbw_edp'"
+		},
+		"link_syn_kkpb_edp_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'link_syn_kkpb_edp'"
+		},
+		"AzureDataLakeStorage1_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'AzureDataLakeStorage1'"
+		},
+		"link_adls_onprim_edp_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'link_adls_onprim_edp'"
+		},
+		"link_fs_kkpb_dev_edp_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'link_fs_kkpb_dev_edp'"
 		},
 		"link_func_edp_functionKey": {
 			"type": "secureString",
@@ -31,25 +43,33 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'accountKey' of 'link_st_kkpb_edp'"
 		},
-		"link_syn_kkpb_edp_connectionString": {
-			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'link_syn_kkpb_edp'"
+		"link_kv_edp_properties_typeProperties_baseUrl": {
+			"type": "string",
+			"defaultValue": "https://kv-kkpb-dev-edp.vault.azure.net/"
+		},
+		"shir-kkpb-edp_properties_typeProperties_linkedInfo_resourceId": {
+			"type": "string",
+			"defaultValue": "/subscriptions/f3ef3afd-9903-4759-a715-dcd5523f3bbe/resourcegroups/rg-kkpb-test-edp/providers/Microsoft.DataFactory/factories/adf-kkpb-uat-edp/integrationruntimes/shir-kkpb-edp"
 		},
 		"AzureDataLakeStorage1_properties_typeProperties_url": {
 			"type": "string",
-			"defaultValue": "https://stkkpbdevtempedp.dfs.core.windows.net"
+			"defaultValue": "https://stkkpbdevedp.dfs.core.windows.net"
 		},
 		"link_adls_onprim_edp_properties_typeProperties_url": {
 			"type": "string",
-			"defaultValue": "https://stkkpbdevtempedp.dfs.core.windows.net"
+			"defaultValue": "https://stkkpbdevedp.dfs.core.windows.net"
+		},
+		"link_fs_kkpb_dev_edp_properties_typeProperties_host": {
+			"type": "string",
+			"defaultValue": "E:\\Landing"
+		},
+		"link_fs_kkpb_dev_edp_properties_typeProperties_userId": {
+			"type": "string",
+			"defaultValue": "administrator"
 		},
 		"link_func_edp_properties_typeProperties_functionAppUrl": {
 			"type": "string",
 			"defaultValue": "https://func-kkpb-test-edp.azurewebsites.net"
-		},
-		"link_kv_edp_properties_typeProperties_baseUrl": {
-			"type": "string",
-			"defaultValue": "https://kv-kkpb-dev-edp.vault.azure.net/"
 		},
 		"link_spo_http_properties_typeProperties_url": {
 			"type": "string",
@@ -184,38 +204,6 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/AzureDataLakeStorage1')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"description": "  ",
-				"annotations": [],
-				"type": "AzureBlobFS",
-				"typeProperties": {
-					"url": "[parameters('AzureDataLakeStorage1_properties_typeProperties_url')]"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/link_adls_onprim_edp')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"description": "  ",
-				"annotations": [],
-				"type": "AzureBlobFS",
-				"typeProperties": {
-					"url": "[parameters('link_adls_onprim_edp_properties_typeProperties_url')]",
-					"accountKey": {
-						"type": "SecureString",
-						"value": "[parameters('link_adls_onprim_edp_accountKey')]"
-					}
-				}
-			},
-			"dependsOn": []
-		},
-		{
 			"name": "[concat(parameters('factoryName'), '/link_blob_test_edp')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
@@ -248,24 +236,6 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/link_func_edp')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"description": "   ",
-				"annotations": [],
-				"type": "AzureFunction",
-				"typeProperties": {
-					"functionAppUrl": "[parameters('link_func_edp_properties_typeProperties_functionAppUrl')]",
-					"functionKey": {
-						"type": "SecureString",
-						"value": "[parameters('link_func_edp_functionKey')]"
-					}
-				}
-			},
-			"dependsOn": []
-		},
-		{
 			"name": "[concat(parameters('factoryName'), '/link_kv_edp')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
@@ -275,53 +245,6 @@
 				"type": "AzureKeyVault",
 				"typeProperties": {
 					"baseUrl": "[parameters('link_kv_edp_properties_typeProperties_baseUrl')]"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/link_spo_http')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"description": " ",
-				"annotations": [],
-				"type": "HttpServer",
-				"typeProperties": {
-					"url": "[parameters('link_spo_http_properties_typeProperties_url')]",
-					"enableServerCertificateValidation": true,
-					"authenticationType": "Anonymous"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/link_sqldb_kkpb_edp')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureSqlDatabase",
-				"typeProperties": {
-					"connectionString": "[parameters('link_sqldb_kkpb_edp_connectionString')]"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/link_st_kkpb_edp')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"description": " ",
-				"annotations": [],
-				"type": "AzureBlobFS",
-				"typeProperties": {
-					"url": "[parameters('link_st_kkpb_edp_properties_typeProperties_url')]",
-					"accountKey": {
-						"type": "SecureString",
-						"value": "[parameters('link_st_kkpb_edp_accountKey')]"
-					}
 				}
 			},
 			"dependsOn": []
@@ -341,6 +264,21 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/shir-kkpb-edp')]",
+			"type": "Microsoft.DataFactory/factories/integrationRuntimes",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "SelfHosted",
+				"typeProperties": {
+					"linkedInfo": {
+						"resourceId": "[parameters('shir-kkpb-edp_properties_typeProperties_linkedInfo_resourceId')]",
+						"authorizationType": "Rbac"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/shir-onprim-kkbp-edp')]",
 			"type": "Microsoft.DataFactory/factories/integrationRuntimes",
 			"apiVersion": "2018-06-01",
@@ -349,382 +287,6 @@
 				"typeProperties": {}
 			},
 			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/40_PCS_COMMON_TYPE1')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"description": "Load from external website to STG",
-				"activities": [
-					{
-						"name": "Azure Function1",
-						"description": "  ",
-						"type": "AzureFunctionActivity",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 2,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"functionName": {
-								"value": "@pipeline().parameters.P_PRCS_OBJ.FUNC_NM",
-								"type": "Expression"
-							},
-							"method": "POST",
-							"headers": {},
-							"body": {
-								"value": "@pipeline().parameters.P_PRCS_OBJ.FUNC_PARM",
-								"type": "Expression"
-							}
-						},
-						"linkedServiceName": {
-							"referenceName": "link_func_edp",
-							"type": "LinkedServiceReference"
-						}
-					},
-					{
-						"name": "EDW UPDATE COUNT TARGET",
-						"type": "SqlServerStoredProcedure",
-						"dependsOn": [
-							{
-								"activity": "Azure Function1",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"storedProcedureName": {
-								"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA, '.[PROC_UPDT_PRCS]')",
-								"type": "Expression"
-							},
-							"storedProcedureParameters": {
-								"P_CNT_FI_SRC": {
-									"value": {
-										"value": "@activity('Azure Function1').output.NumberOfFiles",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"P_CNT_FI_TGT": {
-									"value": {
-										"value": "@activity('Azure Function1').output.NumberOfFiles",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"P_CNT_REC_SRC": {
-									"value": null,
-									"type": "String"
-								},
-								"P_CNT_REC_TGT": {
-									"value": null,
-									"type": "String"
-								},
-								"P_LD_ID": {
-									"value": {
-										"value": "@pipeline().parameters.P_LD_ID",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"P_PRCS_NM": {
-									"value": {
-										"value": "@pipeline().parameters.P_PRCS_NM",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"P_RMRK": {
-									"value": {
-										"value": "@if(and(equals(activity('Azure Function1').output.statusCode, 200),equals(activity('Azure Function1').output.NumberOfFiles,  0)),'File not found','')",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"P_ST": {
-									"value": "RUNNING",
-									"type": "String"
-								},
-								"P_CNT_REC_CNTL": {
-									"value": null,
-									"type": "String"
-								}
-							}
-						},
-						"linkedServiceName": {
-							"referenceName": "link_sqldb_kkpb_edp",
-							"type": "LinkedServiceReference"
-						}
-					},
-					{
-						"name": "If Condition1",
-						"type": "IfCondition",
-						"dependsOn": [
-							{
-								"activity": "EDW UPDATE COUNT TARGET",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"expression": {
-								"value": "@not(equals(pipeline().parameters.P_PRCS_OBJ.ADB_NM,null))",
-								"type": "Expression"
-							},
-							"ifTrueActivities": [
-								{
-									"name": "Notebook1",
-									"type": "DatabricksNotebook",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "7.00:00:00",
-										"retry": 1,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"notebookPath": {
-											"value": "@pipeline().parameters.P_PRCS_OBJ.ADB_NM",
-											"type": "Expression"
-										},
-										"baseParameters": {
-											"PARAMS": {
-												"value": "@pipeline().parameters.P_PRCS_OBJ.ADB_PARM",
-												"type": "Expression"
-											}
-										}
-									},
-									"linkedServiceName": {
-										"referenceName": "link_dbw_edp",
-										"type": "LinkedServiceReference"
-									}
-								}
-							]
-						}
-					}
-				],
-				"parameters": {
-					"P_LD_ID": {
-						"type": "string"
-					},
-					"P_PRCS_NM": {
-						"type": "string"
-					},
-					"P_PRCS_OBJ": {
-						"type": "object"
-					}
-				},
-				"folder": {
-					"name": "COMMON JOB"
-				},
-				"annotations": [],
-				"lastPublishTime": "2021-02-24T06:46:02Z"
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/link_func_edp')]",
-				"[concat(variables('factoryId'), '/linkedServices/link_sqldb_kkpb_edp')]",
-				"[concat(variables('factoryId'), '/linkedServices/link_dbw_edp')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/40_PCS_COMMON_TYPE1_copy1')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Azure Function1",
-						"type": "AzureFunctionActivity",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"functionName": {
-								"value": "@pipeline().parameters.P_PCS_OBJ.FUNC_NM",
-								"type": "Expression"
-							},
-							"method": "POST",
-							"headers": {},
-							"body": {
-								"value": "@pipeline().parameters.P_PCS_OBJ.FUNC_PARAMS",
-								"type": "Expression"
-							}
-						},
-						"linkedServiceName": {
-							"referenceName": "link_func_edp",
-							"type": "LinkedServiceReference"
-						}
-					},
-					{
-						"name": "EDW UPDATE COUNT TARGET",
-						"type": "SqlServerStoredProcedure",
-						"dependsOn": [
-							{
-								"activity": "Azure Function1",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"storedProcedureName": "[[CNTL].[PROC_UDT_PCS]",
-							"storedProcedureParameters": {
-								"P_CNT_FI_SRC": {
-									"value": {
-										"value": "@activity('Azure Function1').output.NumberOfFiles",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"P_CNT_FI_TGT": {
-									"value": {
-										"value": "@activity('Azure Function1').output.NumberOfFiles",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"P_CNT_REC_SRC": {
-									"value": null,
-									"type": "String"
-								},
-								"P_CNT_REC_TGT": {
-									"value": null,
-									"type": "String"
-								},
-								"P_LOAD_ID": {
-									"value": {
-										"value": "@pipeline().parameters.P_LOAD_ID",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"P_PCS_NM": {
-									"value": {
-										"value": "@pipeline().parameters.P_PCS_NM",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"P_RMRK": {
-									"value": "",
-									"type": "String"
-								},
-								"P_ST": {
-									"value": "RUNNING",
-									"type": "String"
-								}
-							}
-						},
-						"linkedServiceName": {
-							"referenceName": "link_sqldb_kkpb_edp",
-							"type": "LinkedServiceReference"
-						}
-					},
-					{
-						"name": "If Condition1",
-						"type": "IfCondition",
-						"dependsOn": [
-							{
-								"activity": "EDW UPDATE COUNT TARGET",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"expression": {
-								"value": "@not(equals(pipeline().parameters.P_PCS_OBJ.ADB_NM,null))",
-								"type": "Expression"
-							},
-							"ifTrueActivities": [
-								{
-									"name": "Notebook1",
-									"type": "DatabricksNotebook",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "7.00:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"notebookPath": {
-											"value": "@pipeline().parameters.P_PCS_OBJ.ADB_NM",
-											"type": "Expression"
-										},
-										"baseParameters": {
-											"PARAMS": {
-												"value": "@pipeline().parameters.P_PCS_OBJ.ADB_PARAMS",
-												"type": "Expression"
-											}
-										}
-									},
-									"linkedServiceName": {
-										"referenceName": "link_dbw_edp",
-										"type": "LinkedServiceReference"
-									}
-								}
-							]
-						}
-					}
-				],
-				"parameters": {
-					"P_LOAD_ID": {
-						"type": "string"
-					},
-					"P_PCS_NM": {
-						"type": "string"
-					},
-					"P_PCS_OBJ": {
-						"type": "object"
-					}
-				},
-				"folder": {
-					"name": "BK"
-				},
-				"annotations": [],
-				"lastPublishTime": "2021-02-24T05:06:42Z"
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/link_func_edp')]",
-				"[concat(variables('factoryId'), '/linkedServices/link_sqldb_kkpb_edp')]",
-				"[concat(variables('factoryId'), '/linkedServices/link_dbw_edp')]"
-			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/40_PCS_COMMON_TYPE3')]",
@@ -1053,6 +615,168 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/link_dbw_edp')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureDataLakeStorage1')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "  ",
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('AzureDataLakeStorage1_properties_typeProperties_url')]",
+					"accountKey": {
+						"type": "SecureString",
+						"value": "[parameters('AzureDataLakeStorage1_accountKey')]"
+					}
+				},
+				"connectVia": {
+					"referenceName": "shir-kkpb-edp",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/shir-kkpb-edp')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/link_adls_onprim_edp')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "  ",
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('link_adls_onprim_edp_properties_typeProperties_url')]",
+					"accountKey": {
+						"type": "SecureString",
+						"value": "[parameters('link_adls_onprim_edp_accountKey')]"
+					}
+				},
+				"connectVia": {
+					"referenceName": "shir-onprim-kkbp-edp",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/shir-onprim-kkbp-edp')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/link_fs_kkpb_dev_edp')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "  ",
+				"annotations": [],
+				"type": "FileServer",
+				"typeProperties": {
+					"host": "[parameters('link_fs_kkpb_dev_edp_properties_typeProperties_host')]",
+					"userId": "[parameters('link_fs_kkpb_dev_edp_properties_typeProperties_userId')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('link_fs_kkpb_dev_edp_password')]"
+					}
+				},
+				"connectVia": {
+					"referenceName": "shir-onprim-kkbp-edp",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/shir-onprim-kkbp-edp')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/link_func_edp')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "   ",
+				"annotations": [],
+				"type": "AzureFunction",
+				"typeProperties": {
+					"functionAppUrl": "[parameters('link_func_edp_properties_typeProperties_functionAppUrl')]",
+					"functionKey": {
+						"type": "SecureString",
+						"value": "[parameters('link_func_edp_functionKey')]"
+					}
+				},
+				"connectVia": {
+					"referenceName": "shir-kkpb-edp",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/shir-kkpb-edp')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/link_spo_http')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": " ",
+				"annotations": [],
+				"type": "HttpServer",
+				"typeProperties": {
+					"url": "[parameters('link_spo_http_properties_typeProperties_url')]",
+					"enableServerCertificateValidation": true,
+					"authenticationType": "Anonymous"
+				},
+				"connectVia": {
+					"referenceName": "shir-kkpb-edp",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/shir-kkpb-edp')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/link_sqldb_kkpb_edp')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"connectionString": "[parameters('link_sqldb_kkpb_edp_connectionString')]"
+				},
+				"connectVia": {
+					"referenceName": "shir-kkpb-edp",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/shir-kkpb-edp')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/link_st_kkpb_edp')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": " ",
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('link_st_kkpb_edp_properties_typeProperties_url')]",
+					"accountKey": {
+						"type": "SecureString",
+						"value": "[parameters('link_st_kkpb_edp_accountKey')]"
+					}
+				},
+				"connectVia": {
+					"referenceName": "shir-kkpb-edp",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/shir-kkpb-edp')]"
 			]
 		}
 	]

@@ -4575,7 +4575,7 @@
 							},
 							"enableStaging": false,
 							"translator": {
-								"value": "@pipeline().parameters.P_SCHEMA",
+								"value": "@activity('Lookup Schema').output.firstRow",
 								"type": "Expression"
 							}
 						},
@@ -4585,7 +4585,7 @@
 								"type": "DatasetReference",
 								"parameters": {
 									"P_PATH": "TMP/SOURCE/",
-									"P_FILENAME": "CFPARX_20210303.txt",
+									"P_FILENAME": "TEST.txt",
 									"P_DELIMITER": "|",
 									"P_ENCODING": "UTF-8",
 									"P_FIRSTROW_HDR": "Y",
@@ -4598,9 +4598,9 @@
 								"referenceName": "dl_parquet_ds",
 								"type": "DatasetReference",
 								"parameters": {
-									"P_CONTAINER": "staging",
-									"P_PATH": " internal/CBS/SIBS_LNMAST/DATA_DT=20210310",
-									"P_FILENAME": "LNMAST_20210310.parquet"
+									"P_CONTAINER": "working",
+									"P_PATH": "TMP/SOURCE/",
+									"P_FILENAME": "TEST.parquet"
 								}
 							}
 						]
@@ -4633,7 +4633,7 @@
 								"referenceName": "dl_json_ds",
 								"type": "DatasetReference",
 								"parameters": {
-									"P_FILENAME": "SIBS_CFPARX.json"
+									"P_FILENAME": "TEST.json"
 								}
 							}
 						}
@@ -4641,147 +4641,7 @@
 				],
 				"parameters": {
 					"P_SCHEMA": {
-						"type": "string",
-						"defaultValue": {
-							"type": "TabularTranslator",
-							"mappings": [
-								{
-									"source": {
-										"name": "CFRECI",
-										"type": "String"
-									},
-									"sink": {
-										"path": "$['CFRECI']"
-									}
-								},
-								{
-									"source": {
-										"name": "CFSEX",
-										"type": "String"
-									},
-									"sink": {
-										"path": "$['CFSEX']"
-									}
-								},
-								{
-									"source": {
-										"name": "CFDSDS",
-										"type": "String"
-									},
-									"sink": {
-										"path": "$['CFDSDS']"
-									}
-								},
-								{
-									"source": {
-										"name": "CFCCRD",
-										"type": "String"
-									},
-									"sink": {
-										"path": "$['CFCCRD']"
-									}
-								},
-								{
-									"source": {
-										"name": "CFCCDL",
-										"type": "String"
-									},
-									"sink": {
-										"path": "$['CFCCDL']"
-									}
-								},
-								{
-									"source": {
-										"name": "MNLDT8",
-										"type": "Float"
-									},
-									"sink": {
-										"path": "$['MNLDT8']"
-									}
-								},
-								{
-									"source": {
-										"name": "MNLUID",
-										"type": "String"
-									},
-									"sink": {
-										"path": "$['MNLUID']"
-									}
-								},
-								{
-									"source": {
-										"name": "MNLWID",
-										"type": "String"
-									},
-									"sink": {
-										"path": "$['MNLWID']"
-									}
-								},
-								{
-									"source": {
-										"name": "MNLTIM",
-										"type": "String"
-									},
-									"sink": {
-										"path": "$['MNLTIM']"
-									}
-								},
-								{
-									"source": {
-										"name": "MNLSRC",
-										"type": "String"
-									},
-									"sink": {
-										"path": "$['MNLSRC']"
-									}
-								},
-								{
-									"source": {
-										"name": "MNCUID",
-										"type": "String"
-									},
-									"sink": {
-										"path": "$['MNCUID']"
-									}
-								},
-								{
-									"source": {
-										"name": "MNCDT8",
-										"type": "Float"
-									},
-									"sink": {
-										"path": "$['MNCDT8']"
-									}
-								},
-								{
-									"source": {
-										"name": "MNCTIM",
-										"type": "String"
-									},
-									"sink": {
-										"path": "$['MNCTIM']"
-									}
-								},
-								{
-									"source": {
-										"name": "MNCWID",
-										"type": "String"
-									},
-									"sink": {
-										"path": "$['MNCWID']"
-									}
-								},
-								{
-									"source": {
-										"name": "MNCSRC",
-										"type": "String"
-									},
-									"sink": {
-										"path": "$['MNCSRC']"
-									}
-								}
-							]
-						}
+						"type": "string"
 					}
 				},
 				"folder": {

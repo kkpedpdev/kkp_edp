@@ -2,11 +2,16 @@
 	"name": "AzureDataLakeStorage1",
 	"type": "Microsoft.DataFactory/factories/linkedservices",
 	"properties": {
+		"description": "  ",
 		"annotations": [],
 		"type": "AzureBlobFS",
 		"typeProperties": {
-			"url": "https://stkkpbdevtempedp.dfs.core.windows.net"
+			"url": "https://stkkpbdevedp.dfs.core.windows.net",
+			"encryptedCredential": "eyJDcmVkZW50aWFsSWQiOiJkYzY3NjZiZC04ZGUzLTQ4NTgtYmQyNi1kNGI0NjdmNmMyMGUiLCJWZXJzaW9uIjoiMi4wIiwiQ2xhc3NUeXBlIjoiTWljcm9zb2Z0LkRhdGFQcm94eS5Db3JlLkludGVyU2VydmljZURhdGFDb250cmFjdC5DcmVkZW50aWFsU1UwNkNZMTQifQ=="
 		},
-		"description": "  "
+		"connectVia": {
+			"referenceName": "shir-kkpb-edp",
+			"type": "IntegrationRuntimeReference"
+		}
 	}
 }

@@ -233,7 +233,14 @@
 						{
 							"name": "ABORT CHECK STREAM INFORMATION",
 							"type": "Lookup",
-							"dependsOn": [],
+							"dependsOn": [
+								{
+									"activity": "Update Fail Process",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
 							"policy": {
 								"timeout": "7.00:00:00",
 								"retry": 0,
@@ -253,6 +260,82 @@
 									"referenceName": "mssql_cntl_ds",
 									"type": "DatasetReference"
 								}
+							}
+						},
+						{
+							"name": "Update Fail Process",
+							"type": "SqlServerStoredProcedure",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"storedProcedureName": {
+									"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA, '.[PROC_UPDT_PRCS]')",
+									"type": "Expression"
+								},
+								"storedProcedureParameters": {
+									"P_CNT_FI_SRC": {
+										"value": null,
+										"type": "String"
+									},
+									"P_CNT_FI_TGT": {
+										"value": null,
+										"type": "String"
+									},
+									"P_CNT_REC_SRC": {
+										"value": {
+											"value": "@activity('Preprocessing').output.runOutput.ActualRecord",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"P_CNT_REC_TGT": {
+										"value": null,
+										"type": "String"
+									},
+									"P_LD_ID": {
+										"value": {
+											"value": "@pipeline().parameters.P_LD_ID",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"P_PRCS_NM": {
+										"value": {
+											"value": "@pipeline().parameters.P_PRCS_NM",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"P_RMRK": {
+										"value": {
+											"value": "@activity('Preprocessing').output.runOutput.Description",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"P_ST": {
+										"value": "Failed",
+										"type": "String"
+									},
+									"P_CNT_REC_CNTL": {
+										"value": {
+											"value": "@activity('Preprocessing').output.runOutput.ExpectedRecord",
+											"type": "Expression"
+										},
+										"type": "String"
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "link_sqldb_kkpb_edp",
+								"type": "LinkedServiceReference"
 							}
 						}
 					],
@@ -512,89 +595,6 @@
 							}
 						}
 					]
-				}
-			},
-			{
-				"name": "Update Fail Process",
-				"type": "SqlServerStoredProcedure",
-				"dependsOn": [
-					{
-						"activity": "If Condition1",
-						"dependencyConditions": [
-							"Failed"
-						]
-					}
-				],
-				"policy": {
-					"timeout": "7.00:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"storedProcedureName": {
-						"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA, '.[PROC_UPDT_PRCS]')",
-						"type": "Expression"
-					},
-					"storedProcedureParameters": {
-						"P_CNT_FI_SRC": {
-							"value": null,
-							"type": "String"
-						},
-						"P_CNT_FI_TGT": {
-							"value": null,
-							"type": "String"
-						},
-						"P_CNT_REC_SRC": {
-							"value": {
-								"value": "@activity('Preprocessing').output.runOutput.ActualRecord",
-								"type": "Expression"
-							},
-							"type": "String"
-						},
-						"P_CNT_REC_TGT": {
-							"value": null,
-							"type": "String"
-						},
-						"P_LD_ID": {
-							"value": {
-								"value": "@pipeline().parameters.P_LD_ID",
-								"type": "Expression"
-							},
-							"type": "String"
-						},
-						"P_PRCS_NM": {
-							"value": {
-								"value": "@pipeline().parameters.P_PRCS_NM",
-								"type": "Expression"
-							},
-							"type": "String"
-						},
-						"P_RMRK": {
-							"value": {
-								"value": "@activity('Preprocessing').output.runOutput.Description",
-								"type": "Expression"
-							},
-							"type": "String"
-						},
-						"P_ST": {
-							"value": "Failed",
-							"type": "String"
-						},
-						"P_CNT_REC_CNTL": {
-							"value": {
-								"value": "@activity('Preprocessing').output.runOutput.ExpectedRecord",
-								"type": "Expression"
-							},
-							"type": "String"
-						}
-					}
-				},
-				"linkedServiceName": {
-					"referenceName": "link_sqldb_kkpb_edp",
-					"type": "LinkedServiceReference"
 				}
 			}
 		],

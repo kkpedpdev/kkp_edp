@@ -1,9 +1,0 @@
-{
-	"name": "pipeline4",
-	"properties": {
-		"folder": {
-			"name": "BATCH"
-		},
-		"annotations": []
-	}
-}

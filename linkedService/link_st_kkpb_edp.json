@@ -2,12 +2,16 @@
 	"name": "link_st_kkpb_edp",
 	"type": "Microsoft.DataFactory/factories/linkedservices",
 	"properties": {
+		"description": " ",
 		"annotations": [],
 		"type": "AzureBlobFS",
 		"typeProperties": {
 			"url": "https://stkkpbdevedp.dfs.core.windows.net",
-			"encryptedCredential": "ew0KICAiVmVyc2lvbiI6ICIyMDE3LTExLTMwIiwNCiAgIlByb3RlY3Rpb25Nb2RlIjogIktleSIsDQogICJTZWNyZXRDb250ZW50VHlwZSI6ICJQbGFpbnRleHQiLA0KICAiQ3JlZGVudGlhbElkIjogIkFERi1LS1BCLURFVi1FRFBfOWZjZjQ0NDItZGU2Zi00NTc5LWExZDQtNDA0OGFjYTJjY2VkIg0KfQ=="
+			"encryptedCredential": "eyJDcmVkZW50aWFsSWQiOiJhNzhkODFhMS00MmVlLTQzNjItYjljYS1lNjY1ZjYxMTc0ZjYiLCJWZXJzaW9uIjoiMi4wIiwiQ2xhc3NUeXBlIjoiTWljcm9zb2Z0LkRhdGFQcm94eS5Db3JlLkludGVyU2VydmljZURhdGFDb250cmFjdC5DcmVkZW50aWFsU1UwNkNZMTQifQ=="
 		},
-		"description": " "
+		"connectVia": {
+			"referenceName": "shir-kkpb-edp",
+			"type": "IntegrationRuntimeReference"
+		}
 	}
 }

@@ -1,7 +1,7 @@
 {
-	"name": "40_PCS_COMMON_TYPE7",
+	"name": "40_PCS_COMMON_TYPE10",
 	"properties": {
-		"description": "Copy text from sharepoints to ref",
+		"description": "Copy excel from sharepoints to ref",
 		"activities": [
 			{
 				"name": "Copy Raw",
@@ -163,14 +163,11 @@
 				"userProperties": [],
 				"typeProperties": {
 					"source": {
-						"type": "DelimitedTextSource",
+						"type": "ExcelSource",
 						"storeSettings": {
 							"type": "AzureBlobFSReadSettings",
 							"recursive": true,
 							"enablePartitionDiscovery": false
-						},
-						"formatSettings": {
-							"type": "DelimitedTextReadSettings"
 						}
 					},
 					"sink": {
@@ -190,9 +187,13 @@
 				},
 				"inputs": [
 					{
-						"referenceName": "dl_csv_ds",
+						"referenceName": "dl_xlsx_ds",
 						"type": "DatasetReference",
 						"parameters": {
+							"P_CONATINER": {
+								"value": "@activity('Lookup1').output.firstrow.CNTNR",
+								"type": "Expression"
+							},
 							"P_PATH": {
 								"value": "@concat(pipeline().parameters.P_PRCS_OBJ.PTH,'/')",
 								"type": "Expression"
@@ -201,20 +202,8 @@
 								"value": "@activity('Lookup1').output.firstrow.FI_NM",
 								"type": "Expression"
 							},
-							"P_DELIMITER": {
-								"value": "@activity('Lookup1').output.firstrow.DLM_STRNG",
-								"type": "Expression"
-							},
-							"P_ENCODING": {
-								"value": "@activity('Lookup1').output.firstrow.ENCDNG",
-								"type": "Expression"
-							},
-							"P_FIRSTROW_HDR": {
-								"value": "@activity('Lookup1').output.firstrow.FRST_ROW_HD",
-								"type": "Expression"
-							},
-							"P_CONTAINER": {
-								"value": "@activity('Lookup1').output.firstrow.CNTNR",
+							"P_SHEET": {
+								"value": "@activity('Lookup1').output.firstrow.SHT_NM",
 								"type": "Expression"
 							}
 						}

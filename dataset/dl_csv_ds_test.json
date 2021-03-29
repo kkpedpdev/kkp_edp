@@ -1,0 +1,46 @@
+{
+	"name": "dl_csv_ds_test",
+	"properties": {
+		"description": "  ",
+		"linkedServiceName": {
+			"referenceName": "link_st_kkpb_edp",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"P_PATH": {
+				"type": "string"
+			},
+			"P_FILENAME": {
+				"type": "string"
+			},
+			"P_CONTAINER": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": {
+					"value": "@dataset().P_FILENAME",
+					"type": "Expression"
+				},
+				"folderPath": {
+					"value": "@dataset().P_PATH",
+					"type": "Expression"
+				},
+				"fileSystem": {
+					"value": "@dataset().P_CONTAINER",
+					"type": "Expression"
+				}
+			},
+			"columnDelimiter": "|",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

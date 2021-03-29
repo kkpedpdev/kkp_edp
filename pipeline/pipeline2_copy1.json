@@ -1,11 +1,18 @@
 {
-	"name": "pipeline2",
+	"name": "pipeline2_copy1",
 	"properties": {
 		"activities": [
 			{
 				"name": "Copy STG",
 				"type": "Copy",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "Lookup Schema",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
 				"policy": {
 					"timeout": "7.00:00:00",
 					"retry": 0,
@@ -37,50 +44,20 @@
 					},
 					"enableStaging": false,
 					"translator": {
-						"type": "TabularTranslator",
-						"mappings": [
-							{
-								"source": {
-									"name": "RECORD_INDICATOR",
-									"type": "String"
-								},
-								"sink": {
-									"name": "RECORD_INDICATOR",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"name": "DATA_DT",
-									"type": "DateTime",
-									"format": "MM/dd/yyyy hh:mm:ss"
-								},
-								"sink": {
-									"name": "DATA_DT",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"name": "DATA_DT2",
-									"type": "DateTime",
-									"format": "yyyyMMdd"
-								},
-								"sink": {
-									"name": "DATA_DT2",
-									"type": "String"
-								}
-							}
-						]
+						"value": "@activity('Lookup Schema').output.firstRow",
+						"type": "Expression"
 					}
 				},
 				"inputs": [
 					{
-						"referenceName": "dl_csv_ds_test",
+						"referenceName": "dl_csv_ds",
 						"type": "DatasetReference",
 						"parameters": {
 							"P_PATH": "TMP/SOURCE/",
 							"P_FILENAME": "TEST.txt",
+							"P_DELIMITER": "|",
+							"P_ENCODING": "UTF-8",
+							"P_FIRSTROW_HDR": "Y",
 							"P_CONTAINER": "working"
 						}
 					}
@@ -96,6 +73,39 @@
 						}
 					}
 				]
+			},
+			{
+				"name": "Lookup Schema",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "JsonSource",
+						"storeSettings": {
+							"type": "AzureBlobFSReadSettings",
+							"recursive": true,
+							"enablePartitionDiscovery": false
+						},
+						"formatSettings": {
+							"type": "JsonReadSettings"
+						}
+					},
+					"dataset": {
+						"referenceName": "dl_json_ds",
+						"type": "DatasetReference",
+						"parameters": {
+							"P_FILENAME": "TEST.json"
+						}
+					}
+				}
 			}
 		],
 		"parameters": {

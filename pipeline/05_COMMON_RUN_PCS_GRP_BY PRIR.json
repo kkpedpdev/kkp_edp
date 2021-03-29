@@ -19,7 +19,7 @@
 					"source": {
 						"type": "SqlServerSource",
 						"sqlReaderStoredProcedureName": {
-							"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA,'.PROC_GET_PRCS_GRP_BY_STREM_2')",
+							"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA,'.PROC_GET_PRCS_GRP_BY_STREM')",
 							"type": "Expression"
 						},
 						"storedProcedureParameters": {

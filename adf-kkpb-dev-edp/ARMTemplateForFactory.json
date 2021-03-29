@@ -4840,6 +4840,38 @@
 											}
 										}
 									]
+								},
+								{
+									"value": "10",
+									"activities": [
+										{
+											"name": "40_PCS_COMMON_TYPE10",
+											"type": "ExecutePipeline",
+											"dependsOn": [],
+											"userProperties": [],
+											"typeProperties": {
+												"pipeline": {
+													"referenceName": "40_PCS_COMMON_TYPE10",
+													"type": "PipelineReference"
+												},
+												"waitOnCompletion": true,
+												"parameters": {
+													"P_LD_ID": {
+														"value": "@pipeline().parameters.P_LD_ID",
+														"type": "Expression"
+													},
+													"P_PRCS_NM": {
+														"value": "@pipeline().parameters.P_PRCS_NM",
+														"type": "Expression"
+													},
+													"P_PRCS_OBJ": {
+														"value": "@activity('GET PROCESS INFORMATION').output.FIRSTROW",
+														"type": "Expression"
+													}
+												}
+											}
+										}
+									]
 								}
 							]
 						}
@@ -5123,7 +5155,8 @@
 				"[concat(variables('factoryId'), '/pipelines/40_PCS_COMMON_TYPE5')]",
 				"[concat(variables('factoryId'), '/pipelines/40_PCS_COMMON_TYPE6')]",
 				"[concat(variables('factoryId'), '/pipelines/40_PCS_COMMON_TYPE7')]",
-				"[concat(variables('factoryId'), '/pipelines/40_PCS_COMMON_TYPE9')]"
+				"[concat(variables('factoryId'), '/pipelines/40_PCS_COMMON_TYPE9')]",
+				"[concat(variables('factoryId'), '/pipelines/40_PCS_COMMON_TYPE10')]"
 			]
 		},
 		{

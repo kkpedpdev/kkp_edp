@@ -39,10 +39,6 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'link_sqldb_kkpb_edp'"
 		},
-		"link_st_kkpb_edp_accountKey": {
-			"type": "secureString",
-			"metadata": "Secure string for 'accountKey' of 'link_st_kkpb_edp'"
-		},
 		"link_kv_edp_properties_typeProperties_baseUrl": {
 			"type": "string",
 			"defaultValue": "https://kv-kkpb-dev-edp.vault.azure.net/"
@@ -74,10 +70,6 @@
 		"link_spo_http_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://kiatnakin365.sharepoint.com"
-		},
-		"link_st_kkpb_edp_properties_typeProperties_url": {
-			"type": "string",
-			"defaultValue": "https://stkkpbdevedp.dfs.core.windows.net"
 		}
 	},
 	"variables": {
@@ -577,6 +569,42 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/TEST_JDBC')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Notebook1",
+						"type": "DatabricksNotebook",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": "/Users/pran.piya@kkpfg.com/TEST/TEST ADF SYN"
+						},
+						"linkedServiceName": {
+							"referenceName": "link_dbw_edp",
+							"type": "LinkedServiceReference"
+						}
+					}
+				],
+				"folder": {
+					"name": "TEST"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/link_dbw_edp')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/Test DBW')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -745,30 +773,6 @@
 				"type": "AzureSqlDatabase",
 				"typeProperties": {
 					"connectionString": "[parameters('link_sqldb_kkpb_edp_connectionString')]"
-				},
-				"connectVia": {
-					"referenceName": "shir-kkpb-edp",
-					"type": "IntegrationRuntimeReference"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/integrationRuntimes/shir-kkpb-edp')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/link_st_kkpb_edp')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"description": " ",
-				"annotations": [],
-				"type": "AzureBlobFS",
-				"typeProperties": {
-					"url": "[parameters('link_st_kkpb_edp_properties_typeProperties_url')]",
-					"accountKey": {
-						"type": "SecureString",
-						"value": "[parameters('link_st_kkpb_edp_accountKey')]"
-					}
 				},
 				"connectVia": {
 					"referenceName": "shir-kkpb-edp",

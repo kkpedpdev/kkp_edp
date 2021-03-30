@@ -13,6 +13,42 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('factoryName'), '/onprim_bin_ds')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "  ",
+				"linkedServiceName": {
+					"referenceName": "link_fs_kkpb_dev_edp",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"P_PATH": {
+						"type": "string"
+					},
+					"P_FILENAME": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "FileServerLocation",
+						"fileName": {
+							"value": "@dataset().P_FILENAME",
+							"type": "Expression"
+						},
+						"folderPath": {
+							"value": "@dataset().P_PATH",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/sp_bin_ds')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -454,7 +490,7 @@
 							},
 							"enableStaging": false,
 							"translator": {
-								"value": "@activity('Lookup Schema').output",
+								"value": "@activity('Lookup Schema').output.firstRow",
 								"type": "Expression"
 							}
 						},
@@ -1298,7 +1334,9 @@
 				"annotations": [],
 				"lastPublishTime": "2021-02-24T06:46:02Z"
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/onprim_bin_ds')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/40_PCS_COMMON_TYPE2_INIT')]",
@@ -1656,7 +1694,9 @@
 				"annotations": [],
 				"lastPublishTime": "2021-02-24T06:46:02Z"
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/onprim_bin_ds')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/40_PCS_COMMON_TYPE2_copy3')]",
@@ -2155,7 +2195,9 @@
 				"annotations": [],
 				"lastPublishTime": "2021-02-24T06:46:02Z"
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/onprim_bin_ds')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/40_PCS_COMMON_TYPE2_copy4')]",
@@ -2801,7 +2843,9 @@
 				"annotations": [],
 				"lastPublishTime": "2021-02-24T06:46:02Z"
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/onprim_bin_ds')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/40_PCS_COMMON_TYPE4')]",
@@ -2992,7 +3036,9 @@
 				"annotations": [],
 				"lastPublishTime": "2021-02-24T06:46:02Z"
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/onprim_bin_ds')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/40_PCS_COMMON_TYPE5')]",
@@ -4231,7 +4277,9 @@
 				"annotations": [],
 				"lastPublishTime": "2021-02-24T06:25:52Z"
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/onprim_bin_ds')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/EXT_TABLE')]",
@@ -5658,130 +5706,6 @@
 								}
 							}
 						]
-					}
-				],
-				"parameters": {
-					"P_SCHEMA": {
-						"type": "string"
-					}
-				},
-				"folder": {
-					"name": "TEST"
-				},
-				"annotations": []
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/pipeline2_copy1')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Copy STG",
-						"type": "Copy",
-						"dependsOn": [
-							{
-								"activity": "Lookup Schema",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "DelimitedTextSource",
-								"storeSettings": {
-									"type": "AzureBlobFSReadSettings",
-									"recursive": true,
-									"enablePartitionDiscovery": false
-								},
-								"formatSettings": {
-									"type": "DelimitedTextReadSettings"
-								}
-							},
-							"sink": {
-								"type": "ParquetSink",
-								"storeSettings": {
-									"type": "AzureBlobFSWriteSettings"
-								},
-								"formatSettings": {
-									"type": "ParquetWriteSettings"
-								}
-							},
-							"enableStaging": false,
-							"translator": {
-								"value": "@activity('Lookup Schema').output.firstRow",
-								"type": "Expression"
-							}
-						},
-						"inputs": [
-							{
-								"referenceName": "dl_csv_ds",
-								"type": "DatasetReference",
-								"parameters": {
-									"P_PATH": "TMP/SOURCE/",
-									"P_FILENAME": "TEST.txt",
-									"P_DELIMITER": "|",
-									"P_ENCODING": "UTF-8",
-									"P_FIRSTROW_HDR": "Y",
-									"P_CONTAINER": "working"
-								}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "dl_parquet_ds",
-								"type": "DatasetReference",
-								"parameters": {
-									"P_CONTAINER": "working",
-									"P_PATH": "TMP/SOURCE/",
-									"P_FILENAME": "TEST.parquet"
-								}
-							}
-						]
-					},
-					{
-						"name": "Lookup Schema",
-						"type": "Lookup",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "JsonSource",
-								"storeSettings": {
-									"type": "AzureBlobFSReadSettings",
-									"recursive": true,
-									"enablePartitionDiscovery": false
-								},
-								"formatSettings": {
-									"type": "JsonReadSettings"
-								}
-							},
-							"dataset": {
-								"referenceName": "dl_json_ds",
-								"type": "DatasetReference",
-								"parameters": {
-									"P_FILENAME": "TEST.json"
-								}
-							}
-						}
 					}
 				],
 				"parameters": {

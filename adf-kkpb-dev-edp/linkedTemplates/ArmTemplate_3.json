@@ -13,6 +13,125 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('factoryName'), '/pipeline2_copy1')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Copy STG",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Lookup Schema",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "ExcelSource",
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"recursive": true,
+									"enablePartitionDiscovery": false
+								}
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"value": "@activity('Lookup Schema').output.firstRow",
+								"type": "Expression"
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "dl_xlsx_ds",
+								"type": "DatasetReference",
+								"parameters": {
+									"P_CONATINER": "raw",
+									"P_PATH": "internal/manualfile/collection/PARAM",
+									"P_FILENAME": "COLLECTION_PARAM.xlsx",
+									"P_SHEET": "PARAM_MAP_CODE"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "dl_parquet_ds",
+								"type": "DatasetReference",
+								"parameters": {
+									"P_CONTAINER": "working",
+									"P_PATH": "TMP/SOURCE",
+									"P_FILENAME": "COLLECTION_PARAM_TEST.parquet"
+								}
+							}
+						]
+					},
+					{
+						"name": "Lookup Schema",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "JsonSource",
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"recursive": true,
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "JsonReadSettings"
+								}
+							},
+							"dataset": {
+								"referenceName": "dl_json_ds",
+								"type": "DatasetReference",
+								"parameters": {
+									"P_FILENAME": "COLLECTION_PARAM.json"
+								}
+							}
+						}
+					}
+				],
+				"parameters": {
+					"P_SCHEMA": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "TEST"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/testAPI')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",

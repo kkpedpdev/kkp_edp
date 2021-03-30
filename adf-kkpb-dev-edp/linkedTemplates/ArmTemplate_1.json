@@ -6,12 +6,42 @@
 			"type": "string",
 			"metadata": "Data Factory name",
 			"defaultValue": "adf-kkpb-dev-edp"
+		},
+		"link_st_kkpb_edp_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'link_st_kkpb_edp'"
+		},
+		"link_st_kkpb_edp_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://stkkpbdevedp.dfs.core.windows.net"
 		}
 	},
 	"variables": {
 		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
 	},
 	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/link_st_kkpb_edp')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": " ",
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('link_st_kkpb_edp_properties_typeProperties_url')]",
+					"accountKey": {
+						"type": "SecureString",
+						"value": "[parameters('link_st_kkpb_edp_accountKey')]"
+					}
+				},
+				"connectVia": {
+					"referenceName": "shir-kkpb-edp",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": []
+		},
 		{
 			"name": "[concat(parameters('factoryName'), '/40_PCS_COMMON_TYPE1')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
@@ -405,7 +435,9 @@
 				},
 				"schema": []
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/link_st_kkpb_edp')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/bin_adls_ds')]",
@@ -448,7 +480,9 @@
 					}
 				}
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/link_st_kkpb_edp')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/bin_blob_ds')]",
@@ -759,7 +793,9 @@
 				},
 				"schema": []
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/link_st_kkpb_edp')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/dl_csv_ds_test')]",
@@ -807,7 +843,9 @@
 				},
 				"schema": []
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/link_st_kkpb_edp')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/dl_json_ds')]",
@@ -873,7 +911,9 @@
 					}
 				}
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/link_st_kkpb_edp')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/dl_parquet_ds')]",
@@ -914,7 +954,9 @@
 				},
 				"schema": []
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/link_st_kkpb_edp')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/dl_sql_ds')]",
@@ -956,7 +998,9 @@
 				},
 				"schema": []
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/link_st_kkpb_edp')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/dl_work_ds')]",
@@ -1007,7 +1051,9 @@
 					}
 				]
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/link_st_kkpb_edp')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/dl_xlsx_ds')]",
@@ -1058,7 +1104,9 @@
 				},
 				"schema": []
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/link_st_kkpb_edp')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/mssql_cntl_ds')]",
@@ -1074,42 +1122,6 @@
 				"type": "AzureSqlTable",
 				"schema": [],
 				"typeProperties": {}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/onprim_bin_ds')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"description": "  ",
-				"linkedServiceName": {
-					"referenceName": "link_fs_kkpb_dev_edp",
-					"type": "LinkedServiceReference"
-				},
-				"parameters": {
-					"P_PATH": {
-						"type": "string"
-					},
-					"P_FILENAME": {
-						"type": "string"
-					}
-				},
-				"annotations": [],
-				"type": "Binary",
-				"typeProperties": {
-					"location": {
-						"type": "FileServerLocation",
-						"fileName": {
-							"value": "@dataset().P_FILENAME",
-							"type": "Expression"
-						},
-						"folderPath": {
-							"value": "@dataset().P_PATH",
-							"type": "Expression"
-						}
-					}
-				}
 			},
 			"dependsOn": []
 		}

@@ -68,8 +68,8 @@
 								"parameters": {
 									"P_CONATINER": "raw",
 									"P_PATH": "internal/manualfile/collection/PARAM",
-									"P_FILENAME": "COLLECTION_PARAM.xlsx",
-									"P_SHEET": "PARAM_MAP_CODE"
+									"P_FILENAME": "COLLECTION_USERLIST.xlsx",
+									"P_SHEET": "User Outbound List"
 								}
 							}
 						],
@@ -113,7 +113,7 @@
 								"referenceName": "dl_json_ds",
 								"type": "DatasetReference",
 								"parameters": {
-									"P_FILENAME": "COLLECTION_PARAM.json"
+									"P_FILENAME": "COLLECTION_USERLIST.json"
 								}
 							}
 						}

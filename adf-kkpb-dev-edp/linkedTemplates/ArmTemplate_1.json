@@ -789,7 +789,7 @@
 						"value": "@if(EQUALS(dataset().P_FIRSTROW_HDR,'Y'),TRUE,FALSE)",
 						"type": "Expression"
 					},
-					"quoteChar": "\""
+					"quoteChar": ""
 				},
 				"schema": []
 			},

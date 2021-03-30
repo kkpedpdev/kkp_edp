@@ -23,14 +23,11 @@
 				"userProperties": [],
 				"typeProperties": {
 					"source": {
-						"type": "DelimitedTextSource",
+						"type": "ExcelSource",
 						"storeSettings": {
 							"type": "AzureBlobFSReadSettings",
 							"recursive": true,
 							"enablePartitionDiscovery": false
-						},
-						"formatSettings": {
-							"type": "DelimitedTextReadSettings"
 						}
 					},
 					"sink": {
@@ -50,15 +47,13 @@
 				},
 				"inputs": [
 					{
-						"referenceName": "dl_csv_ds",
+						"referenceName": "dl_xlsx_ds",
 						"type": "DatasetReference",
 						"parameters": {
-							"P_PATH": "TMP/SOURCE/",
-							"P_FILENAME": "TEST.txt",
-							"P_DELIMITER": "|",
-							"P_ENCODING": "UTF-8",
-							"P_FIRSTROW_HDR": "Y",
-							"P_CONTAINER": "working"
+							"P_CONATINER": "raw",
+							"P_PATH": "internal/manualfile/collection/PARAM",
+							"P_FILENAME": "COLLECTION_PARAM.xlsx",
+							"P_SHEET": "PARAM_MAP_CODE"
 						}
 					}
 				],
@@ -68,8 +63,8 @@
 						"type": "DatasetReference",
 						"parameters": {
 							"P_CONTAINER": "working",
-							"P_PATH": "TMP/SOURCE/",
-							"P_FILENAME": "TEST.parquet"
+							"P_PATH": "TMP/SOURCE",
+							"P_FILENAME": "COLLECTION_PARAM_TEST.parquet"
 						}
 					}
 				]
@@ -102,7 +97,7 @@
 						"referenceName": "dl_json_ds",
 						"type": "DatasetReference",
 						"parameters": {
-							"P_FILENAME": "TEST.json"
+							"P_FILENAME": "COLLECTION_PARAM.json"
 						}
 					}
 				}

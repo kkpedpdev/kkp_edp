@@ -251,9 +251,12 @@
 						"referenceName": "dl_csv_ds",
 						"type": "DatasetReference",
 						"parameters": {
-							"P_PATH": "TMP/SOURCE/",
+							"P_PATH": {
+								"value": "@concat(activity('GET PROCESS INFORMATION').output.FIRSTROW.PTH, '/', activity('GET PROCESS INFORMATION').output.FIRSTROW.CALC_DATA_DT)",
+								"type": "Expression"
+							},
 							"P_FILENAME": {
-								"value": "@replace(activity('Lookup1').output.firstrow.SCHM_FI,'.json', '.txt')",
+								"value": "@activity('Lookup1').output.firstrow.FI_NM",
 								"type": "Expression"
 							},
 							"P_DELIMITER": {
@@ -265,7 +268,10 @@
 								"type": "Expression"
 							},
 							"P_FIRSTROW_HDR": "Y",
-							"P_CONTAINER": "working"
+							"P_CONTAINER": {
+								"value": "@activity('GET PROCESS INFORMATION').output.FIRSTROW.CNTNR",
+								"type": "Expression"
+							}
 						}
 					}
 				],

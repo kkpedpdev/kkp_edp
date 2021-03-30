@@ -335,7 +335,7 @@
 			},
 			"P_PRCS_NM": {
 				"type": "string",
-				"defaultValue": "GET_LOCATION_FACE_RECOGNITION_CustGeoInfo"
+				"defaultValue": "T1_HP_CONTRACT_MASTER_D_99"
 			}
 		},
 		"folder": {

@@ -12399,10 +12399,12 @@
 				],
 				"parameters": {
 					"P_RUN_MODE": {
-						"type": "string"
+						"type": "string",
+						"defaultValue": "R"
 					},
 					"P_STREM_NM": {
-						"type": "string"
+						"type": "string",
+						"defaultValue": "EDP_FINAL"
 					}
 				},
 				"annotations": []

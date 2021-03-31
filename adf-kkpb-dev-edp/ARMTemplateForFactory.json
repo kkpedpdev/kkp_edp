@@ -12379,7 +12379,7 @@
 									"type": "String"
 								},
 								"P_STREM_RSLT": {
-									"value": "SUCCESS",
+									"value": "FINISH",
 									"type": "String"
 								},
 								"P_STREM_ID": {

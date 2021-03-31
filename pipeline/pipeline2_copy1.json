@@ -34,14 +34,12 @@
 						}
 					},
 					"sink": {
-						"type": "DelimitedTextSink",
+						"type": "ParquetSink",
 						"storeSettings": {
 							"type": "AzureBlobFSWriteSettings"
 						},
 						"formatSettings": {
-							"type": "DelimitedTextWriteSettings",
-							"quoteAllText": true,
-							"fileExtension": ".txt"
+							"type": "ParquetWriteSettings"
 						}
 					},
 					"enableStaging": false,
@@ -66,15 +64,12 @@
 				],
 				"outputs": [
 					{
-						"referenceName": "dl_csv_ds",
+						"referenceName": "dl_parquet_ds",
 						"type": "DatasetReference",
 						"parameters": {
-							"P_PATH": "TMP/SOURCE/",
-							"P_FILENAME": "TEST_RESULT.txt",
-							"P_DELIMITER": "|",
-							"P_ENCODING": "UTF-8",
-							"P_FIRSTROW_HDR": "Y",
-							"P_CONTAINER": "working"
+							"P_CONTAINER": "working",
+							"P_PATH": "TMP/SOURCE",
+							"P_FILENAME": "TEST.parquet"
 						}
 					}
 				]

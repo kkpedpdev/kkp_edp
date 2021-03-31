@@ -239,6 +239,9 @@
 				"defaultValue": "EDP_FINAL"
 			}
 		},
+		"folder": {
+			"name": "COMMON JOB"
+		},
 		"annotations": []
 	}
 }

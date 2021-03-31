@@ -13,6 +13,120 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('factoryName'), '/pipeline2')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Copy STG",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "DelimitedTextSource",
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"recursive": true,
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "DelimitedTextReadSettings"
+								}
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "RECORD_INDICATOR",
+											"type": "String"
+										},
+										"sink": {
+											"name": "RECORD_INDICATOR",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "DATA_DT",
+											"type": "DateTime",
+											"format": "MM/dd/yyyy hh:mm:ss"
+										},
+										"sink": {
+											"name": "DATA_DT",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "DATA_DT2",
+											"type": "DateTime",
+											"format": "yyyyMMdd"
+										},
+										"sink": {
+											"name": "DATA_DT2",
+											"type": "String"
+										}
+									}
+								]
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "dl_csv_ds_test",
+								"type": "DatasetReference",
+								"parameters": {
+									"P_PATH": "TMP/SOURCE/",
+									"P_FILENAME": "TEST.txt",
+									"P_CONTAINER": "working"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "dl_parquet_ds",
+								"type": "DatasetReference",
+								"parameters": {
+									"P_CONTAINER": "working",
+									"P_PATH": "TMP/SOURCE/",
+									"P_FILENAME": "TEST.parquet"
+								}
+							}
+						]
+					}
+				],
+				"parameters": {
+					"P_SCHEMA": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "TEST"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/pipeline2_copy1')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",

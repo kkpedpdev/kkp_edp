@@ -52,7 +52,7 @@
 							{
 								"source": {
 									"name": "DATA_DT",
-									"type": "DateTime",
+									"type": "Double",
 									"format": "MM/dd/yyyy hh:mm:ss"
 								},
 								"sink": {

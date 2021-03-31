@@ -14244,11 +14244,14 @@
 						"userProperties": [],
 						"typeProperties": {
 							"source": {
-								"type": "ExcelSource",
+								"type": "DelimitedTextSource",
 								"storeSettings": {
 									"type": "AzureBlobFSReadSettings",
 									"recursive": true,
 									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "DelimitedTextReadSettings"
 								}
 							},
 							"sink": {
@@ -14268,13 +14271,15 @@
 						},
 						"inputs": [
 							{
-								"referenceName": "dl_xlsx_ds",
+								"referenceName": "dl_csv_ds",
 								"type": "DatasetReference",
 								"parameters": {
-									"P_CONATINER": "raw",
-									"P_PATH": "internal/manualfile/collection/PARAM",
-									"P_FILENAME": "COLLECTION_USERLIST.xlsx",
-									"P_SHEET": "User Outbound List"
+									"P_PATH": "TMP/SOURCE/",
+									"P_FILENAME": "TEST.txt",
+									"P_DELIMITER": "|",
+									"P_ENCODING": "UTF-8",
+									"P_FIRSTROW_HDR": "Y",
+									"P_CONTAINER": "working"
 								}
 							}
 						],
@@ -14284,8 +14289,8 @@
 								"type": "DatasetReference",
 								"parameters": {
 									"P_CONTAINER": "working",
-									"P_PATH": "TMP/SOURCE",
-									"P_FILENAME": "COLLECTION_PARAM_TEST.parquet"
+									"P_PATH": "TMP/SOURCE/",
+									"P_FILENAME": "TEST.parquet"
 								}
 							}
 						]
@@ -14318,7 +14323,7 @@
 								"referenceName": "dl_json_ds",
 								"type": "DatasetReference",
 								"parameters": {
-									"P_FILENAME": "COLLECTION_USERLIST.json"
+									"P_FILENAME": "TEST.json"
 								}
 							}
 						}
@@ -14335,7 +14340,7 @@
 				"annotations": []
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/dl_xlsx_ds')]",
+				"[concat(variables('factoryId'), '/datasets/dl_csv_ds')]",
 				"[concat(variables('factoryId'), '/datasets/dl_parquet_ds')]",
 				"[concat(variables('factoryId'), '/datasets/dl_json_ds')]"
 			]

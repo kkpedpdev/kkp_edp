@@ -11455,7 +11455,7 @@
 							},
 							"enableStaging": false,
 							"translator": {
-								"value": "@activity('Lookup Schema').output",
+								"value": "@activity('Lookup Schema').output.firstRow",
 								"type": "Expression"
 							}
 						},

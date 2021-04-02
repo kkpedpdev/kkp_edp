@@ -5875,7 +5875,7 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/00_STREAM_COMMON')]",
+			"name": "[concat(parameters('factoryName'), '/00_STREAM_COMMON_bk')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -6295,7 +6295,7 @@
 					}
 				},
 				"folder": {
-					"name": "COMMON JOB"
+					"name": "BK"
 				},
 				"annotations": [],
 				"lastPublishTime": "2021-02-24T05:06:51Z"
@@ -6432,7 +6432,7 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/00_STREAM_COMMON_2')]",
+			"name": "[concat(parameters('factoryName'), '/00_STREAM_COMMON')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -7414,7 +7414,7 @@
 					}
 				},
 				"folder": {
-					"name": "COMMON JOB"
+					"name": "BK"
 				},
 				"annotations": [],
 				"lastPublishTime": "2021-02-24T05:06:51Z"

@@ -666,7 +666,7 @@
 				],
 				"outputs": [
 					{
-						"referenceName": "dl_bin_wc_ds",
+						"referenceName": "dl_bin_wc_ds2",
 						"type": "DatasetReference",
 						"parameters": {
 							"P_CONTAINER": "working",
@@ -705,7 +705,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"dataset": {
-						"referenceName": "dl_bin_wc_ds",
+						"referenceName": "dl_bin_wc_ds2",
 						"type": "DatasetReference",
 						"parameters": {
 							"P_CONTAINER": "working",

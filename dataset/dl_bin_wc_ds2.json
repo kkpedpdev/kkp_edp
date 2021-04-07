@@ -1,9 +1,9 @@
 {
-	"name": "dl_bin_wc_ds",
+	"name": "dl_bin_wc_ds2",
 	"properties": {
 		"description": "  ",
 		"linkedServiceName": {
-			"referenceName": "link_adls_onprim_edp",
+			"referenceName": "link_st_kkpb_edp",
 			"type": "LinkedServiceReference"
 		},
 		"parameters": {

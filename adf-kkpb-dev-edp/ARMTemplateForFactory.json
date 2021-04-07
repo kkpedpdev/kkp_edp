@@ -8728,15 +8728,14 @@
 						],
 						"outputs": [
 							{
-								"referenceName": "dl_bin_ds2",
+								"referenceName": "dl_bin_wc_ds2",
 								"type": "DatasetReference",
 								"parameters": {
 									"P_CONTAINER": "working",
 									"P_PATH": {
 										"value": "@concat('TMP/SOURCE/',pipeline().parameters.P_PRCS_NM)",
 										"type": "Expression"
-									},
-									"P_FILENAME": "*.*"
+									}
 								}
 							}
 						]
@@ -8768,15 +8767,14 @@
 						"userProperties": [],
 						"typeProperties": {
 							"dataset": {
-								"referenceName": "dl_bin_ds2",
+								"referenceName": "dl_bin_wc_ds2",
 								"type": "DatasetReference",
 								"parameters": {
 									"P_CONTAINER": "working",
 									"P_PATH": {
 										"value": "@concat('TMP/SOURCE/',pipeline().parameters.P_PRCS_NM)",
 										"type": "Expression"
-									},
-									"P_FILENAME": "*.*"
+									}
 								}
 							},
 							"fieldList": [
@@ -8818,6 +8816,7 @@
 				"[concat(variables('factoryId'), '/datasets/mssql_cntl_ds')]",
 				"[concat(variables('factoryId'), '/datasets/dl_json_ds')]",
 				"[concat(variables('factoryId'), '/datasets/dl_bin_ds2')]",
+				"[concat(variables('factoryId'), '/datasets/dl_bin_wc_ds2')]",
 				"[concat(variables('factoryId'), '/linkedServices/link_dbw_edp')]",
 				"[concat(variables('factoryId'), '/linkedServices/link_sqldb_kkpb_edp')]",
 				"[concat(variables('factoryId'), '/datasets/dl_csv_ds')]",
@@ -16510,6 +16509,44 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/link_adls_onprim_edp')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/dl_bin_wc_ds2')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "  ",
+				"linkedServiceName": {
+					"referenceName": "link_st_kkpb_edp",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"P_CONTAINER": {
+						"type": "string"
+					},
+					"P_PATH": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": {
+							"value": "@dataset().P_PATH",
+							"type": "Expression"
+						},
+						"fileSystem": {
+							"value": "@dataset().P_CONTAINER",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/link_st_kkpb_edp')]"
 			]
 		},
 		{

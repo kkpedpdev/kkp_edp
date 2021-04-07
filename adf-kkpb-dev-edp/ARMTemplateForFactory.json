@@ -8249,11 +8249,11 @@
 							"isSequential": true,
 							"activities": [
 								{
-									"name": "Set variable1",
+									"name": "Set filename list",
 									"type": "SetVariable",
 									"dependsOn": [
 										{
-											"activity": "Set variable3",
+											"activity": "Set V_TMP",
 											"dependencyConditions": [
 												"Succeeded"
 											]
@@ -8269,20 +8269,7 @@
 									}
 								},
 								{
-									"name": "Append variable1",
-									"type": "AppendVariable",
-									"dependsOn": [],
-									"userProperties": [],
-									"typeProperties": {
-										"variableName": "V_FILENAMES",
-										"value": {
-											"value": "@CONCAT( activity('Lookup1').output.FirstRow.CNTNR, '/', activity('Lookup1').output.FirstRow.PTH, '/',  pipeline().parameters.P_PRCS_OBJ.CALC_DATA_DT,'/',item().name, ', ')",
-											"type": "Expression"
-										}
-									}
-								},
-								{
-									"name": "Set variable3",
+									"name": "Set V_TMP",
 									"type": "SetVariable",
 									"dependsOn": [],
 									"userProperties": [],
@@ -8466,7 +8453,426 @@
 						}
 					},
 					{
-						"name": "Set variable2",
+						"name": "Preprocessing",
+						"type": "DatabricksNotebook",
+						"dependsOn": [
+							{
+								"activity": "Set variable Param",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": "/DEV/00_Common/edp/adf/dbn-adf-preprocessing",
+							"baseParameters": {
+								"PARAMS": {
+									"value": "@variables('P_PARAM')",
+									"type": "Expression"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "link_dbw_edp",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "If Condition1",
+						"type": "IfCondition",
+						"dependsOn": [
+							{
+								"activity": "Preprocessing",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"expression": {
+								"value": "@equals(activity('Preprocessing').output.runOutput.Status,'Success')",
+								"type": "Expression"
+							},
+							"ifFalseActivities": [
+								{
+									"name": "ABORT CHECK STREAM INFORMATION",
+									"type": "Lookup",
+									"dependsOn": [
+										{
+											"activity": "Update Fail Process",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "SqlServerSource",
+											"sqlReaderQuery": "SELECT 1/0",
+											"queryTimeout": "02:00:00",
+											"partitionOption": "None"
+										},
+										"dataset": {
+											"referenceName": "mssql_cntl_ds",
+											"type": "DatasetReference",
+											"parameters": {}
+										}
+									}
+								},
+								{
+									"name": "Update Fail Process",
+									"type": "SqlServerStoredProcedure",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"storedProcedureName": {
+											"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA, '.[PROC_UPDT_PRCS]')",
+											"type": "Expression"
+										},
+										"storedProcedureParameters": {
+											"P_CNT_FI_SRC": {
+												"value": null,
+												"type": "String"
+											},
+											"P_CNT_FI_TGT": {
+												"value": null,
+												"type": "String"
+											},
+											"P_CNT_REC_SRC": {
+												"value": {
+													"value": "@activity('Preprocessing').output.runOutput.ActualRecord",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"P_CNT_REC_TGT": {
+												"value": null,
+												"type": "String"
+											},
+											"P_LD_ID": {
+												"value": {
+													"value": "@pipeline().parameters.P_LD_ID",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"P_PRCS_NM": {
+												"value": {
+													"value": "@pipeline().parameters.P_PRCS_NM",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"P_RMRK": {
+												"value": {
+													"value": "@activity('Preprocessing').output.runOutput.Description",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"P_ST": {
+												"value": "Failed",
+												"type": "String"
+											},
+											"P_CNT_REC_CNTL": {
+												"value": {
+													"value": "@activity('Preprocessing').output.runOutput.ExpectedRecord",
+													"type": "Expression"
+												},
+												"type": "String"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "link_sqldb_kkpb_edp",
+										"type": "LinkedServiceReference"
+									}
+								}
+							],
+							"ifTrueActivities": [
+								{
+									"name": "Copy STG",
+									"type": "Copy",
+									"dependsOn": [
+										{
+											"activity": "Update Log Count Preprocess",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "DelimitedTextSource",
+											"storeSettings": {
+												"type": "AzureBlobFSReadSettings",
+												"recursive": true,
+												"enablePartitionDiscovery": false
+											},
+											"formatSettings": {
+												"type": "DelimitedTextReadSettings"
+											}
+										},
+										"sink": {
+											"type": "ParquetSink",
+											"storeSettings": {
+												"type": "AzureBlobFSWriteSettings"
+											},
+											"formatSettings": {
+												"type": "ParquetWriteSettings"
+											}
+										},
+										"enableStaging": false,
+										"logSettings": {
+											"enableCopyActivityLog": true,
+											"copyActivityLogSettings": {
+												"logLevel": "Warning",
+												"enableReliableLogging": false
+											},
+											"logLocationSettings": {
+												"linkedServiceName": {
+													"referenceName": "link_st_kkpb_edp",
+													"type": "LinkedServiceReference"
+												},
+												"path": "logs/ADF"
+											}
+										},
+										"translator": {
+											"value": "@activity('Lookup Schema').output.firstRow",
+											"type": "Expression"
+										}
+									},
+									"inputs": [
+										{
+											"referenceName": "dl_csv_ds",
+											"type": "DatasetReference",
+											"parameters": {
+												"P_PATH": "TMP/SOURCE/",
+												"P_FILENAME": {
+													"value": "@replace(activity('Lookup1').output.firstrow.SCHM_FI,'.json', '.txt')",
+													"type": "Expression"
+												},
+												"P_DELIMITER": {
+													"value": "@activity('Lookup1').output.firstrow.DLM_STRNG",
+													"type": "Expression"
+												},
+												"P_ENCODING": {
+													"value": "@activity('Lookup1').output.firstrow.ENCDNG",
+													"type": "Expression"
+												},
+												"P_FIRSTROW_HDR": "Y",
+												"P_CONTAINER": "working"
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "dl_parquet_ds",
+											"type": "DatasetReference",
+											"parameters": {
+												"P_CONTAINER": {
+													"value": "@pipeline().parameters.P_PRCS_OBJ.TGT_CNTNR",
+													"type": "Expression"
+												},
+												"P_PATH": {
+													"value": "@concat(pipeline().parameters.P_PRCS_OBJ.TGT_PTH,'/', pipeline().parameters.P_PRCS_OBJ.TGT_TBL, '/DATA_DT=', pipeline().parameters.P_PRCS_OBJ.CALC_DATA_DT)",
+													"type": "Expression"
+												},
+												"P_FILENAME": {
+													"value": "@concat(activity('Lookup1').output.firstrow.FI_NM)",
+													"type": "Expression"
+												}
+											}
+										}
+									]
+								},
+								{
+									"name": "Update Log Count",
+									"type": "SqlServerStoredProcedure",
+									"dependsOn": [
+										{
+											"activity": "Copy STG",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"storedProcedureName": {
+											"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA, '.[PROC_UPDT_PRCS]')",
+											"type": "Expression"
+										},
+										"storedProcedureParameters": {
+											"P_CNT_FI_SRC": {
+												"value": null,
+												"type": "String"
+											},
+											"P_CNT_FI_TGT": {
+												"value": null,
+												"type": "String"
+											},
+											"P_CNT_REC_SRC": {
+												"value": null,
+												"type": "String"
+											},
+											"P_CNT_REC_TGT": {
+												"value": {
+													"value": "@activity('Copy STG').output.rowsCopied",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"P_LD_ID": {
+												"value": {
+													"value": "@pipeline().parameters.P_LD_ID",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"P_PRCS_NM": {
+												"value": {
+													"value": "@pipeline().parameters.P_PRCS_NM",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"P_RMRK": {
+												"value": null,
+												"type": "String"
+											},
+											"P_ST": {
+												"value": "Running",
+												"type": "String"
+											},
+											"P_CNT_REC_CNTL": {
+												"value": null,
+												"type": "String"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "link_sqldb_kkpb_edp",
+										"type": "LinkedServiceReference"
+									}
+								},
+								{
+									"name": "Update Log Count Preprocess",
+									"type": "SqlServerStoredProcedure",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"storedProcedureName": {
+											"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA, '.[PROC_UPDT_PRCS]')",
+											"type": "Expression"
+										},
+										"storedProcedureParameters": {
+											"P_CNT_FI_SRC": {
+												"value": null,
+												"type": "String"
+											},
+											"P_CNT_FI_TGT": {
+												"value": null,
+												"type": "String"
+											},
+											"P_CNT_REC_SRC": {
+												"value": {
+													"value": "@activity('Preprocessing').output.runOutput.ActualRecord",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"P_CNT_REC_TGT": {
+												"value": null,
+												"type": "String"
+											},
+											"P_LD_ID": {
+												"value": {
+													"value": "@pipeline().parameters.P_LD_ID",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"P_PRCS_NM": {
+												"value": {
+													"value": "@pipeline().parameters.P_PRCS_NM",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"P_RMRK": {
+												"value": null,
+												"type": "String"
+											},
+											"P_ST": {
+												"value": "Running",
+												"type": "String"
+											},
+											"P_CNT_REC_CNTL": {
+												"value": {
+													"value": "@activity('Preprocessing').output.runOutput.ExpectedRecord",
+													"type": "Expression"
+												},
+												"type": "String"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "link_sqldb_kkpb_edp",
+										"type": "LinkedServiceReference"
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "Set variable Param",
 						"type": "SetVariable",
 						"dependsOn": [
 							{
@@ -8478,9 +8884,9 @@
 						],
 						"userProperties": [],
 						"typeProperties": {
-							"variableName": "V_FILENAME",
+							"variableName": "P_PARAM",
 							"value": {
-								"value": "@join(variables('V_FILENAMES'),',')",
+								"value": "@replace(activity('Lookup1').output.firstrow.PARM, activity('Lookup1').output.FirstRow.FI_NM, variables('V_FILENAME'))",
 								"type": "Expression"
 							}
 						}
@@ -8506,9 +8912,6 @@
 					"V_FILENAME": {
 						"type": "String"
 					},
-					"V_FILENAMES": {
-						"type": "Array"
-					},
 					"V_TMP": {
 						"type": "String"
 					}
@@ -8525,7 +8928,12 @@
 				"[concat(variables('factoryId'), '/datasets/mssql_cntl_ds')]",
 				"[concat(variables('factoryId'), '/datasets/dl_json_ds')]",
 				"[concat(variables('factoryId'), '/datasets/dl_bin_ds2')]",
-				"[concat(variables('factoryId'), '/datasets/dl_bin_wc_ds2')]"
+				"[concat(variables('factoryId'), '/datasets/dl_bin_wc_ds2')]",
+				"[concat(variables('factoryId'), '/linkedServices/link_dbw_edp')]",
+				"[concat(variables('factoryId'), '/linkedServices/link_sqldb_kkpb_edp')]",
+				"[concat(variables('factoryId'), '/datasets/dl_csv_ds')]",
+				"[concat(variables('factoryId'), '/datasets/dl_parquet_ds')]",
+				"[concat(variables('factoryId'), '/linkedServices/link_st_kkpb_edp')]"
 			]
 		},
 		{
@@ -9343,7 +9751,7 @@
 					}
 				},
 				"folder": {
-					"name": "COMMON JOB"
+					"name": "BK"
 				},
 				"annotations": [],
 				"lastPublishTime": "2021-02-24T06:46:02Z"

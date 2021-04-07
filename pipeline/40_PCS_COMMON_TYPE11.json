@@ -195,7 +195,7 @@
 							"typeProperties": {
 								"variableName": "V_FILENAME",
 								"value": {
-									"value": "@CONCAT( variables('P_PARAM'),item().name)",
+									"value": "@CONCAT( variables('P_PARAM'), activity('Lookup1').output.FirstRow.CNTNR, '/', activity('Lookup1').output.FirstRow.PTH, '/',  pipeline().parameters.P_PRCS_OBJ.CALC_DATA_DT,'/',item().name, ', ')",
 									"type": "Expression"
 								}
 							}

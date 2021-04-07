@@ -13,6 +13,106 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('factoryName'), '/TEST SHAREPOINTS')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Copy sharepoints to ref",
+				"activities": [
+					{
+						"name": "Copy Raw",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "GetBearerToken",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "BinarySource",
+								"storeSettings": {
+									"type": "HttpReadSettings",
+									"requestMethod": "GET",
+									"additionalHeaders": {
+										"value": "@{concat('Authorization: Bearer ', activity('GetBearerToken').output.access_token)}",
+										"type": "Expression"
+									},
+									"requestTimeout": ""
+								},
+								"formatSettings": {
+									"type": "BinaryReadSettings"
+								}
+							},
+							"sink": {
+								"type": "BinarySink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								}
+							},
+							"enableStaging": false
+						},
+						"inputs": [
+							{
+								"referenceName": "sp_bin_ds",
+								"type": "DatasetReference",
+								"parameters": {
+									"ServerRelativeUrl": "/sites/EDPFileCenterUAT/ShareCenter/Landing/internal/manualfile/real_estate/20201231/BMR_202012.xlsx"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "dl_bin_ds3",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					},
+					{
+						"name": "GetBearerToken",
+						"type": "WebActivity",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"url": {
+								"value": "@pipeline().globalParameters.P_GLBL_BEARER_TOKEN",
+								"type": "Expression"
+							},
+							"method": "POST",
+							"headers": {
+								"Content-Type": "application/x-www-form-urlencoded"
+							},
+							"body": "grant_type=client_credentials&client_id=8578d84d-db28-449a-9c11-a8bae5465c04@9fce0284-1a8c-4368-85b0-571bbad0df08&client_secret=mVbWh~igL5kKkzFVXEg6BLOw86--_G4.cd&resource=00000003-0000-0ff1-ce00-000000000000/kiatnakin365.sharepoint.com@9fce0284-1a8c-4368-85b0-571bbad0df08"
+						}
+					}
+				],
+				"folder": {
+					"name": "TEST"
+				},
+				"annotations": [],
+				"lastPublishTime": "2021-02-25T03:32:43Z"
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/TEST SHAREPOINTS_copy1')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -6649,133 +6749,6 @@
 				},
 				"annotations": [],
 				"lastPublishTime": "2021-02-24T05:06:51Z"
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/pipelines/10_COMMON_RUN_PCS_GRP')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/05_COMMON_RUN_PCS_GRP_BY_PRIR')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"description": " ",
-				"activities": [
-					{
-						"name": "GET PROCESS GROUP LIST",
-						"type": "Lookup",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "SqlServerSource",
-								"sqlReaderStoredProcedureName": {
-									"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA,'.PROC_GET_PRCS_GRP_BY_STREM_2')",
-									"type": "Expression"
-								},
-								"storedProcedureParameters": {
-									"P_PRIR": {
-										"type": "String",
-										"value": {
-											"value": "@pipeline().parameters.P_PRIR",
-											"type": "Expression"
-										}
-									},
-									"P_STREM_NM": {
-										"type": "String",
-										"value": {
-											"value": "@pipeline().parameters.P_STREAM",
-											"type": "Expression"
-										}
-									}
-								},
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "mssql_cntl_ds",
-								"type": "DatasetReference",
-								"parameters": {}
-							},
-							"firstRowOnly": false
-						}
-					},
-					{
-						"name": "FOR EACH PROCESS GROUP",
-						"type": "ForEach",
-						"dependsOn": [
-							{
-								"activity": "GET PROCESS GROUP LIST",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@activity('GET PROCESS GROUP LIST').output.value",
-								"type": "Expression"
-							},
-							"isSequential": false,
-							"batchCount": 20,
-							"activities": [
-								{
-									"name": "Run Each Process Group",
-									"type": "ExecutePipeline",
-									"dependsOn": [],
-									"userProperties": [],
-									"typeProperties": {
-										"pipeline": {
-											"referenceName": "10_COMMON_RUN_PCS_GRP",
-											"type": "PipelineReference"
-										},
-										"waitOnCompletion": true,
-										"parameters": {
-											"P_PRCS_GRP": {
-												"value": "@item().PRCS_GRP",
-												"type": "Expression"
-											},
-											"P_RUN_MODE": {
-												"value": "@pipeline().parameters.P_RUN_MODE",
-												"type": "Expression"
-											},
-											"P_STREM_ID": {
-												"value": "@pipeline().parameters.P_STREM_ID",
-												"type": "Expression"
-											}
-										}
-									}
-								}
-							]
-						}
-					}
-				],
-				"parameters": {
-					"P_STREAM": {
-						"type": "string"
-					},
-					"P_PRIR": {
-						"type": "string"
-					},
-					"P_RUN_MODE": {
-						"type": "string"
-					},
-					"P_STREM_ID": {
-						"type": "string"
-					}
-				},
-				"folder": {
-					"name": "COMMON JOB"
-				},
-				"annotations": []
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/pipelines/10_COMMON_RUN_PCS_GRP')]"

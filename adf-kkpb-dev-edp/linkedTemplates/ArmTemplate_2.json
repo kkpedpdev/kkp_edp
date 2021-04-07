@@ -999,12 +999,19 @@
 								{
 									"name": "Set variable1",
 									"type": "SetVariable",
-									"dependsOn": [],
+									"dependsOn": [
+										{
+											"activity": "Set variable3",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
 									"userProperties": [],
 									"typeProperties": {
 										"variableName": "V_FILENAME",
 										"value": {
-											"value": "@CONCAT( variables('P_PARAM'), activity('Lookup1').output.FirstRow.CNTNR, '/', activity('Lookup1').output.FirstRow.PTH, '/',  pipeline().parameters.P_PRCS_OBJ.CALC_DATA_DT,'/',item().name, ', ')",
+											"value": "@CONCAT( variables('V_TMP'), activity('Lookup1').output.FirstRow.CNTNR, '/', activity('Lookup1').output.FirstRow.PTH, '/',  pipeline().parameters.P_PRCS_OBJ.CALC_DATA_DT,'/',item().name, ', ')",
 											"type": "Expression"
 										}
 									}
@@ -1018,6 +1025,19 @@
 										"variableName": "V_FILENAMES",
 										"value": {
 											"value": "@CONCAT( activity('Lookup1').output.FirstRow.CNTNR, '/', activity('Lookup1').output.FirstRow.PTH, '/',  pipeline().parameters.P_PRCS_OBJ.CALC_DATA_DT,'/',item().name, ', ')",
+											"type": "Expression"
+										}
+									}
+								},
+								{
+									"name": "Set variable3",
+									"type": "SetVariable",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "V_TMP",
+										"value": {
+											"value": "@variables('V_FILENAME')",
 											"type": "Expression"
 										}
 									}
@@ -1236,6 +1256,9 @@
 					},
 					"V_FILENAMES": {
 						"type": "Array"
+					},
+					"V_TMP": {
+						"type": "String"
 					}
 				},
 				"folder": {

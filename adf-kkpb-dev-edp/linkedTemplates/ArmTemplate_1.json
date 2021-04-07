@@ -729,6 +729,42 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/dl_bin_wc_ds')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "  ",
+				"linkedServiceName": {
+					"referenceName": "link_adls_onprim_edp",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"P_CONTAINER": {
+						"type": "string"
+					},
+					"P_PATH": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": {
+							"value": "@dataset().P_PATH",
+							"type": "Expression"
+						},
+						"fileSystem": {
+							"value": "@dataset().P_CONTAINER",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/dl_csv_ds')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -1107,23 +1143,6 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/link_st_kkpb_edp')]"
 			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/mssql_cntl_ds')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"description": "  ",
-				"linkedServiceName": {
-					"referenceName": "link_sqldb_kkpb_edp",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [],
-				"typeProperties": {}
-			},
-			"dependsOn": []
 		}
 	]
 }

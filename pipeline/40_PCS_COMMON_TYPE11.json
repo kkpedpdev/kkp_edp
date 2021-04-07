@@ -199,6 +199,19 @@
 									"type": "Expression"
 								}
 							}
+						},
+						{
+							"name": "Append variable1",
+							"type": "AppendVariable",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "V_FILENAMES",
+								"value": {
+									"value": "@CONCAT( activity('Lookup1').output.FirstRow.CNTNR, '/', activity('Lookup1').output.FirstRow.PTH, '/',  pipeline().parameters.P_PRCS_OBJ.CALC_DATA_DT,'/',item().name, ', ')",
+									"type": "Expression"
+								}
+							}
 						}
 					]
 				}
@@ -391,6 +404,9 @@
 			},
 			"V_FILENAME": {
 				"type": "String"
+			},
+			"V_FILENAMES": {
+				"type": "Array"
 			}
 		},
 		"folder": {

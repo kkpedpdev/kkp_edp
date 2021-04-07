@@ -8889,7 +8889,7 @@
 						"typeProperties": {
 							"variableName": "P_PARAM",
 							"value": {
-								"value": "@replace(activity('Lookup1').output.firstrow.PARM, activity('Lookup1').output.FirstRow.FI_NM, variables('V_FILENAME'))",
+								"value": "@replace(activity('Lookup1').output.firstrow.PARM, \nconcat(activity('Lookup1').output.FirstRow.CNTNR, '/', activity('Lookup1').output.FirstRow.PTH, '/', pipeline().parameters.P_PRCS_OBJ.CALC_DATA_DT, '/', activity('Lookup1').output.FirstRow.FI_NM), variables('V_FILENAME'))",
 								"type": "Expression"
 							}
 						}

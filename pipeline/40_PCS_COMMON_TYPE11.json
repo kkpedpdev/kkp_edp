@@ -383,6 +383,26 @@
 						"enablePartitionDiscovery": false
 					}
 				}
+			},
+			{
+				"name": "Set variable2",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "ForEach1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "V_FILENAME",
+					"value": {
+						"value": "@join(variables('V_FILENAMES'),',')",
+						"type": "Expression"
+					}
+				}
 			}
 		],
 		"parameters": {

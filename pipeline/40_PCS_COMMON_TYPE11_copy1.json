@@ -1,5 +1,5 @@
 {
-	"name": "40_PCS_COMMON_TYPE11",
+	"name": "40_PCS_COMMON_TYPE11_copy1",
 	"properties": {
 		"description": "Load text data from On-prim to STG",
 		"activities": [
@@ -601,11 +601,52 @@
 				}
 			},
 			{
+				"name": "Delete1",
+				"type": "Delete",
+				"dependsOn": [
+					{
+						"activity": "Copy Raw",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataset": {
+						"referenceName": "dl_bin_ds",
+						"type": "DatasetReference",
+						"parameters": {
+							"P_CONTAINER": "working",
+							"P_PATH": {
+								"value": "@concat('TMP/SOURCE/',pipeline().parameters.P_PRCS_NM)",
+								"type": "Expression"
+							},
+							"P_FILENAME": "*.*"
+						}
+					},
+					"enableLogging": false,
+					"storeSettings": {
+						"type": "AzureBlobFSReadSettings",
+						"recursive": true,
+						"wildcardFileName": "*.*",
+						"enablePartitionDiscovery": false
+					}
+				}
+			},
+			{
 				"name": "Copy data1",
 				"type": "Copy",
 				"dependsOn": [
 					{
-						"activity": "Copy Raw",
+						"activity": "Delete1",
 						"dependencyConditions": [
 							"Succeeded"
 						]

@@ -8234,12 +8234,6 @@
 						"type": "ForEach",
 						"dependsOn": [
 							{
-								"activity": "Lookup Schema",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							},
-							{
 								"activity": "Get Metadata1",
 								"dependencyConditions": [
 									"Succeeded"
@@ -8249,7 +8243,7 @@
 						"userProperties": [],
 						"typeProperties": {
 							"items": {
-								"value": "@activity('Get Metadata1').output,childItems",
+								"value": "@activity('Get Metadata1').output.childItems",
 								"type": "Expression"
 							},
 							"activities": [
@@ -8794,6 +8788,12 @@
 						"dependsOn": [
 							{
 								"activity": "Copy data1",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "Lookup Schema",
 								"dependencyConditions": [
 									"Succeeded"
 								]
@@ -15289,6 +15289,36 @@
 							"formatSettings": {
 								"type": "BinaryReadSettings"
 							}
+						}
+					},
+					{
+						"name": "ForEach1",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "Get Metadata1",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('Get Metadata1').output.childItems",
+								"type": "Expression"
+							},
+							"activities": [
+								{
+									"name": "Wait1",
+									"type": "Wait",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"waitTimeInSeconds": 1
+									}
+								}
+							]
 						}
 					}
 				],

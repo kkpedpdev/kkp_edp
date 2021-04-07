@@ -8473,7 +8473,7 @@
 						"userProperties": [],
 						"typeProperties": {
 							"notebookPath": {
-								"value": "@CONCAT(pipeline().globalParameters.P_GLBL_ADB_PATH, 'dbn-adf-preprocessing')",
+								"value": "@CONCAT(pipeline().globalParameters.P_GLBL_ADB_PATH, 'dbn-adf-preprocessing-wildcard')",
 								"type": "Expression"
 							},
 							"baseParameters": {

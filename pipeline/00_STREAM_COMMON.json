@@ -363,7 +363,7 @@
 							"userProperties": [],
 							"typeProperties": {
 								"pipeline": {
-									"referenceName": "05_COMMON_RUN_PCS_GRP_BY PRIR",
+									"referenceName": "05_COMMON_RUN_PCS_GRP_BY_PRIR",
 									"type": "PipelineReference"
 								},
 								"waitOnCompletion": true,

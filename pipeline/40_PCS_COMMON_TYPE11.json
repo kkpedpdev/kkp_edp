@@ -1,7 +1,7 @@
 {
-	"name": "40_PCS_COMMON_TYPE2_copy4",
+	"name": "40_PCS_COMMON_TYPE11",
 	"properties": {
-		"description": "Load text data from On-prim to STG",
+		"description": "Load multi text data from On-prim to STG",
 		"activities": [
 			{
 				"name": "Copy Raw",
@@ -27,7 +27,16 @@
 						"type": "BinarySource",
 						"storeSettings": {
 							"type": "FileServerReadSettings",
-							"recursive": true
+							"recursive": true,
+							"wildcardFolderPath": {
+								"value": "@concat(pipeline().parameters.P_PRCS_OBJ.PTH, '/', pipeline().parameters.P_PRCS_OBJ.CALC_DATA_DT)",
+								"type": "Expression"
+							},
+							"wildcardFileName": {
+								"value": "@activity('Lookup1').output.firstrow.FI_NM",
+								"type": "Expression"
+							},
+							"deleteFilesAfterCompletion": false
 						},
 						"formatSettings": {
 							"type": "BinaryReadSettings"
@@ -43,18 +52,8 @@
 				},
 				"inputs": [
 					{
-						"referenceName": "onprim_bin_ds",
-						"type": "DatasetReference",
-						"parameters": {
-							"P_PATH": {
-								"value": "@concat(pipeline().parameters.P_PRCS_OBJ.PTH, '/', pipeline().parameters.P_PRCS_OBJ.CALC_DATA_DT)",
-								"type": "Expression"
-							},
-							"P_FILENAME": {
-								"value": "@activity('Lookup1').output.firstrow.FI_NM",
-								"type": "Expression"
-							}
-						}
+						"referenceName": "onprim_bin_wc_ds",
+						"type": "DatasetReference"
 					}
 				],
 				"outputs": [
@@ -80,6 +79,7 @@
 			},
 			{
 				"name": "Lookup1",
+				"description": "  ",
 				"type": "Lookup",
 				"dependsOn": [],
 				"policy": {
@@ -142,7 +142,7 @@
 				],
 				"policy": {
 					"timeout": "7.00:00:00",
-					"retry": 1,
+					"retry": 0,
 					"retryIntervalInSeconds": 30,
 					"secureOutput": false,
 					"secureInput": false
@@ -232,7 +232,14 @@
 						{
 							"name": "ABORT CHECK STREAM INFORMATION",
 							"type": "Lookup",
-							"dependsOn": [],
+							"dependsOn": [
+								{
+									"activity": "Update Fail Process",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
 							"policy": {
 								"timeout": "7.00:00:00",
 								"retry": 0,
@@ -252,6 +259,82 @@
 									"referenceName": "mssql_cntl_ds",
 									"type": "DatasetReference"
 								}
+							}
+						},
+						{
+							"name": "Update Fail Process",
+							"type": "SqlServerStoredProcedure",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"storedProcedureName": {
+									"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA, '.[PROC_UPDT_PRCS]')",
+									"type": "Expression"
+								},
+								"storedProcedureParameters": {
+									"P_CNT_FI_SRC": {
+										"value": null,
+										"type": "String"
+									},
+									"P_CNT_FI_TGT": {
+										"value": null,
+										"type": "String"
+									},
+									"P_CNT_REC_SRC": {
+										"value": {
+											"value": "@activity('Preprocessing').output.runOutput.ActualRecord",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"P_CNT_REC_TGT": {
+										"value": null,
+										"type": "String"
+									},
+									"P_LD_ID": {
+										"value": {
+											"value": "@pipeline().parameters.P_LD_ID",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"P_PRCS_NM": {
+										"value": {
+											"value": "@pipeline().parameters.P_PRCS_NM",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"P_RMRK": {
+										"value": {
+											"value": "@activity('Preprocessing').output.runOutput.Description",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"P_ST": {
+										"value": "Failed",
+										"type": "String"
+									},
+									"P_CNT_REC_CNTL": {
+										"value": {
+											"value": "@activity('Preprocessing').output.runOutput.ExpectedRecord",
+											"type": "Expression"
+										},
+										"type": "String"
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "link_sqldb_kkpb_edp",
+								"type": "LinkedServiceReference"
 							}
 						}
 					],
@@ -297,6 +380,20 @@
 									}
 								},
 								"enableStaging": false,
+								"logSettings": {
+									"enableCopyActivityLog": true,
+									"copyActivityLogSettings": {
+										"logLevel": "Warning",
+										"enableReliableLogging": false
+									},
+									"logLocationSettings": {
+										"linkedServiceName": {
+											"referenceName": "link_st_kkpb_edp",
+											"type": "LinkedServiceReference"
+										},
+										"path": "logs/ADF"
+									}
+								},
 								"translator": {
 									"value": "@activity('Lookup Schema').output.firstRow",
 									"type": "Expression"
@@ -495,127 +592,8 @@
 								"referenceName": "link_sqldb_kkpb_edp",
 								"type": "LinkedServiceReference"
 							}
-						},
-						{
-							"name": "Copy to Curated",
-							"type": "DatabricksNotebook",
-							"dependsOn": [
-								{
-									"activity": "Update Log Count",
-									"dependencyConditions": [
-										"Succeeded"
-									]
-								}
-							],
-							"policy": {
-								"timeout": "7.00:00:00",
-								"retry": 0,
-								"retryIntervalInSeconds": 30,
-								"secureOutput": false,
-								"secureInput": false
-							},
-							"userProperties": [],
-							"typeProperties": {
-								"notebookPath": {
-									"value": "@pipeline().parameters.P_PRCS_OBJ.ADB_NM",
-									"type": "Expression"
-								},
-								"baseParameters": {
-									"PARAMS": {
-										"value": "@pipeline().parameters.P_PRCS_OBJ.ADB_PARM",
-										"type": "Expression"
-									}
-								}
-							},
-							"linkedServiceName": {
-								"referenceName": "link_dbw_edp",
-								"type": "LinkedServiceReference"
-							}
 						}
 					]
-				}
-			},
-			{
-				"name": "Update Fail Process",
-				"type": "SqlServerStoredProcedure",
-				"dependsOn": [
-					{
-						"activity": "If Condition1",
-						"dependencyConditions": [
-							"Failed"
-						]
-					}
-				],
-				"policy": {
-					"timeout": "7.00:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"storedProcedureName": {
-						"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA, '.[PROC_UPDT_PRCS]')",
-						"type": "Expression"
-					},
-					"storedProcedureParameters": {
-						"P_CNT_FI_SRC": {
-							"value": null,
-							"type": "String"
-						},
-						"P_CNT_FI_TGT": {
-							"value": null,
-							"type": "String"
-						},
-						"P_CNT_REC_SRC": {
-							"value": {
-								"value": "@activity('Preprocessing').output.runOutput.ActualRecord",
-								"type": "Expression"
-							},
-							"type": "String"
-						},
-						"P_CNT_REC_TGT": {
-							"value": null,
-							"type": "String"
-						},
-						"P_LD_ID": {
-							"value": {
-								"value": "@pipeline().parameters.P_LD_ID",
-								"type": "Expression"
-							},
-							"type": "String"
-						},
-						"P_PRCS_NM": {
-							"value": {
-								"value": "@pipeline().parameters.P_PRCS_NM",
-								"type": "Expression"
-							},
-							"type": "String"
-						},
-						"P_RMRK": {
-							"value": {
-								"value": "@activity('Preprocessing').output.runOutput.Description",
-								"type": "Expression"
-							},
-							"type": "String"
-						},
-						"P_ST": {
-							"value": "Failed",
-							"type": "String"
-						},
-						"P_CNT_REC_CNTL": {
-							"value": {
-								"value": "@activity('Preprocessing').output.runOutput.ExpectedRecord",
-								"type": "Expression"
-							},
-							"type": "String"
-						}
-					}
-				},
-				"linkedServiceName": {
-					"referenceName": "link_sqldb_kkpb_edp",
-					"type": "LinkedServiceReference"
 				}
 			}
 		],
@@ -633,7 +611,7 @@
 			}
 		},
 		"folder": {
-			"name": "BK"
+			"name": "COMMON JOB"
 		},
 		"annotations": [],
 		"lastPublishTime": "2021-02-24T06:46:02Z"

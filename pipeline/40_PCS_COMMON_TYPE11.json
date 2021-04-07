@@ -666,15 +666,14 @@
 				],
 				"outputs": [
 					{
-						"referenceName": "dl_bin_ds2",
+						"referenceName": "dl_bin_wc_ds",
 						"type": "DatasetReference",
 						"parameters": {
 							"P_CONTAINER": "working",
 							"P_PATH": {
 								"value": "@concat('TMP/SOURCE/',pipeline().parameters.P_PRCS_NM)",
 								"type": "Expression"
-							},
-							"P_FILENAME": "*.*"
+							}
 						}
 					}
 				]
@@ -706,15 +705,14 @@
 				"userProperties": [],
 				"typeProperties": {
 					"dataset": {
-						"referenceName": "dl_bin_ds2",
+						"referenceName": "dl_bin_wc_ds",
 						"type": "DatasetReference",
 						"parameters": {
 							"P_CONTAINER": "working",
 							"P_PATH": {
 								"value": "@concat('TMP/SOURCE/',pipeline().parameters.P_PRCS_NM)",
 								"type": "Expression"
-							},
-							"P_FILENAME": "*.*"
+							}
 						}
 					},
 					"fieldList": [

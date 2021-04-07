@@ -8250,7 +8250,14 @@
 								{
 									"name": "Preprocessing",
 									"type": "DatabricksNotebook",
-									"dependsOn": [],
+									"dependsOn": [
+										{
+											"activity": "Set variable1",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
 									"policy": {
 										"timeout": "7.00:00:00",
 										"retry": 0,
@@ -8263,7 +8270,7 @@
 										"notebookPath": "/DEV/00_Common/edp/adf/dbn-adf-preprocessing",
 										"baseParameters": {
 											"PARAMS": {
-												"value": "@activity('Lookup1').output.firstrow.PARM",
+												"value": "@variables('P_PARAM')",
 												"type": "Expression"
 											}
 										}
@@ -8658,6 +8665,19 @@
 											}
 										]
 									}
+								},
+								{
+									"name": "Set variable1",
+									"type": "SetVariable",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "P_PARAM",
+										"value": {
+											"value": "@replace(activity('Lookup1').output.firstrow.PARM, activity('Lookup1').output.FI_NM, item())",
+											"type": "Expression"
+										}
+									}
 								}
 							]
 						}
@@ -8667,7 +8687,7 @@
 						"type": "Copy",
 						"dependsOn": [
 							{
-								"activity": "Copy Raw",
+								"activity": "Delete1",
 								"dependencyConditions": [
 									"Succeeded"
 								]
@@ -8789,6 +8809,46 @@
 								"type": "BinaryReadSettings"
 							}
 						}
+					},
+					{
+						"name": "Delete1",
+						"type": "Delete",
+						"dependsOn": [
+							{
+								"activity": "Copy Raw",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataset": {
+								"referenceName": "dl_bin_ds",
+								"type": "DatasetReference",
+								"parameters": {
+									"P_CONTAINER": "working",
+									"P_PATH": {
+										"value": "@concat('TMP/SOURCE/',pipeline().parameters.P_PRCS_NM)",
+										"type": "Expression"
+									},
+									"P_FILENAME": "*.*"
+								}
+							},
+							"enableLogging": false,
+							"storeSettings": {
+								"type": "AzureBlobFSReadSettings",
+								"recursive": true,
+								"enablePartitionDiscovery": false
+							}
+						}
 					}
 				],
 				"parameters": {
@@ -8804,6 +8864,11 @@
 						"type": "object"
 					}
 				},
+				"variables": {
+					"P_PARAM": {
+						"type": "String"
+					}
+				},
 				"folder": {
 					"name": "COMMON JOB"
 				},
@@ -8817,6 +8882,7 @@
 				"[concat(variables('factoryId'), '/datasets/dl_json_ds')]",
 				"[concat(variables('factoryId'), '/datasets/dl_bin_ds2')]",
 				"[concat(variables('factoryId'), '/datasets/dl_bin_wc_ds2')]",
+				"[concat(variables('factoryId'), '/datasets/dl_bin_ds')]",
 				"[concat(variables('factoryId'), '/linkedServices/link_dbw_edp')]",
 				"[concat(variables('factoryId'), '/linkedServices/link_sqldb_kkpb_edp')]",
 				"[concat(variables('factoryId'), '/datasets/dl_csv_ds')]",

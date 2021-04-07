@@ -671,7 +671,7 @@
 						"parameters": {
 							"P_CONTAINER": "working",
 							"P_PATH": {
-								"value": "@concat('TMP/SOURCE/',pipeline().parameters.P_PRCS_OBJ.PRCS_NM)",
+								"value": "@concat('TMP/SOURCE/',pipeline().parameters.P_PRCS_NM)",
 								"type": "Expression"
 							},
 							"P_FILENAME": "*.*"

@@ -3927,6 +3927,38 @@
 											}
 										}
 									]
+								},
+								{
+									"value": "11",
+									"activities": [
+										{
+											"name": "40_PCS_COMMON_TYPE11",
+											"type": "ExecutePipeline",
+											"dependsOn": [],
+											"userProperties": [],
+											"typeProperties": {
+												"pipeline": {
+													"referenceName": "40_PCS_COMMON_TYPE11",
+													"type": "PipelineReference"
+												},
+												"waitOnCompletion": true,
+												"parameters": {
+													"P_LD_ID": {
+														"value": "@pipeline().parameters.P_LD_ID",
+														"type": "Expression"
+													},
+													"P_PRCS_NM": {
+														"value": "@pipeline().parameters.P_PRCS_NM",
+														"type": "Expression"
+													},
+													"P_PRCS_OBJ": {
+														"value": "@activity('GET PROCESS INFORMATION').output.FIRSTROW",
+														"type": "Expression"
+													}
+												}
+											}
+										}
+									]
 								}
 							]
 						}

@@ -612,7 +612,7 @@
 							"typeProperties": {
 								"variableName": "P_PARAM",
 								"value": {
-									"value": "@replace(activity('Lookup1').output.firstrow.PARM, activity('Lookup1').output.FirstRow.FI_NM, item())",
+									"value": "@replace(activity('Lookup1').output.firstrow.PARM, activity('Lookup1').output.FirstRow.FI_NM, item().name)",
 									"type": "Expression"
 								}
 							}

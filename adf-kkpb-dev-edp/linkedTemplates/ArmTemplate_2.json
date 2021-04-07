@@ -1220,7 +1220,10 @@
 						},
 						"userProperties": [],
 						"typeProperties": {
-							"notebookPath": "/DEV/00_Common/edp/adf/dbn-adf-preprocessing",
+							"notebookPath": {
+								"value": "@CONCAT(pipeline().globalParameters.P_GLBL_ADB_PATH, 'dbn-adf-preprocessing')",
+								"type": "Expression"
+							},
 							"baseParameters": {
 								"PARAMS": {
 									"value": "@variables('P_PARAM')",

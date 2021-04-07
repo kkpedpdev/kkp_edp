@@ -188,7 +188,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"items": {
-						"value": "@activity('Get Metadata1').output,items",
+						"value": "@activity('Get Metadata1').output,childItems",
 						"type": "Expression"
 					},
 					"activities": [
@@ -763,6 +763,7 @@
 					],
 					"storeSettings": {
 						"type": "AzureBlobFSReadSettings",
+						"recursive": true,
 						"enablePartitionDiscovery": false
 					},
 					"formatSettings": {

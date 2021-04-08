@@ -444,7 +444,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"expression": {
-						"value": "@equals(activity('START STREAM').output.firstrow.STATUS,'1')",
+						"value": "@equals(activity('START STREAM').output.firstrow.STATUS,'P')",
 						"type": "Expression"
 					},
 					"ifFalseActivities": [

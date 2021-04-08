@@ -1754,7 +1754,7 @@
 								"type": "Expression"
 							},
 							"isSequential": false,
-							"batchCount": 20,
+							"batchCount": 10,
 							"activities": [
 								{
 									"name": "Run Each Process Group",

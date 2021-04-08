@@ -7,10 +7,6 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "adf-kkpb-dev-edp"
 		},
-		"link_blob_test_edp_connectionString": {
-			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'link_blob_test_edp'"
-		},
 		"link_dbw_edp_accessToken": {
 			"type": "secureString",
 			"metadata": "Secure string for 'accessToken' of 'link_dbw_edp'"
@@ -38,6 +34,10 @@
 		"link_sqldb_kkpb_edp_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'link_sqldb_kkpb_edp'"
+		},
+		"link_st_kkpb_edp_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'link_st_kkpb_edp'"
 		},
 		"link_kv_edp_properties_typeProperties_baseUrl": {
 			"type": "string",
@@ -70,6 +70,10 @@
 		"link_spo_http_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://kiatnakin365.sharepoint.com"
+		},
+		"link_st_kkpb_edp_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://stkkpbdevedp.dfs.core.windows.net"
 		}
 	},
 	"variables": {
@@ -192,19 +196,6 @@
 				},
 				"annotations": [],
 				"lastPublishTime": "2021-02-24T10:43:36Z"
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/link_blob_test_edp')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureBlobStorage",
-				"typeProperties": {
-					"connectionString": "[parameters('link_blob_test_edp_connectionString')]"
-				}
 			},
 			"dependsOn": []
 		},
@@ -773,6 +764,30 @@
 				"type": "AzureSqlDatabase",
 				"typeProperties": {
 					"connectionString": "[parameters('link_sqldb_kkpb_edp_connectionString')]"
+				},
+				"connectVia": {
+					"referenceName": "shir-kkpb-edp",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/shir-kkpb-edp')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/link_st_kkpb_edp')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": " ",
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('link_st_kkpb_edp_properties_typeProperties_url')]",
+					"accountKey": {
+						"type": "SecureString",
+						"value": "[parameters('link_st_kkpb_edp_accountKey')]"
+					}
 				},
 				"connectVia": {
 					"referenceName": "shir-kkpb-edp",

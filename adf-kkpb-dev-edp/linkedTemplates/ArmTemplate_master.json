@@ -15,10 +15,6 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'accountKey' of 'link_adls_onprim_edp'"
 		},
-		"link_blob_test_edp_connectionString": {
-			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'link_blob_test_edp'"
-		},
 		"link_dbw_edp_accessToken": {
 			"type": "secureString",
 			"metadata": "Secure string for 'accessToken' of 'link_dbw_edp'"
@@ -106,9 +102,6 @@
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
 					},
-					"link_blob_test_edp_connectionString": {
-						"value": "[parameters('link_blob_test_edp_connectionString')]"
-					},
 					"link_dbw_edp_accessToken": {
 						"value": "[parameters('link_dbw_edp_accessToken')]"
 					},
@@ -129,6 +122,9 @@
 					},
 					"link_sqldb_kkpb_edp_connectionString": {
 						"value": "[parameters('link_sqldb_kkpb_edp_connectionString')]"
+					},
+					"link_st_kkpb_edp_accountKey": {
+						"value": "[parameters('link_st_kkpb_edp_accountKey')]"
 					},
 					"link_kv_edp_properties_typeProperties_baseUrl": {
 						"value": "[parameters('link_kv_edp_properties_typeProperties_baseUrl')]"
@@ -153,6 +149,9 @@
 					},
 					"link_spo_http_properties_typeProperties_url": {
 						"value": "[parameters('link_spo_http_properties_typeProperties_url')]"
+					},
+					"link_st_kkpb_edp_properties_typeProperties_url": {
+						"value": "[parameters('link_st_kkpb_edp_properties_typeProperties_url')]"
 					}
 				}
 			},
@@ -171,12 +170,6 @@
 				"parameters": {
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
-					},
-					"link_st_kkpb_edp_accountKey": {
-						"value": "[parameters('link_st_kkpb_edp_accountKey')]"
-					},
-					"link_st_kkpb_edp_properties_typeProperties_url": {
-						"value": "[parameters('link_st_kkpb_edp_properties_typeProperties_url')]"
 					}
 				}
 			},

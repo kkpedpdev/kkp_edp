@@ -13,790 +13,6 @@
 	},
 	"resources": [
 		{
-			"name": "[concat(parameters('factoryName'), '/RIB_EXT_TABLE')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"description": " ",
-				"activities": [
-					{
-						"name": "Notebook1",
-						"type": "DatabricksNotebook",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 5,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"notebookPath": "/DEV/00_Common/edp/adf/dbn-gen-folder-rib"
-						},
-						"linkedServiceName": {
-							"referenceName": "link_dbw_edp",
-							"type": "LinkedServiceReference"
-						}
-					},
-					{
-						"name": "Lookup1",
-						"type": "Lookup",
-						"dependsOn": [
-							{
-								"activity": "Notebook1",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "DelimitedTextSource",
-								"storeSettings": {
-									"type": "AzureBlobFSReadSettings",
-									"recursive": true,
-									"enablePartitionDiscovery": false
-								},
-								"formatSettings": {
-									"type": "DelimitedTextReadSettings"
-								}
-							},
-							"dataset": {
-								"referenceName": "dl_work_ds",
-								"type": "DatasetReference",
-								"parameters": {
-									"P_FILEPATH": "TMP/RIBFOLDER",
-									"P_FILENAME": "ribFolders.txt"
-								}
-							},
-							"firstRowOnly": false
-						}
-					},
-					{
-						"name": "kkpmobile-req-for",
-						"type": "ForEach",
-						"dependsOn": [
-							{
-								"activity": "kkpmobile-request",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@activity('kkpmobile-request').output.value",
-								"type": "Expression"
-							},
-							"isSequential": false,
-							"batchCount": 50,
-							"activities": [
-								{
-									"name": "kkpmobile-req-db",
-									"type": "DatabricksNotebook",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "7.00:00:00",
-										"retry": 5,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"notebookPath": "/DEV/00_Common/edp/adf/dbn-gen-script-rib",
-										"baseParameters": {
-											"PARAMS": {
-												"value": "@concat(item().Prop_0,'^|',item().Prop_1,'^|',item().Prop_2)\n",
-												"type": "Expression"
-											}
-										}
-									},
-									"linkedServiceName": {
-										"referenceName": "link_dbw_edp",
-										"type": "LinkedServiceReference"
-									}
-								},
-								{
-									"name": "kkpmobile-req-sp",
-									"type": "SqlServerStoredProcedure",
-									"dependsOn": [
-										{
-											"activity": "kkpmobile-req-db",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										}
-									],
-									"policy": {
-										"timeout": "7.00:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"storedProcedureName": "[[dbo].[CREATE_EXTERNAL_TABLE]",
-										"storedProcedureParameters": {
-											"SQL": {
-												"value": {
-													"value": "@activity('kkpmobile-req-db').output.runOutput",
-													"type": "Expression"
-												},
-												"type": "String"
-											}
-										}
-									},
-									"linkedServiceName": {
-										"referenceName": "link_syn_kkpb_edp",
-										"type": "LinkedServiceReference"
-									}
-								}
-							]
-						}
-					},
-					{
-						"name": "Notebook2_copy1",
-						"type": "DatabricksNotebook",
-						"dependsOn": [
-							{
-								"activity": "Notebook1",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 5,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"notebookPath": "/DEV/00_Common/edp/adf/dbn-compare-folder-rib"
-						},
-						"linkedServiceName": {
-							"referenceName": "link_dbw_edp",
-							"type": "LinkedServiceReference"
-						}
-					},
-					{
-						"name": "SEND EMAIL",
-						"type": "WebActivity",
-						"dependsOn": [
-							{
-								"activity": "Notebook2_copy1",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"url": "https://prod-05.southeastasia.logic.azure.com:443/workflows/87cb500b80b74094a5bea5f149f3b45a/triggers/manual/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=U4UdfX5WK2SF1bQKwro9Wmujq8RKOiGaTvcvclI17pw",
-							"method": "POST",
-							"headers": {
-								"Content-Type": "application/json"
-							},
-							"body": {
-								"value": "@concat('{\"Message\": \"',activity('Notebook2_copy1').output.runOutput.RESULT_SET,'\",\"EmailTo\":\"pran.inteltion@gmail.com\",\n}')",
-								"type": "Expression"
-							}
-						}
-					},
-					{
-						"name": "kkpmobile-request",
-						"type": "Filter",
-						"dependsOn": [
-							{
-								"activity": "Lookup1",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@activity('Lookup1').output.value",
-								"type": "Expression"
-							},
-							"condition": {
-								"value": "@equals(item().Prop_0,'kkp-kkpmobile-tracking-request')",
-								"type": "Expression"
-							}
-						}
-					},
-					{
-						"name": "kkpmobile-res-for",
-						"type": "ForEach",
-						"dependsOn": [
-							{
-								"activity": "kkpmobile-response",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@activity('kkpmobile-response').output.value",
-								"type": "Expression"
-							},
-							"isSequential": false,
-							"batchCount": 50,
-							"activities": [
-								{
-									"name": "kkpmobile-res-db",
-									"type": "DatabricksNotebook",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "7.00:00:00",
-										"retry": 5,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"notebookPath": "/DEV/00_Common/edp/adf/dbn-gen-script-rib",
-										"baseParameters": {
-											"PARAMS": {
-												"value": "@concat(item().Prop_0,'^|',item().Prop_1,'^|',item().Prop_2)\n",
-												"type": "Expression"
-											}
-										}
-									},
-									"linkedServiceName": {
-										"referenceName": "link_dbw_edp",
-										"type": "LinkedServiceReference"
-									}
-								},
-								{
-									"name": "kkpmobile-res-sp",
-									"type": "SqlServerStoredProcedure",
-									"dependsOn": [
-										{
-											"activity": "kkpmobile-res-db",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										}
-									],
-									"policy": {
-										"timeout": "7.00:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"storedProcedureName": "[[dbo].[CREATE_EXTERNAL_TABLE]",
-										"storedProcedureParameters": {
-											"SQL": {
-												"value": {
-													"value": "@activity('kkpmobile-res-db').output.runOutput",
-													"type": "Expression"
-												},
-												"type": "String"
-											}
-										}
-									},
-									"linkedServiceName": {
-										"referenceName": "link_syn_kkpb_edp",
-										"type": "LinkedServiceReference"
-									}
-								}
-							]
-						}
-					},
-					{
-						"name": "kkpmobile-response",
-						"type": "Filter",
-						"dependsOn": [
-							{
-								"activity": "Lookup1",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@activity('Lookup1').output.value",
-								"type": "Expression"
-							},
-							"condition": {
-								"value": "@equals(item().Prop_0,'kkp-kkpmobile-tracking-response')",
-								"type": "Expression"
-							}
-						}
-					},
-					{
-						"name": "ribmobile-req",
-						"type": "ForEach",
-						"dependsOn": [
-							{
-								"activity": "ribmobile-request",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@activity('ribmobile-request').output.value",
-								"type": "Expression"
-							},
-							"isSequential": false,
-							"batchCount": 50,
-							"activities": [
-								{
-									"name": "ribmobile-req-db",
-									"type": "DatabricksNotebook",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "7.00:00:00",
-										"retry": 5,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"notebookPath": "/DEV/00_Common/edp/adf/dbn-gen-script-rib",
-										"baseParameters": {
-											"PARAMS": {
-												"value": "@concat(item().Prop_0,'^|',item().Prop_1,'^|',item().Prop_2)\n",
-												"type": "Expression"
-											}
-										}
-									},
-									"linkedServiceName": {
-										"referenceName": "link_dbw_edp",
-										"type": "LinkedServiceReference"
-									}
-								},
-								{
-									"name": "rib-mobile-req-sp",
-									"type": "SqlServerStoredProcedure",
-									"dependsOn": [
-										{
-											"activity": "ribmobile-req-db",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										}
-									],
-									"policy": {
-										"timeout": "7.00:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"storedProcedureName": "[[dbo].[CREATE_EXTERNAL_TABLE]",
-										"storedProcedureParameters": {
-											"SQL": {
-												"value": {
-													"value": "@activity('ribmobile-req-db').output.runOutput",
-													"type": "Expression"
-												},
-												"type": "String"
-											}
-										}
-									},
-									"linkedServiceName": {
-										"referenceName": "link_syn_kkpb_edp",
-										"type": "LinkedServiceReference"
-									}
-								}
-							]
-						}
-					},
-					{
-						"name": "ribmobile-request",
-						"type": "Filter",
-						"dependsOn": [
-							{
-								"activity": "Lookup1",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@activity('Lookup1').output.value",
-								"type": "Expression"
-							},
-							"condition": {
-								"value": "@equals(item().Prop_0,'kkp-ribmobile-tracking-request')",
-								"type": "Expression"
-							}
-						}
-					},
-					{
-						"name": "ribmobile-res",
-						"type": "ForEach",
-						"dependsOn": [
-							{
-								"activity": "ribmobile-response",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@activity('ribmobile-response').output.value",
-								"type": "Expression"
-							},
-							"isSequential": false,
-							"batchCount": 35,
-							"activities": [
-								{
-									"name": "ribmobile-res-db",
-									"type": "DatabricksNotebook",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "7.00:00:00",
-										"retry": 5,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"notebookPath": "/DEV/00_Common/edp/adf/dbn-gen-script-rib",
-										"baseParameters": {
-											"PARAMS": {
-												"value": "@concat(item().Prop_0,'^|',item().Prop_1,'^|',item().Prop_2)\n",
-												"type": "Expression"
-											}
-										}
-									},
-									"linkedServiceName": {
-										"referenceName": "link_dbw_edp",
-										"type": "LinkedServiceReference"
-									}
-								},
-								{
-									"name": "ribmobile-res-sp",
-									"type": "SqlServerStoredProcedure",
-									"dependsOn": [
-										{
-											"activity": "ribmobile-res-db",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										}
-									],
-									"policy": {
-										"timeout": "7.00:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"storedProcedureName": "[[dbo].[CREATE_EXTERNAL_TABLE]",
-										"storedProcedureParameters": {
-											"SQL": {
-												"value": {
-													"value": "@activity('ribmobile-res-db').output.runOutput",
-													"type": "Expression"
-												},
-												"type": "String"
-											}
-										}
-									},
-									"linkedServiceName": {
-										"referenceName": "link_syn_kkpb_edp",
-										"type": "LinkedServiceReference"
-									}
-								}
-							]
-						}
-					},
-					{
-						"name": "ribmobile-response",
-						"type": "Filter",
-						"dependsOn": [
-							{
-								"activity": "Lookup1",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@activity('Lookup1').output.value",
-								"type": "Expression"
-							},
-							"condition": {
-								"value": "@equals(item().Prop_0,'kkp-ribmobile-tracking-response')",
-								"type": "Expression"
-							}
-						}
-					},
-					{
-						"name": "ribpibweb-req",
-						"type": "ForEach",
-						"dependsOn": [
-							{
-								"activity": "ribpibweb-request",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@activity('ribpibweb-request').output.value",
-								"type": "Expression"
-							},
-							"isSequential": false,
-							"batchCount": 50,
-							"activities": [
-								{
-									"name": "ribpibweb-req-db",
-									"type": "DatabricksNotebook",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "7.00:00:00",
-										"retry": 5,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"notebookPath": "/DEV/00_Common/edp/adf/dbn-gen-script-rib",
-										"baseParameters": {
-											"PARAMS": {
-												"value": "@concat(item().Prop_0,'^|',item().Prop_1,'^|',item().Prop_2)\n",
-												"type": "Expression"
-											}
-										}
-									},
-									"linkedServiceName": {
-										"referenceName": "link_dbw_edp",
-										"type": "LinkedServiceReference"
-									}
-								},
-								{
-									"name": "ribpibweb-req-sp",
-									"type": "SqlServerStoredProcedure",
-									"dependsOn": [
-										{
-											"activity": "ribpibweb-req-db",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										}
-									],
-									"policy": {
-										"timeout": "7.00:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"storedProcedureName": "[[dbo].[CREATE_EXTERNAL_TABLE]",
-										"storedProcedureParameters": {
-											"SQL": {
-												"value": {
-													"value": "@activity('ribpibweb-req-db').output.runOutput",
-													"type": "Expression"
-												},
-												"type": "String"
-											}
-										}
-									},
-									"linkedServiceName": {
-										"referenceName": "link_syn_kkpb_edp",
-										"type": "LinkedServiceReference"
-									}
-								}
-							]
-						}
-					},
-					{
-						"name": "ribpibweb-request",
-						"type": "Filter",
-						"dependsOn": [
-							{
-								"activity": "Lookup1",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@activity('Lookup1').output.value",
-								"type": "Expression"
-							},
-							"condition": {
-								"value": "@equals(item().Prop_0,'kkp-ribpibweb-tracking-request')",
-								"type": "Expression"
-							}
-						}
-					},
-					{
-						"name": "ribpibweb-res",
-						"type": "ForEach",
-						"dependsOn": [
-							{
-								"activity": "ribpibweb-response",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@activity('ribpibweb-response').output.value",
-								"type": "Expression"
-							},
-							"isSequential": false,
-							"batchCount": 50,
-							"activities": [
-								{
-									"name": "ribpibweb-res-db",
-									"type": "DatabricksNotebook",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "7.00:00:00",
-										"retry": 5,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"notebookPath": "/DEV/00_Common/edp/adf/dbn-gen-script-rib",
-										"baseParameters": {
-											"PARAMS": {
-												"value": "@concat(item().Prop_0,'^|',item().Prop_1,'^|',item().Prop_2)\n",
-												"type": "Expression"
-											}
-										}
-									},
-									"linkedServiceName": {
-										"referenceName": "link_dbw_edp",
-										"type": "LinkedServiceReference"
-									}
-								},
-								{
-									"name": "ribpibweb-res-sp",
-									"type": "SqlServerStoredProcedure",
-									"dependsOn": [
-										{
-											"activity": "ribpibweb-res-db",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										}
-									],
-									"policy": {
-										"timeout": "7.00:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"storedProcedureName": "[[dbo].[CREATE_EXTERNAL_TABLE]",
-										"storedProcedureParameters": {
-											"SQL": {
-												"value": {
-													"value": "@activity('ribpibweb-res-db').output.runOutput",
-													"type": "Expression"
-												},
-												"type": "String"
-											}
-										}
-									},
-									"linkedServiceName": {
-										"referenceName": "link_syn_kkpb_edp",
-										"type": "LinkedServiceReference"
-									}
-								}
-							]
-						}
-					},
-					{
-						"name": "ribpibweb-response",
-						"type": "Filter",
-						"dependsOn": [
-							{
-								"activity": "Lookup1",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@activity('Lookup1').output.value",
-								"type": "Expression"
-							},
-							"condition": {
-								"value": "@equals(item().Prop_0,'kkp-ribpibweb-tracking-request')",
-								"type": "Expression"
-							}
-						}
-					}
-				],
-				"folder": {
-					"name": "UTILS"
-				},
-				"annotations": [],
-				"lastPublishTime": "2021-02-24T05:06:43Z"
-			},
-			"dependsOn": []
-		},
-		{
 			"name": "[concat(parameters('factoryName'), '/TEST SHAREPOINTS')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -3836,9 +3052,7 @@
 				"annotations": [],
 				"lastPublishTime": "2021-02-24T06:25:52Z"
 			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/pipelines/RIB_EXT_TABLE')]"
-			]
+			"dependsOn": []
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/30_PCS_COMMON_VALIDATE')]",
@@ -7108,6 +6322,436 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/pipelines/20_PCS_COMMON_START')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/00_STREAM_COMMON_bk')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": " ",
+				"activities": [
+					{
+						"name": "GET PROCESS GROUP LIST",
+						"type": "Lookup",
+						"dependsOn": [
+							{
+								"activity": "START STREAM",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "SqlServerSource",
+								"sqlReaderStoredProcedureName": {
+									"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA,'.PROC_GET_PRCS_GRP_BY_STREM')",
+									"type": "Expression"
+								},
+								"storedProcedureParameters": {
+									"P_STREM_NM": {
+										"type": "String",
+										"value": {
+											"value": "@pipeline().parameters.P_STREM_NM",
+											"type": "Expression"
+										}
+									}
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "mssql_cntl_ds",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "FOR EACH PROCESS GROUP",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "GET PROCESS GROUP LIST",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('GET PROCESS GROUP LIST').output.value",
+								"type": "Expression"
+							},
+							"isSequential": false,
+							"activities": [
+								{
+									"name": "Run Each Process Group",
+									"type": "ExecutePipeline",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "10_COMMON_RUN_PCS_GRP",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {
+											"P_PRCS_GRP": {
+												"value": "@item().PRCS_GRP",
+												"type": "Expression"
+											},
+											"P_RUN_MODE": {
+												"value": "@pipeline().parameters.P_RUN_MODE",
+												"type": "Expression"
+											},
+											"P_STREM_ID": {
+												"value": "@activity('START STREAM').output.FIRSTROW.STREM_ID",
+												"type": "Expression"
+											}
+										}
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "STREAM RESULT",
+						"type": "Lookup",
+						"dependsOn": [
+							{
+								"activity": "UPDATE STREAM",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "SqlServerSource",
+								"sqlReaderStoredProcedureName": {
+									"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA,'.PROC_STREM_RSLT')",
+									"type": "Expression"
+								},
+								"storedProcedureParameters": {
+									"P_STREM_NM": {
+										"type": "String",
+										"value": {
+											"value": "@pipeline().parameters.P_STREM_NM",
+											"type": "Expression"
+										}
+									},
+									"P_STREM_ID": {
+										"type": "String",
+										"value": {
+											"value": "@activity('START STREAM').output.FIRSTROW.STREM_ID",
+											"type": "Expression"
+										}
+									}
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "mssql_cntl_ds",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": true
+						}
+					},
+					{
+						"name": "FINAL STREAM",
+						"type": "Lookup",
+						"dependsOn": [
+							{
+								"activity": "FOR EACH PROCESS GROUP",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "SqlServerSource",
+								"sqlReaderStoredProcedureName": {
+									"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA,'.PROC_FINL_STREM')",
+									"type": "Expression"
+								},
+								"storedProcedureParameters": {
+									"P_DATA_DT": {
+										"type": "String",
+										"value": {
+											"value": "@activity('START STREAM').output.FIRSTROW.DATA_DT",
+											"type": "Expression"
+										}
+									},
+									"P_STREM_NM": {
+										"type": "String",
+										"value": {
+											"value": "@pipeline().parameters.P_STREM_NM",
+											"type": "Expression"
+										}
+									},
+									"P_STREM_ID": {
+										"type": "String",
+										"value": {
+											"value": "@activity('START STREAM').output.FIRSTROW.STREM_ID",
+											"type": "Expression"
+										}
+									}
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "mssql_cntl_ds",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						}
+					},
+					{
+						"name": "SEND EMAIL",
+						"type": "WebActivity",
+						"dependsOn": [
+							{
+								"activity": "GET EMAIL",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "STREAM RESULT",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"url": "https://prod-11.southeastasia.logic.azure.com:443/workflows/0c8fc5c0ef894032905ccf103cbe04a7/triggers/manual/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=agmp-_JAWWQboJJN9WzVGHrl7MuFv6UUDPuhdqhiqAM",
+							"method": "POST",
+							"headers": {
+								"Content-Type": "application/json"
+							},
+							"body": {
+								"value": "{\n\"Message\":\"@{activity('STREAM RESULT').output.firstrow.RESULT_SET}\",\n\"EmailTo\":\"@{activity('GET EMAIL').output.firstrow.EMAIL}\",\n\"Data_dt\":\"@{activity('FINAL STREAM').output.firstrow.DATA_DT_FORMAT}\",\n\"StreamName\":\"@{pipeline().parameters.P_STREM_NM}\"\n}",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "GET EMAIL",
+						"type": "Lookup",
+						"dependsOn": [
+							{
+								"activity": "FINAL STREAM",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "SqlServerSource",
+								"sqlReaderStoredProcedureName": {
+									"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA,'.PROC_GET_EMAIL')",
+									"type": "Expression"
+								},
+								"storedProcedureParameters": {
+									"P_STREM_NM": {
+										"type": "String",
+										"value": {
+											"value": "@pipeline().parameters.P_STREM_NM",
+											"type": "Expression"
+										}
+									},
+									"P_STREM_RSLT": {
+										"type": "String",
+										"value": {
+											"value": "@activity('FINAL STREAM').output.FIRSTROW.STREM_RSLT",
+											"type": "Expression"
+										}
+									}
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "mssql_cntl_ds",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": true
+						}
+					},
+					{
+						"name": "START STREAM",
+						"description": "           ",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "SqlServerSource",
+								"sqlReaderStoredProcedureName": {
+									"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA,'.PROC_STRT_STREM')",
+									"type": "Expression"
+								},
+								"storedProcedureParameters": {
+									"P_RUN_MODE": {
+										"type": "String",
+										"value": {
+											"value": "@pipeline().parameters.P_RUN_MODE",
+											"type": "Expression"
+										}
+									},
+									"P_STREM_NM": {
+										"type": "String",
+										"value": {
+											"value": "@pipeline().parameters.P_STREM_NM",
+											"type": "Expression"
+										}
+									}
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "mssql_cntl_ds",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						}
+					},
+					{
+						"name": "UPDATE STREAM",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "FINAL STREAM",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": {
+								"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA,'.PROC_UPDT_STREM')",
+								"type": "Expression"
+							},
+							"storedProcedureParameters": {
+								"P_STREM_NM": {
+									"value": {
+										"value": "@pipeline().parameters.P_STREM_NM",
+										"type": "Expression"
+									},
+									"type": "String"
+								},
+								"P_STREM_RSLT": {
+									"value": {
+										"value": "@activity('FINAL STREAM').output.firstrow.STREM_RSLT",
+										"type": "Expression"
+									},
+									"type": "String"
+								},
+								"P_STREM_ID": {
+									"value": {
+										"value": "@activity('START STREAM').output.FIRSTROW.STREM_ID",
+										"type": "Expression"
+									},
+									"type": "String"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "link_sqldb_kkpb_edp",
+							"type": "LinkedServiceReference"
+						}
+					}
+				],
+				"parameters": {
+					"P_STREM_NM": {
+						"type": "string",
+						"defaultValue": "EDP_SET"
+					},
+					"P_RUN_MODE": {
+						"type": "string",
+						"defaultValue": "R"
+					}
+				},
+				"variables": {
+					"V_STREAM_RESULT": {
+						"type": "String",
+						"defaultValue": "-999"
+					}
+				},
+				"folder": {
+					"name": "BK"
+				},
+				"annotations": [],
+				"lastPublishTime": "2021-02-24T05:06:51Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/10_COMMON_RUN_PCS_GRP')]"
 			]
 		}
 	]

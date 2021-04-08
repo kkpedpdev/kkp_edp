@@ -11,9 +11,6 @@
 		"link_adls_onprim_edp_accountKey": {
 			"value": ""
 		},
-		"link_blob_test_edp_connectionString": {
-			"value": ""
-		},
 		"link_dbw_edp_accessToken": {
 			"value": ""
 		},

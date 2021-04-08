@@ -2606,7 +2606,7 @@
 						},
 						"userProperties": [],
 						"typeProperties": {
-							"notebookPath": "/DEV/00_Common/edp/adf/dbn-adf-preprocessing",
+							"notebookPath": "/DEV/00_Common/edp/adf/dbn-adf-preprocessing-wildcard",
 							"baseParameters": {
 								"PARAMS": {
 									"value": "@activity('Lookup1').output.firstrow.PARM",

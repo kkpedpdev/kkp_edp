@@ -155,6 +155,10 @@
 						"PARAMS": {
 							"value": "@activity('Lookup1').output.firstrow.PARM",
 							"type": "Expression"
+						},
+						"ENV": {
+							"value": "@pipeline().globalParameters.P_GLBL_ENV",
+							"type": "Expression"
 						}
 					}
 				},

@@ -419,6 +419,10 @@
 						"PARAMS": {
 							"value": "@variables('P_PARAM')",
 							"type": "Expression"
+						},
+						"ENV": {
+							"value": "@pipeline().globalParameters.P_GLBL_ENV",
+							"type": "Expression"
 						}
 					}
 				},

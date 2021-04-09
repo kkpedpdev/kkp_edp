@@ -150,7 +150,10 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"notebookPath": "/DEV/00_Common/edp/adf/dbn-adf-preprocessing-wildcard",
+					"notebookPath": {
+						"value": "@concat('/', toUpper(pipeline().globalParameters.P_GLBL_ENV)  , '/00_Common/edp/adf/dbn-adf-preprocessing-wildcard')",
+						"type": "Expression"
+					},
 					"baseParameters": {
 						"PARAMS": {
 							"value": "@activity('Lookup1').output.firstrow.PARM",

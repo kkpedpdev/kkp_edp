@@ -24,7 +24,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"notebookPath": {
-						"value": "@pipeline().parameters.P_PRCS_OBJ.ADB_NM",
+						"value": "@concat('/', toUpper(pipeline().globalParameters.P_GLBL_ENV)  , pipeline().parameters.P_PRCS_OBJ.ADB_NM)",
 						"type": "Expression"
 					},
 					"baseParameters": {

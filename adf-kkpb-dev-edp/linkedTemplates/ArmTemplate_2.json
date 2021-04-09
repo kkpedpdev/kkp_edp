@@ -1169,7 +1169,7 @@
 						"userProperties": [],
 						"typeProperties": {
 							"notebookPath": {
-								"value": "@CONCAT(pipeline().globalParameters.P_GLBL_ADB_PATH, 'dbn-adf-preprocessing-wildcard')",
+								"value": "@concat('/', toUpper(pipeline().globalParameters.P_GLBL_ENV)  , '/00_Common/edp/adf/dbn-adf-preprocessing-wildcard')",
 								"type": "Expression"
 							},
 							"baseParameters": {
@@ -2610,7 +2610,10 @@
 						},
 						"userProperties": [],
 						"typeProperties": {
-							"notebookPath": "/DEV/00_Common/edp/adf/dbn-adf-preprocessing-wildcard",
+							"notebookPath": {
+								"value": "@concat('/', toUpper(pipeline().globalParameters.P_GLBL_ENV)  , '/00_Common/edp/adf/dbn-adf-preprocessing-wildcard')",
+								"type": "Expression"
+							},
 							"baseParameters": {
 								"PARAMS": {
 									"value": "@activity('Lookup1').output.firstrow.PARM",
@@ -4627,7 +4630,7 @@
 						"userProperties": [],
 						"typeProperties": {
 							"notebookPath": {
-								"value": "@pipeline().parameters.P_PRCS_OBJ.ADB_NM",
+								"value": "@concat('/', toUpper(pipeline().globalParameters.P_GLBL_ENV)  , pipeline().parameters.P_PRCS_OBJ.ADB_NM)",
 								"type": "Expression"
 							},
 							"baseParameters": {
@@ -4825,7 +4828,7 @@
 						"userProperties": [],
 						"typeProperties": {
 							"notebookPath": {
-								"value": "@pipeline().parameters.P_PRCS_OBJ.ADB_NM",
+								"value": "@concat('/', toUpper(pipeline().globalParameters.P_GLBL_ENV)  , pipeline().parameters.P_PRCS_OBJ.ADB_NM)",
 								"type": "Expression"
 							},
 							"baseParameters": {
@@ -5054,7 +5057,7 @@
 						"userProperties": [],
 						"typeProperties": {
 							"notebookPath": {
-								"value": "@pipeline().parameters.P_PRCS_OBJ.ADB_NM",
+								"value": "@concat('/', toUpper(pipeline().globalParameters.P_GLBL_ENV)  , pipeline().parameters.P_PRCS_OBJ.ADB_NM)",
 								"type": "Expression"
 							},
 							"baseParameters": {

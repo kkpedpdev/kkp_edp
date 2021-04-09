@@ -17,6 +17,6 @@
 	},
 	"P_GLBL_ENV": {
 		"type": "string",
-		"value": "DEV"
+		"value": "dev"
 	}
 }

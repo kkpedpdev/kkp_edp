@@ -30,7 +30,7 @@
 					},
 					"authentication": {
 						"type": "MSI",
-						"resource": "https://management.azure.com"
+						"resource": "https://management.core.windows.net/"
 					}
 				}
 			}

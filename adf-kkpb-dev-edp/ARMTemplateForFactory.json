@@ -7711,6 +7711,10 @@
 											"PARAMS": {
 												"value": "@pipeline().parameters.P_PRCS_OBJ.ADB_PARM",
 												"type": "Expression"
+											},
+											"ENV": {
+												"value": "@pipeline().globalParameters.P_GLBL_ENV",
+												"type": "Expression"
 											}
 										}
 									},
@@ -8583,6 +8587,10 @@
 							"baseParameters": {
 								"PARAMS": {
 									"value": "@variables('P_PARAM')",
+									"type": "Expression"
+								},
+								"ENV": {
+									"value": "@pipeline().globalParameters.P_GLBL_ENV",
 									"type": "Expression"
 								}
 							}
@@ -10218,6 +10226,10 @@
 							"baseParameters": {
 								"PARAMS": {
 									"value": "@activity('Lookup1').output.firstrow.PARM",
+									"type": "Expression"
+								},
+								"ENV": {
+									"value": "@pipeline().globalParameters.P_GLBL_ENV",
 									"type": "Expression"
 								}
 							}
@@ -12252,6 +12264,10 @@
 								"PARAMS": {
 									"value": "@pipeline().parameters.P_PRCS_OBJ.ADB_PARM",
 									"type": "Expression"
+								},
+								"ENV": {
+									"value": "@pipeline().globalParameters.P_GLBL_ENV",
+									"type": "Expression"
 								}
 							}
 						},
@@ -12316,6 +12332,10 @@
 							"baseParameters": {
 								"PARAMS": {
 									"value": "@pipeline().parameters.P_PRCS_OBJ.ADB_PARM",
+									"type": "Expression"
+								},
+								"ENV": {
+									"value": "@pipeline().globalParameters.P_GLBL_ENV",
 									"type": "Expression"
 								}
 							}
@@ -12569,6 +12589,10 @@
 							"baseParameters": {
 								"PARAMS": {
 									"value": "@pipeline().parameters.P_PRCS_OBJ.ADB_PARM",
+									"type": "Expression"
+								},
+								"ENV": {
+									"value": "@pipeline().globalParameters.P_GLBL_ENV",
 									"type": "Expression"
 								}
 							}
@@ -12883,6 +12907,10 @@
 							"baseParameters": {
 								"PARAMS": {
 									"value": "@pipeline().parameters.P_PRCS_OBJ.ADB_PARM",
+									"type": "Expression"
+								},
+								"ENV": {
+									"value": "@pipeline().globalParameters.P_GLBL_ENV",
 									"type": "Expression"
 								}
 							}
@@ -14495,17 +14523,20 @@
 						"userProperties": [],
 						"typeProperties": {
 							"url": "https://management.azure.com/subscriptions/f3ef3afd-9903-4759-a715-dcd5523f3bbe/resourceGroups/rg-kkpb-test-edp/providers/Microsoft.DataFactory/factories/adf-kkpb-dev-edp/pipelines/testAPI/createRun?api-version=2018-06-01",
+							"connectVia": {
+								"referenceName": "shir-kkpb-edp",
+								"type": "IntegrationRuntimeReference"
+							},
 							"method": "POST",
 							"headers": {
 								"Content-Type": "application/json"
 							},
 							"body": {
-								"lastUpdatedAfter": "2018-06-16T00:36:44.3345758Z",
-								"lastUpdatedBefore": "2018-06-16T00:49:48.3686473Z"
+								"myParam1": "bla bla"
 							},
 							"authentication": {
 								"type": "MSI",
-								"resource": "https://management.azure.com"
+								"resource": "https://management.core.windows.net/"
 							}
 						}
 					}
@@ -14538,7 +14569,9 @@
 				"annotations": [],
 				"lastPublishTime": "2021-02-24T10:43:36Z"
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/shir-kkpb-edp')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/RIB_EXT')]",

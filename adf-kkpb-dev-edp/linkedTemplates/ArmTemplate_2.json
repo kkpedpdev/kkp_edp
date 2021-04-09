@@ -1176,6 +1176,10 @@
 								"PARAMS": {
 									"value": "@variables('P_PARAM')",
 									"type": "Expression"
+								},
+								"ENV": {
+									"value": "@pipeline().globalParameters.P_GLBL_ENV",
+									"type": "Expression"
 								}
 							}
 						},
@@ -2610,6 +2614,10 @@
 							"baseParameters": {
 								"PARAMS": {
 									"value": "@activity('Lookup1').output.firstrow.PARM",
+									"type": "Expression"
+								},
+								"ENV": {
+									"value": "@pipeline().globalParameters.P_GLBL_ENV",
 									"type": "Expression"
 								}
 							}
@@ -4626,6 +4634,10 @@
 								"PARAMS": {
 									"value": "@pipeline().parameters.P_PRCS_OBJ.ADB_PARM",
 									"type": "Expression"
+								},
+								"ENV": {
+									"value": "@pipeline().globalParameters.P_GLBL_ENV",
+									"type": "Expression"
 								}
 							}
 						},
@@ -4819,6 +4831,10 @@
 							"baseParameters": {
 								"PARAMS": {
 									"value": "@pipeline().parameters.P_PRCS_OBJ.ADB_PARM",
+									"type": "Expression"
+								},
+								"ENV": {
+									"value": "@pipeline().globalParameters.P_GLBL_ENV",
 									"type": "Expression"
 								}
 							}
@@ -5044,6 +5060,10 @@
 							"baseParameters": {
 								"PARAMS": {
 									"value": "@pipeline().parameters.P_PRCS_OBJ.ADB_PARM",
+									"type": "Expression"
+								},
+								"ENV": {
+									"value": "@pipeline().globalParameters.P_GLBL_ENV",
 									"type": "Expression"
 								}
 							}

@@ -171,6 +171,10 @@
 											"PARAMS": {
 												"value": "@pipeline().parameters.P_PRCS_OBJ.ADB_PARM",
 												"type": "Expression"
+											},
+											"ENV": {
+												"value": "@pipeline().globalParameters.P_GLBL_ENV",
+												"type": "Expression"
 											}
 										}
 									},

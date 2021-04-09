@@ -1,0 +1,120 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "adf-kkpb-dev-edp"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/Oak_test2')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Web1",
+						"type": "WebActivity",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"url": "https://management.azure.com/subscriptions/f3ef3afd-9903-4759-a715-dcd5523f3bbe/resourceGroups/rg-kkpb-test-edp/providers/Microsoft.DataFactory/factories/adf-kkpb-dev-edp/pipelines/testAPI/createRun?api-version=2018-06-01",
+							"connectVia": {
+								"referenceName": "shir-kkpb-edp",
+								"type": "IntegrationRuntimeReference"
+							},
+							"method": "POST",
+							"headers": {
+								"Content-Type": "application/json",
+								"Authorization": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6Im5PbzNaRHJPRFhFSzFqS1doWHNsSFJfS1hFZyIsImtpZCI6Im5PbzNaRHJPRFhFSzFqS1doWHNsSFJfS1hFZyJ9.eyJhdWQiOiJodHRwczovL21hbmFnZW1lbnQuYXp1cmUuY29tIiwiaXNzIjoiaHR0cHM6Ly9zdHMud2luZG93cy5uZXQvOWZjZTAyODQtMWE4Yy00MzY4LTg1YjAtNTcxYmJhZDBkZjA4LyIsImlhdCI6MTYxNzk2NDc0OCwibmJmIjoxNjE3OTY0NzQ4LCJleHAiOjE2MTc5Njg2NDgsImFpbyI6IkUyWmdZTEQxbXM0eW4zblI2OW9Jc1hYekovRG9Bd0E9IiwiYXBwaWQiOiIwNjQ1MGQ4Mi1hNWViLTQ3MTItYjY3YS1iNjFjYjRhMmY3OTAiLCJhcHBpZGFjciI6IjEiLCJpZHAiOiJodHRwczovL3N0cy53aW5kb3dzLm5ldC85ZmNlMDI4NC0xYThjLTQzNjgtODViMC01NzFiYmFkMGRmMDgvIiwib2lkIjoiNDlmMzllM2ItNjg4OC00NmQ5LWE1OWUtN2Y1MjZhYWUzZTNjIiwicmgiOiIwLkFUNEFoQUxPbjR3YWFFT0ZzRmNidXREZkNJSU5SUWJycFJKSHRucTJITFNpOTVBLUFBQS4iLCJzdWIiOiI0OWYzOWUzYi02ODg4LTQ2ZDktYTU5ZS03ZjUyNmFhZTNlM2MiLCJ0aWQiOiI5ZmNlMDI4NC0xYThjLTQzNjgtODViMC01NzFiYmFkMGRmMDgiLCJ1dGkiOiJkc2tpcFJyQjIwYXUwdkJHWkt4SEFRIiwidmVyIjoiMS4wIiwieG1zX3RjZHQiOjE1NzI1MjkzMzl9.VTOgigF-f9ijAXD0Nwpvz52kdBxXPa2NB1U_FdXmhdSVCJuw1hLQW0IcX_8gbX8afgU5y6yS3bqqjxTGh9mrlzZB8cuD9C0aWxezns8ppswKCOi0PO1xgElqD-N622Kp3QsrJOV2w9JgOLOAU6y7YtfiIK-JiBUHqlQpAEOe5xkbnTf-1r0BGRV_G4YHofR0aHRs-Qx0jk5dambLEEncYTt8hdEd02ZCGYDH4Zg9Of4tI1h2t7v0wm3q9Rgo7t7OvziDr90dbgibA6Ny8yb9YhdL9yWGvwt7ZIatyoCBUOmkLhKlktG2jUQjfZYTdnmbLwWsUMgE5nY_3r-lZGJ_uA"
+							},
+							"body": {
+								"myParam1": "bla bla"
+							}
+						}
+					}
+				],
+				"variables": {
+					"subscriptionId": {
+						"type": "String",
+						"defaultValue": "39f31ac1-7170-4ce0-9582-ca6a8312bb55"
+					},
+					"resourceGroupName": {
+						"type": "String",
+						"defaultValue": "rg-kkpb-test-edp"
+					},
+					"factoryName": {
+						"type": "String",
+						"defaultValue": "adf-kkpb-dev-edp"
+					},
+					"pipelineName": {
+						"type": "String",
+						"defaultValue": "00_STREAM_COMMON"
+					},
+					"apiVersion": {
+						"type": "String",
+						"defaultValue": "2018-06-01"
+					}
+				},
+				"folder": {
+					"name": "TEST"
+				},
+				"annotations": [],
+				"lastPublishTime": "2021-02-24T10:43:36Z"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Hello1')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Lookup1",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": "SELECT  STREM_NM  FROM  CNTL.CNTL_CFG_STREM",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "mssql_cntl_ds",
+								"type": "DatasetReference"
+							}
+						}
+					}
+				],
+				"folder": {
+					"name": "TEST"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		}
+	]
+}

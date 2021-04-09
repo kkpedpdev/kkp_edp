@@ -1,0 +1,209 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "adf-kkpb-dev-edp"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/40_PCS_COMMON_TYPE1')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Load from external website to STG",
+				"activities": [
+					{
+						"name": "Azure Function1",
+						"description": "  ",
+						"type": "AzureFunctionActivity",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 2,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"functionName": {
+								"value": "@concat(toUpper(pipeline().globalParameters.P_GLBL_ENV),pipeline().parameters.P_PRCS_OBJ.FUNC_NM)",
+								"type": "Expression"
+							},
+							"method": "POST",
+							"body": {
+								"value": "@pipeline().parameters.P_PRCS_OBJ.FUNC_PARM",
+								"type": "Expression"
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "link_func_edp",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "EDW UPDATE COUNT TARGET",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "Azure Function1",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": {
+								"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA, '.[PROC_UPDT_PRCS]')",
+								"type": "Expression"
+							},
+							"storedProcedureParameters": {
+								"P_CNT_FI_SRC": {
+									"value": {
+										"value": "@activity('Azure Function1').output.NumberOfFiles",
+										"type": "Expression"
+									},
+									"type": "String"
+								},
+								"P_CNT_FI_TGT": {
+									"value": {
+										"value": "@activity('Azure Function1').output.NumberOfFiles",
+										"type": "Expression"
+									},
+									"type": "String"
+								},
+								"P_CNT_REC_SRC": {
+									"value": null,
+									"type": "String"
+								},
+								"P_CNT_REC_TGT": {
+									"value": null,
+									"type": "String"
+								},
+								"P_LD_ID": {
+									"value": {
+										"value": "@pipeline().parameters.P_LD_ID",
+										"type": "Expression"
+									},
+									"type": "String"
+								},
+								"P_PRCS_NM": {
+									"value": {
+										"value": "@pipeline().parameters.P_PRCS_NM",
+										"type": "Expression"
+									},
+									"type": "String"
+								},
+								"P_RMRK": {
+									"value": {
+										"value": "@if(and(equals(activity('Azure Function1').output.statusCode, 200),equals(activity('Azure Function1').output.NumberOfFiles,  0)),'File not found','')",
+										"type": "Expression"
+									},
+									"type": "String"
+								},
+								"P_ST": {
+									"value": "RUNNING",
+									"type": "String"
+								},
+								"P_CNT_REC_CNTL": {
+									"value": null,
+									"type": "String"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "link_sqldb_kkpb_edp",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "If Condition1",
+						"type": "IfCondition",
+						"dependsOn": [
+							{
+								"activity": "EDW UPDATE COUNT TARGET",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"expression": {
+								"value": "@not(equals(pipeline().parameters.P_PRCS_OBJ.ADB_NM,null))",
+								"type": "Expression"
+							},
+							"ifTrueActivities": [
+								{
+									"name": "Notebook1",
+									"type": "DatabricksNotebook",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 1,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"notebookPath": {
+											"value": "@concat(toUpper(pipeline().globalParameters.P_GLBL_ENV)  , pipeline().parameters.P_PRCS_OBJ.ADB_NM)",
+											"type": "Expression"
+										},
+										"baseParameters": {
+											"PARAMS": {
+												"value": "@pipeline().parameters.P_PRCS_OBJ.ADB_PARM",
+												"type": "Expression"
+											},
+											"ENV": {
+												"value": "@pipeline().globalParameters.P_GLBL_ENV",
+												"type": "Expression"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "link_dbw_edp",
+										"type": "LinkedServiceReference"
+									}
+								}
+							]
+						}
+					}
+				],
+				"parameters": {
+					"P_LD_ID": {
+						"type": "string"
+					},
+					"P_PRCS_NM": {
+						"type": "string"
+					},
+					"P_PRCS_OBJ": {
+						"type": "object"
+					}
+				},
+				"folder": {
+					"name": "COMMON JOB"
+				},
+				"annotations": [],
+				"lastPublishTime": "2021-02-24T06:46:02Z"
+			},
+			"dependsOn": []
+		}
+	]
+}

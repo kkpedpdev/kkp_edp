@@ -14,10 +14,6 @@
 				"type": "string",
 				"value": "https://accounts.accesscontrol.windows.net/9fce0284-1a8c-4368-85b0-571bbad0df08/tokens/OAuth/2"
 			},
-			"P_GLBL_ADB_PATH": {
-				"type": "string",
-				"value": "/DEV/00_Common/edp/adf/"
-			},
 			"P_GLBL_ENV": {
 				"type": "string",
 				"value": "dev"

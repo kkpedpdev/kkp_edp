@@ -1,0 +1,121 @@
+{
+	"name": "05_COMMON_RUN_PCS_GRP_BY_PRIR_DB",
+	"properties": {
+		"description": " ",
+		"activities": [
+			{
+				"name": "GET PROCESS GROUP LIST",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "SqlServerSource",
+						"sqlReaderStoredProcedureName": {
+							"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA,'.PROC_GET_PRCS_GRP_BY_STREM')",
+							"type": "Expression"
+						},
+						"storedProcedureParameters": {
+							"P_PRIR": {
+								"type": "String",
+								"value": {
+									"value": "@pipeline().parameters.P_PRIR",
+									"type": "Expression"
+								}
+							},
+							"P_STREM_NM": {
+								"type": "String",
+								"value": {
+									"value": "@pipeline().parameters.P_STREAM",
+									"type": "Expression"
+								}
+							}
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "mssql_cntl_ds",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "FOR EACH PROCESS GROUP",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "GET PROCESS GROUP LIST",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('GET PROCESS GROUP LIST').output.value",
+						"type": "Expression"
+					},
+					"isSequential": false,
+					"batchCount": 4,
+					"activities": [
+						{
+							"name": "Run Each Process Group",
+							"type": "ExecutePipeline",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"pipeline": {
+									"referenceName": "10_COMMON_RUN_PCS_GRP_DB",
+									"type": "PipelineReference"
+								},
+								"waitOnCompletion": true,
+								"parameters": {
+									"P_PRCS_GRP": {
+										"value": "@item().PRCS_GRP",
+										"type": "Expression"
+									},
+									"P_RUN_MODE": {
+										"value": "@pipeline().parameters.P_RUN_MODE",
+										"type": "Expression"
+									},
+									"P_STREM_ID": {
+										"value": "@pipeline().parameters.P_STREM_ID",
+										"type": "Expression"
+									}
+								}
+							}
+						}
+					]
+				}
+			}
+		],
+		"parameters": {
+			"P_STREAM": {
+				"type": "string"
+			},
+			"P_PRIR": {
+				"type": "string"
+			},
+			"P_RUN_MODE": {
+				"type": "string"
+			},
+			"P_STREM_ID": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "DEBUG"
+		},
+		"annotations": []
+	}
+}

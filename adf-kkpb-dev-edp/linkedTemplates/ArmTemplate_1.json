@@ -412,6 +412,33 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/adls_csv_ds_copy1')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "  ",
+				"linkedServiceName": {
+					"referenceName": "link_st_kkpb_edp",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "test.csv",
+						"folderPath": "test",
+						"fileSystem": "working"
+					},
+					"columnDelimiter": "^|",
+					"escapeChar": "\\",
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/bin_adls_ds')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -1082,57 +1109,6 @@
 						"type": "String"
 					}
 				]
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/dl_xlsx_ds')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "link_st_kkpb_edp",
-					"type": "LinkedServiceReference"
-				},
-				"parameters": {
-					"P_CONATINER": {
-						"type": "string"
-					},
-					"P_PATH": {
-						"type": "string"
-					},
-					"P_FILENAME": {
-						"type": "string"
-					},
-					"P_SHEET": {
-						"type": "string"
-					}
-				},
-				"annotations": [],
-				"type": "Excel",
-				"typeProperties": {
-					"sheetName": {
-						"value": "@dataset().P_SHEET",
-						"type": "Expression"
-					},
-					"location": {
-						"type": "AzureBlobFSLocation",
-						"fileName": {
-							"value": "@dataset().P_FILENAME",
-							"type": "Expression"
-						},
-						"folderPath": {
-							"value": "@dataset().P_PATH",
-							"type": "Expression"
-						},
-						"fileSystem": {
-							"value": "@dataset().P_CONATINER",
-							"type": "Expression"
-						}
-					},
-					"firstRowAsHeader": true
-				},
-				"schema": []
 			},
 			"dependsOn": []
 		}

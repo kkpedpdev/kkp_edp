@@ -1,0 +1,96 @@
+{
+	"name": "MAIN_BATCH_DEBUGGER",
+	"properties": {
+		"activities": [
+			{
+				"name": "EDP_SET",
+				"type": "ExecutePipeline",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "00_STREAM_COMMON_DB",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"P_STREM_NM": "EDP_SET",
+						"P_RUN_MODE": "N"
+					}
+				}
+			},
+			{
+				"name": "EDP_BANK",
+				"type": "ExecutePipeline",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "00_STREAM_COMMON_DB",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"P_STREM_NM": "EDP_BANK",
+						"P_RUN_MODE": "N"
+					}
+				}
+			},
+			{
+				"name": "EDP_DLT",
+				"type": "ExecutePipeline",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "00_STREAM_COMMON_DB",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"P_STREM_NM": "EDP_DLT",
+						"P_RUN_MODE": "N"
+					}
+				}
+			},
+			{
+				"name": "EDP_BOT",
+				"type": "ExecutePipeline",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "00_STREAM_COMMON_DB",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"P_STREM_NM": "EDP_BOT",
+						"P_RUN_MODE": "N"
+					}
+				}
+			},
+			{
+				"name": "EDP_TIDE",
+				"type": "ExecutePipeline",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "00_STREAM_COMMON_DB",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"P_STREM_NM": "EDP_TIDE",
+						"P_RUN_MODE": "N"
+					}
+				}
+			}
+		],
+		"folder": {
+			"name": "BATCH"
+		},
+		"annotations": []
+	}
+}

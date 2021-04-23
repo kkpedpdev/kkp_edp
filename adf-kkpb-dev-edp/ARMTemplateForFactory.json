@@ -10365,7 +10365,7 @@
 										"type": "Expression"
 									},
 									"P_PATH": {
-										"value": "@concat(pipeline().parameters.P_PRCS_OBJ.TGT_PTH)",
+										"value": "@concat(pipeline().parameters.P_PRCS_OBJ.TGT_PTH,'/', pipeline().parameters.P_PRCS_OBJ.TGT_TBL)",
 										"type": "Expression"
 									},
 									"P_FILENAME": {
@@ -17083,6 +17083,107 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/MAIN_BATCH_DEBUGGER')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "EDP_SET",
+						"type": "ExecutePipeline",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "00_STREAM_COMMON_DB",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"P_STREM_NM": "EDP_SET",
+								"P_RUN_MODE": "N"
+							}
+						}
+					},
+					{
+						"name": "EDP_BANK",
+						"type": "ExecutePipeline",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "00_STREAM_COMMON_DB",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"P_STREM_NM": "EDP_BANK",
+								"P_RUN_MODE": "N"
+							}
+						}
+					},
+					{
+						"name": "EDP_DLT",
+						"type": "ExecutePipeline",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "00_STREAM_COMMON_DB",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"P_STREM_NM": "EDP_DLT",
+								"P_RUN_MODE": "N"
+							}
+						}
+					},
+					{
+						"name": "EDP_BOT",
+						"type": "ExecutePipeline",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "00_STREAM_COMMON_DB",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"P_STREM_NM": "EDP_BOT",
+								"P_RUN_MODE": "N"
+							}
+						}
+					},
+					{
+						"name": "EDP_TIDE",
+						"type": "ExecutePipeline",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "00_STREAM_COMMON_DB",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"P_STREM_NM": "EDP_TIDE",
+								"P_RUN_MODE": "N"
+							}
+						}
+					}
+				],
+				"folder": {
+					"name": "BATCH"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/00_STREAM_COMMON_DB')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/Oak_test2')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -20085,6 +20186,36 @@
 				}
 			},
 			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/trigger1')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Started",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "MAIN_BATCH_DEBUGGER",
+							"type": "PipelineReference"
+						},
+						"parameters": {}
+					}
+				],
+				"type": "ScheduleTrigger",
+				"typeProperties": {
+					"recurrence": {
+						"frequency": "Day",
+						"interval": 1,
+						"startTime": "2021-04-24T02:15:00",
+						"timeZone": "SE Asia Standard Time"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/MAIN_BATCH_DEBUGGER')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/shir-kkpb-edp')]",

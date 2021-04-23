@@ -2844,7 +2844,7 @@
 							"waitOnCompletion": true,
 							"parameters": {
 								"P_STREM_NM": "EDP_SET",
-								"P_RUN_MODE": "N"
+								"P_RUN_MODE": "F"
 							}
 						}
 					},
@@ -2861,7 +2861,7 @@
 							"waitOnCompletion": true,
 							"parameters": {
 								"P_STREM_NM": "EDP_BANK",
-								"P_RUN_MODE": "N"
+								"P_RUN_MODE": "F"
 							}
 						}
 					},
@@ -2878,7 +2878,7 @@
 							"waitOnCompletion": true,
 							"parameters": {
 								"P_STREM_NM": "EDP_DLT",
-								"P_RUN_MODE": "N"
+								"P_RUN_MODE": "F"
 							}
 						}
 					},
@@ -2895,7 +2895,7 @@
 							"waitOnCompletion": true,
 							"parameters": {
 								"P_STREM_NM": "EDP_BOT",
-								"P_RUN_MODE": "N"
+								"P_RUN_MODE": "F"
 							}
 						}
 					},
@@ -2912,7 +2912,7 @@
 							"waitOnCompletion": true,
 							"parameters": {
 								"P_STREM_NM": "EDP_TIDE",
-								"P_RUN_MODE": "N"
+								"P_RUN_MODE": "F"
 							}
 						}
 					}

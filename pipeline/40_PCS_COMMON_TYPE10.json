@@ -219,7 +219,7 @@
 								"type": "Expression"
 							},
 							"P_PATH": {
-								"value": "@concat(pipeline().parameters.P_PRCS_OBJ.TGT_PTH)",
+								"value": "@concat(pipeline().parameters.P_PRCS_OBJ.TGT_PTH,'/', pipeline().parameters.P_PRCS_OBJ.TGT_TBL)",
 								"type": "Expression"
 							},
 							"P_FILENAME": {

@@ -1,7 +1,7 @@
 {
-	"name": "40_PCS_COMMON_TYPE10",
+	"name": "40_PCS_COMMON_TYPE12",
 	"properties": {
-		"description": "Copy excel from sharepoints to ref",
+		"description": "Copy text from sharepoints to staging with collection format",
 		"activities": [
 			{
 				"name": "Copy Raw",

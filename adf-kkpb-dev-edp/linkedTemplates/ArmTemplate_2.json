@@ -587,100 +587,6 @@
 						}
 					},
 					{
-						"name": "Copy STG",
-						"type": "Copy",
-						"dependsOn": [
-							{
-								"activity": "Lookup Schema",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							},
-							{
-								"activity": "Preprocessing",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "ExcelSource",
-								"storeSettings": {
-									"type": "AzureBlobFSReadSettings",
-									"recursive": true,
-									"enablePartitionDiscovery": false
-								}
-							},
-							"sink": {
-								"type": "ParquetSink",
-								"storeSettings": {
-									"type": "AzureBlobFSWriteSettings"
-								},
-								"formatSettings": {
-									"type": "ParquetWriteSettings"
-								}
-							},
-							"enableStaging": false,
-							"translator": {
-								"value": "@activity('Lookup Schema').output.firstRow",
-								"type": "Expression"
-							}
-						},
-						"inputs": [
-							{
-								"referenceName": "dl_xlsx_ds",
-								"type": "DatasetReference",
-								"parameters": {
-									"P_CONATINER": {
-										"value": "@activity('Lookup1').output.firstrow.CNTNR",
-										"type": "Expression"
-									},
-									"P_PATH": {
-										"value": "@concat(pipeline().parameters.P_PRCS_OBJ.PTH,'/')",
-										"type": "Expression"
-									},
-									"P_FILENAME": {
-										"value": "@activity('Lookup1').output.firstrow.FI_NM",
-										"type": "Expression"
-									},
-									"P_SHEET": {
-										"value": "@activity('Lookup1').output.firstrow.SHT_NM",
-										"type": "Expression"
-									}
-								}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "dl_parquet_ds",
-								"type": "DatasetReference",
-								"parameters": {
-									"P_CONTAINER": {
-										"value": "@pipeline().parameters.P_PRCS_OBJ.TGT_CNTNR",
-										"type": "Expression"
-									},
-									"P_PATH": {
-										"value": "@concat(pipeline().parameters.P_PRCS_OBJ.TGT_PTH)",
-										"type": "Expression"
-									},
-									"P_FILENAME": {
-										"value": "@activity('Lookup1').output.firstrow.FI_NM",
-										"type": "Expression"
-									}
-								}
-							}
-						]
-					},
-					{
 						"name": "Lookup Schema",
 						"type": "Lookup",
 						"dependsOn": [
@@ -721,86 +627,6 @@
 									}
 								}
 							}
-						}
-					},
-					{
-						"name": "Update Log Count",
-						"type": "SqlServerStoredProcedure",
-						"dependsOn": [
-							{
-								"activity": "Copy STG",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"storedProcedureName": {
-								"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA, '.[PROC_UPDT_PRCS]')",
-								"type": "Expression"
-							},
-							"storedProcedureParameters": {
-								"P_CNT_FI_SRC": {
-									"value": null,
-									"type": "String"
-								},
-								"P_CNT_FI_TGT": {
-									"value": null,
-									"type": "String"
-								},
-								"P_CNT_REC_SRC": {
-									"value": {
-										"value": "@activity('Copy STG').output.rowsRead",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"P_CNT_REC_TGT": {
-									"value": {
-										"value": "@activity('Copy STG').output.rowsCopied",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"P_LD_ID": {
-									"value": {
-										"value": "@pipeline().parameters.P_LD_ID",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"P_PRCS_NM": {
-									"value": {
-										"value": "@pipeline().parameters.P_PRCS_NM",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"P_RMRK": {
-									"value": "Complete Copy to Staging",
-									"type": "String"
-								},
-								"P_ST": {
-									"value": "Running",
-									"type": "String"
-								},
-								"P_CNT_REC_CNTL": {
-									"value": null,
-									"type": "String"
-								}
-							}
-						},
-						"linkedServiceName": {
-							"referenceName": "link_sqldb_kkpb_edp",
-							"type": "LinkedServiceReference"
 						}
 					},
 					{
@@ -866,6 +692,305 @@
 						"linkedServiceName": {
 							"referenceName": "link_dbw_edp",
 							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "If Condition1",
+						"type": "IfCondition",
+						"dependsOn": [
+							{
+								"activity": "Lookup Schema",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "Preprocessing",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"expression": {
+								"value": "@equals(activity('Preprocessing').output.runOutput.Status,'Success')",
+								"type": "Expression"
+							},
+							"ifFalseActivities": [
+								{
+									"name": "ABORT CHECK STREAM INFORMATION",
+									"type": "Lookup",
+									"dependsOn": [
+										{
+											"activity": "Update Fail Process",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "SqlServerSource",
+											"sqlReaderQuery": "SELECT 1/0",
+											"queryTimeout": "02:00:00",
+											"partitionOption": "None"
+										},
+										"dataset": {
+											"referenceName": "mssql_cntl_ds",
+											"type": "DatasetReference",
+											"parameters": {}
+										}
+									}
+								},
+								{
+									"name": "Update Fail Process",
+									"type": "SqlServerStoredProcedure",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"storedProcedureName": {
+											"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA, '.[PROC_UPDT_PRCS]')",
+											"type": "Expression"
+										},
+										"storedProcedureParameters": {
+											"P_CNT_FI_SRC": {
+												"value": null,
+												"type": "String"
+											},
+											"P_CNT_FI_TGT": {
+												"value": null,
+												"type": "String"
+											},
+											"P_CNT_REC_SRC": {
+												"value": {
+													"value": "@activity('Preprocessing').output.runOutput.ActualRecord",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"P_CNT_REC_TGT": {
+												"value": null,
+												"type": "String"
+											},
+											"P_LD_ID": {
+												"value": {
+													"value": "@pipeline().parameters.P_LD_ID",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"P_PRCS_NM": {
+												"value": {
+													"value": "@pipeline().parameters.P_PRCS_NM",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"P_RMRK": {
+												"value": {
+													"value": "@activity('Preprocessing').output.runOutput.Description",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"P_ST": {
+												"value": "Failed",
+												"type": "String"
+											},
+											"P_CNT_REC_CNTL": {
+												"value": {
+													"value": "@activity('Preprocessing').output.runOutput.ExpectedRecord",
+													"type": "Expression"
+												},
+												"type": "String"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "link_sqldb_kkpb_edp",
+										"type": "LinkedServiceReference"
+									}
+								}
+							],
+							"ifTrueActivities": [
+								{
+									"name": "Copy STG",
+									"type": "Copy",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "ExcelSource",
+											"storeSettings": {
+												"type": "AzureBlobFSReadSettings",
+												"recursive": true,
+												"enablePartitionDiscovery": false
+											}
+										},
+										"sink": {
+											"type": "ParquetSink",
+											"storeSettings": {
+												"type": "AzureBlobFSWriteSettings"
+											},
+											"formatSettings": {
+												"type": "ParquetWriteSettings"
+											}
+										},
+										"enableStaging": false,
+										"translator": {
+											"value": "@activity('Lookup Schema').output.firstRow",
+											"type": "Expression"
+										}
+									},
+									"inputs": [
+										{
+											"referenceName": "dl_xlsx_ds",
+											"type": "DatasetReference",
+											"parameters": {
+												"P_CONATINER": {
+													"value": "@activity('Lookup1').output.firstrow.CNTNR",
+													"type": "Expression"
+												},
+												"P_PATH": {
+													"value": "@concat(pipeline().parameters.P_PRCS_OBJ.PTH,'/')",
+													"type": "Expression"
+												},
+												"P_FILENAME": {
+													"value": "@activity('Lookup1').output.firstrow.FI_NM",
+													"type": "Expression"
+												},
+												"P_SHEET": {
+													"value": "@activity('Lookup1').output.firstrow.SHT_NM",
+													"type": "Expression"
+												}
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "dl_parquet_ds",
+											"type": "DatasetReference",
+											"parameters": {
+												"P_CONTAINER": {
+													"value": "@pipeline().parameters.P_PRCS_OBJ.TGT_CNTNR",
+													"type": "Expression"
+												},
+												"P_PATH": {
+													"value": "@concat(pipeline().parameters.P_PRCS_OBJ.TGT_PTH)",
+													"type": "Expression"
+												},
+												"P_FILENAME": {
+													"value": "@activity('Lookup1').output.firstrow.FI_NM",
+													"type": "Expression"
+												}
+											}
+										}
+									]
+								},
+								{
+									"name": "Update Log Count",
+									"type": "SqlServerStoredProcedure",
+									"dependsOn": [
+										{
+											"activity": "Copy STG",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"storedProcedureName": {
+											"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA, '.[PROC_UPDT_PRCS]')",
+											"type": "Expression"
+										},
+										"storedProcedureParameters": {
+											"P_CNT_FI_SRC": {
+												"value": null,
+												"type": "String"
+											},
+											"P_CNT_FI_TGT": {
+												"value": null,
+												"type": "String"
+											},
+											"P_CNT_REC_SRC": {
+												"value": {
+													"value": "@activity('Copy STG').output.rowsRead",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"P_CNT_REC_TGT": {
+												"value": {
+													"value": "@activity('Copy STG').output.rowsCopied",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"P_LD_ID": {
+												"value": {
+													"value": "@pipeline().parameters.P_LD_ID",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"P_PRCS_NM": {
+												"value": {
+													"value": "@pipeline().parameters.P_PRCS_NM",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"P_RMRK": {
+												"value": "Complete Copy to Staging",
+												"type": "String"
+											},
+											"P_ST": {
+												"value": "Running",
+												"type": "String"
+											},
+											"P_CNT_REC_CNTL": {
+												"value": null,
+												"type": "String"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "link_sqldb_kkpb_edp",
+										"type": "LinkedServiceReference"
+									}
+								}
+							]
 						}
 					}
 				],

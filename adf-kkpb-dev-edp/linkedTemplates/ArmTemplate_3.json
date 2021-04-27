@@ -5323,7 +5323,7 @@
 											"userProperties": [],
 											"typeProperties": {
 												"pipeline": {
-													"referenceName": "40_PCS_COMMON_TYPE10",
+													"referenceName": "40_PCS_COMMON_TYPE12",
 													"type": "PipelineReference"
 												},
 												"waitOnCompletion": true,
@@ -6684,7 +6684,7 @@
 											"userProperties": [],
 											"typeProperties": {
 												"pipeline": {
-													"referenceName": "40_PCS_COMMON_TYPE10",
+													"referenceName": "40_PCS_COMMON_TYPE12",
 													"type": "PipelineReference"
 												},
 												"waitOnCompletion": true,

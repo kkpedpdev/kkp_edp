@@ -1,5 +1,5 @@
 {
-	"name": "40_PCS_COMMON_TYPE10",
+	"name": "40_PCS_COMMON_TYPE10_copy1",
 	"properties": {
 		"description": "Copy excel from sharepoints to ref",
 		"activities": [
@@ -141,13 +141,13 @@
 				"type": "Copy",
 				"dependsOn": [
 					{
-						"activity": "Lookup Schema",
+						"activity": "Copy Raw",
 						"dependencyConditions": [
 							"Succeeded"
 						]
 					},
 					{
-						"activity": "Preprocessing",
+						"activity": "Lookup Schema",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -376,46 +376,6 @@
 						"Content-Type": "application/x-www-form-urlencoded"
 					},
 					"body": "grant_type=client_credentials&client_id=8578d84d-db28-449a-9c11-a8bae5465c04@9fce0284-1a8c-4368-85b0-571bbad0df08&client_secret=mVbWh~igL5kKkzFVXEg6BLOw86--_G4.cd&resource=00000003-0000-0ff1-ce00-000000000000/kiatnakin365.sharepoint.com@9fce0284-1a8c-4368-85b0-571bbad0df08"
-				}
-			},
-			{
-				"name": "Preprocessing",
-				"type": "DatabricksNotebook",
-				"dependsOn": [
-					{
-						"activity": "Copy Raw",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"timeout": "7.00:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"notebookPath": {
-						"value": "@concat('/', toUpper(pipeline().globalParameters.P_GLBL_ENV)  , '/00_Common/edp/adf/dbn-adf-pre-check')",
-						"type": "Expression"
-					},
-					"baseParameters": {
-						"PARAMS": {
-							"value": "@activity('Lookup1').output.firstrow.PARM",
-							"type": "Expression"
-						},
-						"ENV": {
-							"value": "@pipeline().globalParameters.P_GLBL_ENV",
-							"type": "Expression"
-						}
-					}
-				},
-				"linkedServiceName": {
-					"referenceName": "link_dbw_edp",
-					"type": "LinkedServiceReference"
 				}
 			}
 		],

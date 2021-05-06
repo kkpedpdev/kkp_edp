@@ -6059,6 +6059,25 @@
 											}
 										}
 									]
+								},
+								{
+									"value": "8",
+									"activities": [
+										{
+											"name": "40_PCS_COMMON_TYPE8",
+											"type": "ExecutePipeline",
+											"dependsOn": [],
+											"userProperties": [],
+											"typeProperties": {
+												"pipeline": {
+													"referenceName": "40_PCS_COMMON_TYPE8",
+													"type": "PipelineReference"
+												},
+												"waitOnCompletion": true,
+												"parameters": {}
+											}
+										}
+									]
 								}
 							]
 						}
@@ -6345,7 +6364,8 @@
 				"[concat(variables('factoryId'), '/pipelines/40_PCS_COMMON_TYPE9')]",
 				"[concat(variables('factoryId'), '/pipelines/40_PCS_COMMON_TYPE10')]",
 				"[concat(variables('factoryId'), '/pipelines/40_PCS_COMMON_TYPE11')]",
-				"[concat(variables('factoryId'), '/pipelines/40_PCS_COMMON_TYPE12')]"
+				"[concat(variables('factoryId'), '/pipelines/40_PCS_COMMON_TYPE12')]",
+				"[concat(variables('factoryId'), '/pipelines/40_PCS_COMMON_TYPE8')]"
 			]
 		},
 		{
@@ -20816,7 +20836,7 @@
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"annotations": [],
-				"runtimeState": "Started",
+				"runtimeState": "Stopped",
 				"pipelines": [
 					{
 						"pipelineReference": {

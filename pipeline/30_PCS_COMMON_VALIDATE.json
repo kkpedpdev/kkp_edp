@@ -1106,6 +1106,24 @@
 									}
 								}
 							]
+						},
+						{
+							"value": "8",
+							"activities": [
+								{
+									"name": "40_PCS_COMMON_TYPE8",
+									"type": "ExecutePipeline",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "40_PCS_COMMON_TYPE8",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true
+									}
+								}
+							]
 						}
 					]
 				}

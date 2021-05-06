@@ -6437,59 +6437,6 @@
 						]
 					},
 					{
-						"name": "Lookup1",
-						"description": "  ",
-						"type": "Lookup",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "SqlServerSource",
-								"sqlReaderStoredProcedureName": {
-									"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA, '.[PROC_GET_FI]')",
-									"type": "Expression"
-								},
-								"storedProcedureParameters": {
-									"P_DATA_DT": {
-										"type": "String",
-										"value": {
-											"value": "@pipeline().parameters.P_PRCS_OBJ.CALC_DATA_DT",
-											"type": "Expression"
-										}
-									},
-									"P_FI_ID": {
-										"type": "Int32",
-										"value": {
-											"value": "@pipeline().parameters.P_PRCS_OBJ.FI_ID",
-											"type": "Expression"
-										}
-									},
-									"P_PRCS_NM": {
-										"type": "String",
-										"value": {
-											"value": "@pipeline().parameters.P_PRCS_NM",
-											"type": "Expression"
-										}
-									}
-								},
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "mssql_cntl_ds",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						}
-					},
-					{
 						"name": "Copy STG",
 						"type": "Copy",
 						"dependsOn": [
@@ -6710,6 +6657,59 @@
 										"type": "Expression"
 									}
 								}
+							}
+						}
+					},
+					{
+						"name": "Lookup1",
+						"description": "  ",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "SqlServerSource",
+								"sqlReaderStoredProcedureName": {
+									"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA, '.[PROC_GET_FI]')",
+									"type": "Expression"
+								},
+								"storedProcedureParameters": {
+									"P_DATA_DT": {
+										"type": "String",
+										"value": {
+											"value": "@pipeline().parameters.P_PRCS_OBJ.CALC_DATA_DT",
+											"type": "Expression"
+										}
+									},
+									"P_FI_ID": {
+										"type": "Int32",
+										"value": {
+											"value": "@pipeline().parameters.P_PRCS_OBJ.FI_ID",
+											"type": "Expression"
+										}
+									},
+									"P_PRCS_NM": {
+										"type": "String",
+										"value": {
+											"value": "@pipeline().parameters.P_PRCS_NM",
+											"type": "Expression"
+										}
+									}
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "mssql_cntl_ds",
+								"type": "DatasetReference",
+								"parameters": {}
 							}
 						}
 					}

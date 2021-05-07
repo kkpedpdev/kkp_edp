@@ -228,7 +228,7 @@
 				"type": "Copy",
 				"dependsOn": [
 					{
-						"activity": "Delete1",
+						"activity": "Copy Raw",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -348,46 +348,6 @@
 					},
 					"formatSettings": {
 						"type": "BinaryReadSettings"
-					}
-				}
-			},
-			{
-				"name": "Delete1",
-				"type": "Delete",
-				"dependsOn": [
-					{
-						"activity": "Copy Raw",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"timeout": "7.00:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"dataset": {
-						"referenceName": "dl_bin_wc_ds2",
-						"type": "DatasetReference",
-						"parameters": {
-							"P_CONTAINER": "working",
-							"P_PATH": {
-								"value": "@concat('TMP/SOURCE/',pipeline().parameters.P_PRCS_NM)",
-								"type": "Expression"
-							}
-						}
-					},
-					"enableLogging": false,
-					"storeSettings": {
-						"type": "AzureBlobFSReadSettings",
-						"recursive": true,
-						"wildcardFileName": "*.*",
-						"enablePartitionDiscovery": false
 					}
 				}
 			},
@@ -835,6 +795,46 @@
 						"type": "Expression"
 					}
 				}
+			},
+			{
+				"name": "Delete1",
+				"type": "Delete",
+				"dependsOn": [
+					{
+						"activity": "Preprocessing",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataset": {
+						"referenceName": "dl_bin_wc_ds2",
+						"type": "DatasetReference",
+						"parameters": {
+							"P_CONTAINER": "working",
+							"P_PATH": {
+								"value": "@concat('TMP/SOURCE/',pipeline().parameters.P_PRCS_NM)",
+								"type": "Expression"
+							}
+						}
+					},
+					"enableLogging": false,
+					"storeSettings": {
+						"type": "AzureBlobFSReadSettings",
+						"recursive": true,
+						"wildcardFileName": "*.*",
+						"enablePartitionDiscovery": false
+					}
+				}
 			}
 		],
 		"parameters": {
@@ -865,7 +865,7 @@
 			"name": "COMMON JOB"
 		},
 		"annotations": [],
-		"lastPublishTime": "2021-02-24T06:46:02Z"
+		"lastPublishTime": "2021-04-28T08:29:34Z"
 	},
 	"type": "Microsoft.DataFactory/factories/pipelines"
 }

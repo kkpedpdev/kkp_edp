@@ -1451,7 +1451,7 @@
 													"type": "Expression"
 												},
 												"P_DELIMITER": {
-													"value": "@activity('Lookup1').output.firstrow.DLM_STRNG",
+													"value": "@IF(Equals(activity('Lookup1').output.firstrow.DLM_STRNG, '^|'), '\t', activity('Lookup1').output.firstrow.DLM_STRNG)",
 													"type": "Expression"
 												},
 												"P_ENCODING": {

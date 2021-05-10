@@ -885,7 +885,7 @@
 								"type": "BinarySource",
 								"storeSettings": {
 									"type": "FileServerReadSettings",
-									"recursive": true,
+									"recursive": false,
 									"wildcardFolderPath": {
 										"value": "@concat(pipeline().parameters.P_PRCS_OBJ.PTH, '/', pipeline().parameters.P_PRCS_OBJ.CALC_DATA_DT)",
 										"type": "Expression"

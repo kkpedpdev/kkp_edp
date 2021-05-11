@@ -418,7 +418,7 @@
 					"source": {
 						"type": "AzureSqlSource",
 						"sqlReaderQuery": {
-							"value": "@concat('SELECT MAX(PRIR) PRIR\nFROM [CNTL].[CNTL_CFG_PRCS_GRP]\nWHERE STREM_NM = ''', pipeline().parameters.P_STREM_NM, '''')",
+							"value": "@concat('SELECT COALESCE(MAX(PRIR),1) PRIR\nFROM ',pipeline().globalParameters.P_GLBL_CNTL_SCHEMA,'.[CNTL_CFG_PRCS_GRP]\nWHERE STREM_NM = ''', pipeline().parameters.P_STREM_NM, '''')",
 							"type": "Expression"
 						},
 						"queryTimeout": "02:00:00",

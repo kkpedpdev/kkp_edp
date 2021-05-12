@@ -1671,7 +1671,7 @@
 						"userProperties": [],
 						"typeProperties": {
 							"expression": {
-								"value": "@equals(variables('V_LOOP'),activity('Get Max Priority').output.firstrow.prir)",
+								"value": "@greaterOrEquals(int(variables('V_LOOP')),int(activity('Get Max Priority').output.firstrow.prir))",
 								"type": "Expression"
 							},
 							"activities": [

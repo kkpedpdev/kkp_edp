@@ -17,6 +17,10 @@
 			"P_GLBL_ENV": {
 				"type": "string",
 				"value": "dev"
+			},
+			"P_DPDN_WAIT_SEC": {
+				"type": "int",
+				"value": 300
 			}
 		}
 	},

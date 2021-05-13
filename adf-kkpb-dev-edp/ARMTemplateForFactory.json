@@ -17714,8 +17714,8 @@
 			"properties": {
 				"activities": [
 					{
-						"name": "Lookup1",
-						"type": "Lookup",
+						"name": "Web1",
+						"type": "WebActivity",
 						"dependsOn": [],
 						"policy": {
 							"timeout": "7.00:00:00",
@@ -17726,16 +17726,20 @@
 						},
 						"userProperties": [],
 						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderQuery": "SELECT  STREM_NM  FROM  CNTL.CNTL_CFG_STREM",
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
+							"url": "https://management.azure.com/subscriptions/f3ef3afd-9903-4759-a715-dcd5523f3bbe/resourceGroups/rg-kkpb-test-edp/providers/Microsoft.DataFactory/factories/adf-kkpb-dev-edp/pipelines/00_STREAM_COMMON/createRun?api-version=2018-06-01",
+							"connectVia": {
+								"referenceName": "shir-kkpb-edp",
+								"type": "IntegrationRuntimeReference"
 							},
-							"dataset": {
-								"referenceName": "mssql_cntl_ds",
-								"type": "DatasetReference",
-								"parameters": {}
+							"method": "POST",
+							"headers": {},
+							"body": {
+								"value": "@json('{}')",
+								"type": "Expression"
+							},
+							"authentication": {
+								"type": "MSI",
+								"resource": "https://management.azure.com"
 							}
 						}
 					}
@@ -17746,7 +17750,7 @@
 				"annotations": []
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/mssql_cntl_ds')]"
+				"[concat(variables('factoryId'), '/integrationRuntimes/shir-kkpb-edp')]"
 			]
 		},
 		{

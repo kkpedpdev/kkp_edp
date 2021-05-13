@@ -5962,7 +5962,7 @@
 									"userProperties": [],
 									"typeProperties": {
 										"expression": {
-											"value": "@greater(Int(variables('V_LOOP')),3600)",
+											"value": "@greater(Int(variables('V_LOOP')),pipeline().globalParameters.P_DPDN_WAIT_SEC)",
 											"type": "Expression"
 										},
 										"ifTrueActivities": [

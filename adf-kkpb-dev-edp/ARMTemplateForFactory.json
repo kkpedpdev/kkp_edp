@@ -5064,6 +5064,13 @@
 									"type": "Expression"
 								},
 								"storedProcedureParameters": {
+									"P_LD_ID": {
+										"type": "String",
+										"value": {
+											"value": "@pipeline().parameters.P_LD_ID",
+											"type": "Expression"
+										}
+									},
 									"P_PRCS_NM": {
 										"type": "String",
 										"value": {

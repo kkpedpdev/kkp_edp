@@ -6,554 +6,12 @@
 			"type": "string",
 			"metadata": "Data Factory name",
 			"defaultValue": "adf-kkpb-dev-edp"
-		},
-		"link_st_kkpb_edp_accountKey": {
-			"type": "secureString",
-			"metadata": "Secure string for 'accountKey' of 'link_st_kkpb_edp'"
-		},
-		"link_st_kkpb_edp_properties_typeProperties_url": {
-			"type": "string",
-			"defaultValue": "https://stkkpbdevedp.dfs.core.windows.net"
 		}
 	},
 	"variables": {
 		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
 	},
 	"resources": [
-		{
-			"name": "[concat(parameters('factoryName'), '/link_st_kkpb_edp')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"description": " ",
-				"annotations": [],
-				"type": "AzureBlobFS",
-				"typeProperties": {
-					"url": "[parameters('link_st_kkpb_edp_properties_typeProperties_url')]",
-					"accountKey": {
-						"type": "SecureString",
-						"value": "[parameters('link_st_kkpb_edp_accountKey')]"
-					}
-				},
-				"connectVia": {
-					"referenceName": "shir-kkpb-edp",
-					"type": "IntegrationRuntimeReference"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/40_PCS_COMMON_TYPE1')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"description": "Load from external website to STG",
-				"activities": [
-					{
-						"name": "Azure Function1",
-						"description": "  ",
-						"type": "AzureFunctionActivity",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 2,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"functionName": {
-								"value": "@concat(toUpper(pipeline().globalParameters.P_GLBL_ENV),pipeline().parameters.P_PRCS_OBJ.FUNC_NM)",
-								"type": "Expression"
-							},
-							"method": "POST",
-							"headers": {},
-							"body": {
-								"value": "@pipeline().parameters.P_PRCS_OBJ.FUNC_PARM",
-								"type": "Expression"
-							}
-						},
-						"linkedServiceName": {
-							"referenceName": "link_func_edp",
-							"type": "LinkedServiceReference"
-						}
-					},
-					{
-						"name": "EDW UPDATE COUNT TARGET",
-						"type": "SqlServerStoredProcedure",
-						"dependsOn": [
-							{
-								"activity": "Azure Function1",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"storedProcedureName": {
-								"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA, '.[PROC_UPDT_PRCS]')",
-								"type": "Expression"
-							},
-							"storedProcedureParameters": {
-								"P_CNT_FI_SRC": {
-									"value": {
-										"value": "@activity('Azure Function1').output.NumberOfFiles",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"P_CNT_FI_TGT": {
-									"value": {
-										"value": "@activity('Azure Function1').output.NumberOfFiles",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"P_CNT_REC_SRC": {
-									"value": null,
-									"type": "String"
-								},
-								"P_CNT_REC_TGT": {
-									"value": null,
-									"type": "String"
-								},
-								"P_LD_ID": {
-									"value": {
-										"value": "@pipeline().parameters.P_LD_ID",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"P_PRCS_NM": {
-									"value": {
-										"value": "@pipeline().parameters.P_PRCS_NM",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"P_RMRK": {
-									"value": {
-										"value": "@if(and(equals(activity('Azure Function1').output.statusCode, 200),equals(activity('Azure Function1').output.NumberOfFiles,  0)),'File not found','')",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"P_ST": {
-									"value": "RUNNING",
-									"type": "String"
-								},
-								"P_CNT_REC_CNTL": {
-									"value": null,
-									"type": "String"
-								}
-							}
-						},
-						"linkedServiceName": {
-							"referenceName": "link_sqldb_kkpb_edp",
-							"type": "LinkedServiceReference"
-						}
-					},
-					{
-						"name": "If Condition1",
-						"type": "IfCondition",
-						"dependsOn": [
-							{
-								"activity": "EDW UPDATE COUNT TARGET",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"expression": {
-								"value": "@not(equals(pipeline().parameters.P_PRCS_OBJ.ADB_NM,null))",
-								"type": "Expression"
-							},
-							"ifTrueActivities": [
-								{
-									"name": "Notebook1",
-									"type": "DatabricksNotebook",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "7.00:00:00",
-										"retry": 1,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"notebookPath": {
-											"value": "@concat('/',toUpper(pipeline().globalParameters.P_GLBL_ENV)  , pipeline().parameters.P_PRCS_OBJ.ADB_NM)",
-											"type": "Expression"
-										},
-										"baseParameters": {
-											"PARAMS": {
-												"value": "@pipeline().parameters.P_PRCS_OBJ.ADB_PARM",
-												"type": "Expression"
-											},
-											"ENV": {
-												"value": "@pipeline().globalParameters.P_GLBL_ENV",
-												"type": "Expression"
-											}
-										}
-									},
-									"linkedServiceName": {
-										"referenceName": "link_dbw_edp",
-										"type": "LinkedServiceReference"
-									}
-								}
-							]
-						}
-					}
-				],
-				"parameters": {
-					"P_LD_ID": {
-						"type": "string"
-					},
-					"P_PRCS_NM": {
-						"type": "string"
-					},
-					"P_PRCS_OBJ": {
-						"type": "object"
-					}
-				},
-				"folder": {
-					"name": "COMMON JOB"
-				},
-				"annotations": [],
-				"lastPublishTime": "2021-02-24T06:46:02Z"
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/40_PCS_COMMON_TYPE1_DB')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"description": "Load from external website to STG",
-				"activities": [
-					{
-						"name": "Azure Function1",
-						"description": "  ",
-						"type": "AzureFunctionActivity",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 2,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"functionName": {
-								"value": "@concat(toUpper(pipeline().globalParameters.P_GLBL_ENV),pipeline().parameters.P_PRCS_OBJ.FUNC_NM)",
-								"type": "Expression"
-							},
-							"method": "POST",
-							"headers": {},
-							"body": {
-								"value": "@pipeline().parameters.P_PRCS_OBJ.FUNC_PARM",
-								"type": "Expression"
-							}
-						},
-						"linkedServiceName": {
-							"referenceName": "link_func_edp",
-							"type": "LinkedServiceReference"
-						}
-					},
-					{
-						"name": "EDW UPDATE COUNT TARGET",
-						"type": "SqlServerStoredProcedure",
-						"dependsOn": [
-							{
-								"activity": "Azure Function1",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"storedProcedureName": {
-								"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA, '.[PROC_UPDT_PRCS]')",
-								"type": "Expression"
-							},
-							"storedProcedureParameters": {
-								"P_CNT_FI_SRC": {
-									"value": {
-										"value": "@activity('Azure Function1').output.NumberOfFiles",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"P_CNT_FI_TGT": {
-									"value": {
-										"value": "@activity('Azure Function1').output.NumberOfFiles",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"P_CNT_REC_SRC": {
-									"value": null,
-									"type": "String"
-								},
-								"P_CNT_REC_TGT": {
-									"value": null,
-									"type": "String"
-								},
-								"P_LD_ID": {
-									"value": {
-										"value": "@pipeline().parameters.P_LD_ID",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"P_PRCS_NM": {
-									"value": {
-										"value": "@pipeline().parameters.P_PRCS_NM",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"P_RMRK": {
-									"value": {
-										"value": "@if(and(equals(activity('Azure Function1').output.statusCode, 200),equals(activity('Azure Function1').output.NumberOfFiles,  0)),'File not found','')",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"P_ST": {
-									"value": "RUNNING",
-									"type": "String"
-								},
-								"P_CNT_REC_CNTL": {
-									"value": null,
-									"type": "String"
-								}
-							}
-						},
-						"linkedServiceName": {
-							"referenceName": "link_sqldb_kkpb_edp",
-							"type": "LinkedServiceReference"
-						}
-					}
-				],
-				"parameters": {
-					"P_LD_ID": {
-						"type": "string"
-					},
-					"P_PRCS_NM": {
-						"type": "string"
-					},
-					"P_PRCS_OBJ": {
-						"type": "object"
-					}
-				},
-				"folder": {
-					"name": "DEBUG"
-				},
-				"annotations": [],
-				"lastPublishTime": "2021-02-24T06:46:02Z"
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/40_PCS_COMMON_TYPE1_copy1')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Azure Function1",
-						"type": "AzureFunctionActivity",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"functionName": {
-								"value": "@pipeline().parameters.P_PCS_OBJ.FUNC_NM",
-								"type": "Expression"
-							},
-							"method": "POST",
-							"headers": {},
-							"body": {
-								"value": "@pipeline().parameters.P_PCS_OBJ.FUNC_PARAMS",
-								"type": "Expression"
-							}
-						},
-						"linkedServiceName": {
-							"referenceName": "link_func_edp",
-							"type": "LinkedServiceReference"
-						}
-					},
-					{
-						"name": "EDW UPDATE COUNT TARGET",
-						"type": "SqlServerStoredProcedure",
-						"dependsOn": [
-							{
-								"activity": "Azure Function1",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"storedProcedureName": "[[CNTL].[PROC_UDT_PCS]",
-							"storedProcedureParameters": {
-								"P_CNT_FI_SRC": {
-									"value": {
-										"value": "@activity('Azure Function1').output.NumberOfFiles",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"P_CNT_FI_TGT": {
-									"value": {
-										"value": "@activity('Azure Function1').output.NumberOfFiles",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"P_CNT_REC_SRC": {
-									"value": null,
-									"type": "String"
-								},
-								"P_CNT_REC_TGT": {
-									"value": null,
-									"type": "String"
-								},
-								"P_LOAD_ID": {
-									"value": {
-										"value": "@pipeline().parameters.P_LOAD_ID",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"P_PCS_NM": {
-									"value": {
-										"value": "@pipeline().parameters.P_PCS_NM",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"P_RMRK": {
-									"value": "",
-									"type": "String"
-								},
-								"P_ST": {
-									"value": "RUNNING",
-									"type": "String"
-								}
-							}
-						},
-						"linkedServiceName": {
-							"referenceName": "link_sqldb_kkpb_edp",
-							"type": "LinkedServiceReference"
-						}
-					},
-					{
-						"name": "If Condition1",
-						"type": "IfCondition",
-						"dependsOn": [
-							{
-								"activity": "EDW UPDATE COUNT TARGET",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"expression": {
-								"value": "@not(equals(pipeline().parameters.P_PCS_OBJ.ADB_NM,null))",
-								"type": "Expression"
-							},
-							"ifTrueActivities": [
-								{
-									"name": "Notebook1",
-									"type": "DatabricksNotebook",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "7.00:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"notebookPath": {
-											"value": "@pipeline().parameters.P_PCS_OBJ.ADB_NM",
-											"type": "Expression"
-										},
-										"baseParameters": {
-											"PARAMS": {
-												"value": "@pipeline().parameters.P_PCS_OBJ.ADB_PARAMS",
-												"type": "Expression"
-											}
-										}
-									},
-									"linkedServiceName": {
-										"referenceName": "link_dbw_edp",
-										"type": "LinkedServiceReference"
-									}
-								}
-							]
-						}
-					}
-				],
-				"parameters": {
-					"P_LOAD_ID": {
-						"type": "string"
-					},
-					"P_PCS_NM": {
-						"type": "string"
-					},
-					"P_PCS_OBJ": {
-						"type": "object"
-					}
-				},
-				"folder": {
-					"name": "BK"
-				},
-				"annotations": [],
-				"lastPublishTime": "2021-02-24T05:06:42Z"
-			},
-			"dependsOn": []
-		},
 		{
 			"name": "[concat(parameters('factoryName'), '/adls_csv_ds')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
@@ -579,9 +37,7 @@
 				},
 				"schema": []
 			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/link_st_kkpb_edp')]"
-			]
+			"dependsOn": []
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/adls_csv_ds_copy1')]",
@@ -608,9 +64,7 @@
 				},
 				"schema": []
 			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/link_st_kkpb_edp')]"
-			]
+			"dependsOn": []
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/bin_adls_ds')]",
@@ -653,9 +107,7 @@
 					}
 				}
 			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/link_st_kkpb_edp')]"
-			]
+			"dependsOn": []
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/bin_blob_ds')]",
@@ -971,9 +423,7 @@
 					}
 				}
 			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/link_st_kkpb_edp')]"
-			]
+			"dependsOn": []
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/dl_csv_ds')]",
@@ -1040,9 +490,7 @@
 				},
 				"schema": []
 			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/link_st_kkpb_edp')]"
-			]
+			"dependsOn": []
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/dl_csv_ds_test')]",
@@ -1090,9 +538,7 @@
 				},
 				"schema": []
 			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/link_st_kkpb_edp')]"
-			]
+			"dependsOn": []
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/dl_json_ds')]",
@@ -1158,9 +604,7 @@
 					}
 				}
 			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/link_st_kkpb_edp')]"
-			]
+			"dependsOn": []
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/dl_parquet_ds')]",
@@ -1201,9 +645,168 @@
 				},
 				"schema": []
 			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/link_st_kkpb_edp')]"
-			]
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/dl_sql_ds')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "  ",
+				"linkedServiceName": {
+					"referenceName": "link_st_kkpb_edp",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"P_FILEPATH": {
+						"type": "string"
+					},
+					"P_FILENAME": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": {
+							"value": "@dataset().P_FILENAME",
+							"type": "Expression"
+						},
+						"folderPath": {
+							"value": "@dataset().P_FILEPATH",
+							"type": "Expression"
+						},
+						"fileSystem": "working"
+					},
+					"columnDelimiter": "#",
+					"rowDelimiter": "#",
+					"escapeChar": "#",
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/dl_work_ds')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "  ",
+				"linkedServiceName": {
+					"referenceName": "link_st_kkpb_edp",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"P_FILEPATH": {
+						"type": "string"
+					},
+					"P_FILENAME": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": {
+							"value": "@dataset().P_FILENAME",
+							"type": "Expression"
+						},
+						"folderPath": {
+							"value": "@dataset().P_FILEPATH",
+							"type": "Expression"
+						},
+						"fileSystem": "working"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/dl_xlsx_ds')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "link_st_kkpb_edp",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"P_CONATINER": {
+						"type": "string"
+					},
+					"P_PATH": {
+						"type": "string"
+					},
+					"P_FILENAME": {
+						"type": "string"
+					},
+					"P_SHEET": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "Excel",
+				"typeProperties": {
+					"sheetName": {
+						"value": "@dataset().P_SHEET",
+						"type": "Expression"
+					},
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": {
+							"value": "@dataset().P_FILENAME",
+							"type": "Expression"
+						},
+						"folderPath": {
+							"value": "@dataset().P_PATH",
+							"type": "Expression"
+						},
+						"fileSystem": {
+							"value": "@dataset().P_CONATINER",
+							"type": "Expression"
+						}
+					},
+					"firstRowAsHeader": true
+				},
+				"schema": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/mssql_cntl_ds')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "  ",
+				"linkedServiceName": {
+					"referenceName": "link_sqldb_kkpb_edp",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {}
+			},
+			"dependsOn": []
 		}
 	]
 }

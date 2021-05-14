@@ -9,7 +9,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"pipeline": {
-						"referenceName": "00_STREAM_COMMON_2_bk",
+						"referenceName": "00_STREAM_COMMON",
 						"type": "PipelineReference"
 					},
 					"waitOnCompletion": true,
@@ -33,7 +33,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"pipeline": {
-						"referenceName": "00_STREAM_COMMON_2_bk",
+						"referenceName": "00_STREAM_COMMON",
 						"type": "PipelineReference"
 					},
 					"waitOnCompletion": true,

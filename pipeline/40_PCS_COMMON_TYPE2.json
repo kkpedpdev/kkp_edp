@@ -388,6 +388,7 @@
 									}
 								},
 								"enableStaging": false,
+								"enableSkipIncompatibleRow": true,
 								"logSettings": {
 									"enableCopyActivityLog": true,
 									"copyActivityLogSettings": {

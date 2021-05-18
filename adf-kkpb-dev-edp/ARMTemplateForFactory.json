@@ -599,7 +599,7 @@
 									"type": "String"
 								},
 								"P_STREM_RSLT": {
-									"value": "FAIL",
+									"value": "FAILED",
 									"type": "String"
 								},
 								"P_STREM_ID": {
@@ -11572,8 +11572,8 @@
 									{
 										"source": {
 											"name": "DATA_DT",
-											"type": "Double",
-											"format": "MM/dd/yyyy hh:mm:ss"
+											"type": "DateTime",
+											"format": "yyyyMMdd"
 										},
 										"sink": {
 											"name": "DATA_DT",

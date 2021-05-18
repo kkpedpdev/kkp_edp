@@ -52,8 +52,8 @@
 							{
 								"source": {
 									"name": "DATA_DT",
-									"type": "Double",
-									"format": "MM/dd/yyyy hh:mm:ss"
+									"type": "DateTime",
+									"format": "yyyyMMdd"
 								},
 								"sink": {
 									"name": "DATA_DT",
@@ -82,6 +82,98 @@
 							"P_PATH": "TMP/SOURCE/",
 							"P_FILENAME": "TEST.txt",
 							"P_CONTAINER": "working"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "dl_parquet_ds",
+						"type": "DatasetReference",
+						"parameters": {
+							"P_CONTAINER": "working",
+							"P_PATH": "TMP/SOURCE/",
+							"P_FILENAME": "TEST.parquet"
+						}
+					}
+				]
+			},
+			{
+				"name": "Copy STG_copy1",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "ParquetSource",
+						"storeSettings": {
+							"type": "AzureBlobFSReadSettings",
+							"recursive": true,
+							"enablePartitionDiscovery": false
+						}
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"name": "RECORD_INDICATOR",
+									"type": "String"
+								},
+								"sink": {
+									"name": "RECORD_INDICATOR",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "DATA_DT",
+									"type": "DateTime",
+									"format": "yyyyMMdd"
+								},
+								"sink": {
+									"name": "DATA_DT",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "DATA_DT2",
+									"type": "DateTime",
+									"format": "yyyyMMdd"
+								},
+								"sink": {
+									"name": "DATA_DT2",
+									"type": "String"
+								}
+							}
+						]
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "dl_parquet_ds",
+						"type": "DatasetReference",
+						"parameters": {
+							"P_CONTAINER": "working",
+							"P_PATH": "TMP/SOURCE/",
+							"P_FILENAME": "TEST.parquet"
 						}
 					}
 				],

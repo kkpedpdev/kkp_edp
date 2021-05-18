@@ -509,7 +509,7 @@
 							"type": "String"
 						},
 						"P_STREM_RSLT": {
-							"value": "FAIL",
+							"value": "FAILED",
 							"type": "String"
 						},
 						"P_STREM_ID": {

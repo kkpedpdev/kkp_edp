@@ -481,12 +481,12 @@
 						"value": "@dataset().P_ENCODING",
 						"type": "Expression"
 					},
-					"escapeChar": "",
+					"escapeChar": "\\",
 					"firstRowAsHeader": {
 						"value": "@if(EQUALS(dataset().P_FIRSTROW_HDR,'Y'),TRUE,FALSE)",
 						"type": "Expression"
 					},
-					"quoteChar": ""
+					"quoteChar": "\""
 				},
 				"schema": []
 			},

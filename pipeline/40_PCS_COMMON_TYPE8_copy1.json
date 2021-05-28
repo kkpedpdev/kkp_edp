@@ -1,5 +1,5 @@
 {
-	"name": "40_PCS_COMMON_TYPE8",
+	"name": "40_PCS_COMMON_TYPE8_copy1",
 	"properties": {
 		"description": "Reference file from On-prim",
 		"activities": [
@@ -27,16 +27,7 @@
 						"type": "BinarySource",
 						"storeSettings": {
 							"type": "FileServerReadSettings",
-							"recursive": true,
-							"wildcardFolderPath": {
-								"value": "@concat(pipeline().parameters.P_PRCS_OBJ.PTH, '/')",
-								"type": "Expression"
-							},
-							"wildcardFileName": {
-								"value": "@activity('Lookup1').output.firstrow.FI_NM",
-								"type": "Expression"
-							},
-							"deleteFilesAfterCompletion": false
+							"recursive": true
 						},
 						"formatSettings": {
 							"type": "BinaryReadSettings"
@@ -52,13 +43,23 @@
 				},
 				"inputs": [
 					{
-						"referenceName": "onprim_bin_wc_ds",
-						"type": "DatasetReference"
+						"referenceName": "onprim_bin_ds",
+						"type": "DatasetReference",
+						"parameters": {
+							"P_PATH": {
+								"value": "@concat(pipeline().parameters.P_PRCS_OBJ.PTH, '/')",
+								"type": "Expression"
+							},
+							"P_FILENAME": {
+								"value": "@activity('Lookup1').output.firstrow.FI_NM",
+								"type": "Expression"
+							}
+						}
 					}
 				],
 				"outputs": [
 					{
-						"referenceName": "dl_bin_wc_ds",
+						"referenceName": "dl_bin_ds",
 						"type": "DatasetReference",
 						"parameters": {
 							"P_CONTAINER": {
@@ -66,7 +67,11 @@
 								"type": "Expression"
 							},
 							"P_PATH": {
-								"value": "@concat(pipeline().parameters.P_PRCS_OBJ.PTH, '/',pipeline().parameters.P_PRCS_OBJ.CALC_DATA_DT)",
+								"value": "@concat(pipeline().parameters.P_PRCS_OBJ.PTH, '/')",
+								"type": "Expression"
+							},
+							"P_FILENAME": {
+								"value": "@activity('Lookup1').output.firstrow.FI_NM",
 								"type": "Expression"
 							}
 						}
@@ -104,14 +109,6 @@
 						"storeSettings": {
 							"type": "AzureBlobFSReadSettings",
 							"recursive": true,
-							"wildcardFolderPath": {
-								"value": "@concat(pipeline().parameters.P_PRCS_OBJ.PTH,'/')",
-								"type": "Expression"
-							},
-							"wildcardFileName": {
-								"value": "@activity('Lookup1').output.firstrow.FI_NM",
-								"type": "Expression"
-							},
 							"enablePartitionDiscovery": false
 						},
 						"formatSettings": {
@@ -376,7 +373,7 @@
 			}
 		},
 		"folder": {
-			"name": "COMMON JOB"
+			"name": "BAK"
 		},
 		"annotations": [],
 		"lastPublishTime": "2021-02-24T06:25:52Z"

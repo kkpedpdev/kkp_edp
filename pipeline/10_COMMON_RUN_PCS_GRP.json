@@ -60,7 +60,7 @@
 					},
 					"activities": [
 						{
-							"name": "Set variable3",
+							"name": "Set V_TMP",
 							"type": "SetVariable",
 							"dependsOn": [
 								{
@@ -80,11 +80,11 @@
 							}
 						},
 						{
-							"name": "Set variable3_copy1",
+							"name": "Set V_LOOP",
 							"type": "SetVariable",
 							"dependsOn": [
 								{
-									"activity": "Set variable3",
+									"activity": "Set V_TMP",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -100,7 +100,7 @@
 							}
 						},
 						{
-							"name": "Set variable3_copy1_copy1",
+							"name": "Set MAX V_LOOP",
 							"type": "SetVariable",
 							"dependsOn": [
 								{

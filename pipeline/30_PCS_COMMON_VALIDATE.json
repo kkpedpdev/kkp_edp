@@ -1242,7 +1242,7 @@
 										"dependsOn": [],
 										"userProperties": [],
 										"typeProperties": {
-											"waitTimeInSeconds": 300
+											"waitTimeInSeconds": 30
 										}
 									},
 									{
@@ -1280,7 +1280,7 @@
 										"typeProperties": {
 											"variableName": "V_LOOP",
 											"value": {
-												"value": "@string(ADD(int(variables('V_TMP')),300))",
+												"value": "@string(ADD(int(variables('V_TMP')),30))",
 												"type": "Expression"
 											}
 										}

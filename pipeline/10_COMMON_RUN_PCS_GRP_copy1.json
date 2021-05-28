@@ -42,8 +42,8 @@
 				}
 			},
 			{
-				"name": "Set variable1",
-				"type": "SetVariable",
+				"name": "Until1",
+				"type": "Until",
 				"dependsOn": [
 					{
 						"activity": "GET PROCESS LIST",
@@ -54,22 +54,105 @@
 				],
 				"userProperties": [],
 				"typeProperties": {
-					"variableName": "V_PROCESS_LIST",
-					"value": {
-						"value": "@activity('GET PROCESS LIST').output.value",
+					"expression": {
+						"value": "@greaterOrEquals(INT(variables('V_LOOP')),activity('GET PROCESS LIST').output.count)",
 						"type": "Expression"
-					}
+					},
+					"activities": [
+						{
+							"name": "Set variable2",
+							"type": "SetVariable",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "V_PRCS_NM",
+								"value": {
+									"value": "@activity('GET PROCESS LIST').output.value[int(variables('V_LOOP'))].PRCS_NM",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "Set variable3",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "Set variable2",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "V_TMP",
+								"value": {
+									"value": "@variables('V_LOOP')",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "Set variable3_copy1",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "Set variable3",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "V_LOOP",
+								"value": {
+									"value": "@string(ADD(int(variables('V_TMP')),1))",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "Set variable3_copy1_copy1",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "Set variable2",
+									"dependencyConditions": [
+										"Failed"
+									]
+								}
+							],
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "V_LOOP",
+								"value": "999"
+							}
+						}
+					],
+					"timeout": "7.00:00:00"
 				}
 			}
 		],
 		"parameters": {
 			"P_PRCS_GRP": {
-				"type": "string"
+				"type": "string",
+				"defaultValue": "T1_DLT_CAR_D"
 			}
 		},
 		"variables": {
 			"V_PROCESS_LIST": {
 				"type": "Array"
+			},
+			"V_PRCS_NM": {
+				"type": "String"
+			},
+			"V_LOOP": {
+				"type": "String",
+				"defaultValue": "0"
+			},
+			"V_TMP": {
+				"type": "String"
 			}
 		},
 		"folder": {

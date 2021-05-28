@@ -1,5 +1,5 @@
 {
-	"name": "10_COMMON_RUN_PCS_GRP",
+	"name": "10_COMMON_RUN_PCS_GRP_copy2",
 	"properties": {
 		"description": " ",
 		"activities": [
@@ -42,8 +42,8 @@
 				}
 			},
 			{
-				"name": "Until1",
-				"type": "Until",
+				"name": "ForEach1",
+				"type": "ForEach",
 				"dependsOn": [
 					{
 						"activity": "GET PROCESS LIST",
@@ -54,68 +54,12 @@
 				],
 				"userProperties": [],
 				"typeProperties": {
-					"expression": {
-						"value": "@greaterOrEquals(INT(variables('V_LOOP')),activity('GET PROCESS LIST').output.count)",
+					"items": {
+						"value": "@activity('GET PROCESS LIST').output.value",
 						"type": "Expression"
 					},
+					"isSequential": true,
 					"activities": [
-						{
-							"name": "Set variable3",
-							"type": "SetVariable",
-							"dependsOn": [
-								{
-									"activity": "RUN COMMON PROCESS",
-									"dependencyConditions": [
-										"Succeeded"
-									]
-								}
-							],
-							"userProperties": [],
-							"typeProperties": {
-								"variableName": "V_TMP",
-								"value": {
-									"value": "@variables('V_LOOP')",
-									"type": "Expression"
-								}
-							}
-						},
-						{
-							"name": "Set variable3_copy1",
-							"type": "SetVariable",
-							"dependsOn": [
-								{
-									"activity": "Set variable3",
-									"dependencyConditions": [
-										"Succeeded"
-									]
-								}
-							],
-							"userProperties": [],
-							"typeProperties": {
-								"variableName": "V_LOOP",
-								"value": {
-									"value": "@string(ADD(int(variables('V_TMP')),1))",
-									"type": "Expression"
-								}
-							}
-						},
-						{
-							"name": "Set variable3_copy1_copy1",
-							"type": "SetVariable",
-							"dependsOn": [
-								{
-									"activity": "RUN COMMON PROCESS",
-									"dependencyConditions": [
-										"Failed"
-									]
-								}
-							],
-							"userProperties": [],
-							"typeProperties": {
-								"variableName": "V_LOOP",
-								"value": "999"
-							}
-						},
 						{
 							"name": "RUN COMMON PROCESS",
 							"type": "ExecutePipeline",
@@ -129,7 +73,7 @@
 								"waitOnCompletion": true,
 								"parameters": {
 									"P_PRCS_NM": {
-										"value": "@activity('GET PROCESS LIST').output.value[int(variables('V_LOOP'))].PRCS_NM",
+										"value": "@item().PRCS_NM",
 										"type": "Expression"
 									},
 									"P_RUN_MODE": {
@@ -143,8 +87,7 @@
 								}
 							}
 						}
-					],
-					"timeout": "7.00:00:00"
+					]
 				}
 			}
 		],
@@ -157,14 +100,6 @@
 			},
 			"P_STREM_ID": {
 				"type": "string"
-			}
-		},
-		"variables": {
-			"V_LOOP": {
-				"type": "String"
-			},
-			"V_TMP": {
-				"type": "String"
 			}
 		},
 		"folder": {

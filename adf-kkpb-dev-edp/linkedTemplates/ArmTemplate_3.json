@@ -1661,7 +1661,7 @@
 												"dependsOn": [],
 												"userProperties": [],
 												"typeProperties": {
-													"waitTimeInSeconds": 300
+													"waitTimeInSeconds": 30
 												}
 											},
 											{
@@ -1699,7 +1699,7 @@
 												"typeProperties": {
 													"variableName": "V_LOOP",
 													"value": {
-														"value": "@string(ADD(int(variables('V_TMP')),300))",
+														"value": "@string(ADD(int(variables('V_TMP')),30))",
 														"type": "Expression"
 													}
 												}
@@ -3640,8 +3640,8 @@
 						}
 					},
 					{
-						"name": "ForEach1",
-						"type": "ForEach",
+						"name": "Until1",
+						"type": "Until",
 						"dependsOn": [
 							{
 								"activity": "GET PROCESS LIST",
@@ -3652,12 +3652,68 @@
 						],
 						"userProperties": [],
 						"typeProperties": {
-							"items": {
-								"value": "@activity('GET PROCESS LIST').output.value",
+							"expression": {
+								"value": "@greaterOrEquals(INT(variables('V_LOOP')),activity('GET PROCESS LIST').output.count)",
 								"type": "Expression"
 							},
-							"isSequential": true,
 							"activities": [
+								{
+									"name": "Set V_TMP",
+									"type": "SetVariable",
+									"dependsOn": [
+										{
+											"activity": "RUN COMMON PROCESS",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "V_TMP",
+										"value": {
+											"value": "@variables('V_LOOP')",
+											"type": "Expression"
+										}
+									}
+								},
+								{
+									"name": "Set V_LOOP",
+									"type": "SetVariable",
+									"dependsOn": [
+										{
+											"activity": "Set V_TMP",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "V_LOOP",
+										"value": {
+											"value": "@string(ADD(int(variables('V_TMP')),1))",
+											"type": "Expression"
+										}
+									}
+								},
+								{
+									"name": "Set MAX V_LOOP",
+									"type": "SetVariable",
+									"dependsOn": [
+										{
+											"activity": "RUN COMMON PROCESS",
+											"dependencyConditions": [
+												"Failed"
+											]
+										}
+									],
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "V_LOOP",
+										"value": "999"
+									}
+								},
 								{
 									"name": "RUN COMMON PROCESS",
 									"type": "ExecutePipeline",
@@ -3671,7 +3727,7 @@
 										"waitOnCompletion": true,
 										"parameters": {
 											"P_PRCS_NM": {
-												"value": "@item().PRCS_NM",
+												"value": "@activity('GET PROCESS LIST').output.value[int(variables('V_LOOP'))].PRCS_NM",
 												"type": "Expression"
 											},
 											"P_RUN_MODE": {
@@ -3685,7 +3741,8 @@
 										}
 									}
 								}
-							]
+							],
+							"timeout": "7.00:00:00"
 						}
 					}
 				],
@@ -3698,6 +3755,14 @@
 					},
 					"P_STREM_ID": {
 						"type": "string"
+					}
+				},
+				"variables": {
+					"V_LOOP": {
+						"type": "String"
+					},
+					"V_TMP": {
+						"type": "String"
 					}
 				},
 				"folder": {
@@ -3825,6 +3890,123 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/pipelines/20_PCS_COMMON_START_DB')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/10_COMMON_RUN_PCS_GRP_copy2')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": " ",
+				"activities": [
+					{
+						"name": "GET PROCESS LIST",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "SqlServerSource",
+								"sqlReaderStoredProcedureName": {
+									"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA,'.PROC_GET_PRCS_BY_GRP')",
+									"type": "Expression"
+								},
+								"storedProcedureParameters": {
+									"P_PRCS_GRP": {
+										"type": "String",
+										"value": {
+											"value": "@pipeline().parameters.P_PRCS_GRP",
+											"type": "Expression"
+										}
+									}
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "mssql_cntl_ds",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "ForEach1",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "GET PROCESS LIST",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('GET PROCESS LIST').output.value",
+								"type": "Expression"
+							},
+							"isSequential": true,
+							"activities": [
+								{
+									"name": "RUN COMMON PROCESS",
+									"type": "ExecutePipeline",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "20_PCS_COMMON_START",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {
+											"P_PRCS_NM": {
+												"value": "@item().PRCS_NM",
+												"type": "Expression"
+											},
+											"P_RUN_MODE": {
+												"value": "@pipeline().parameters.P_RUN_MODE",
+												"type": "Expression"
+											},
+											"P_STREM_ID": {
+												"value": "@pipeline().parameters.P_STREM_ID",
+												"type": "Expression"
+											}
+										}
+									}
+								}
+							]
+						}
+					}
+				],
+				"parameters": {
+					"P_PRCS_GRP": {
+						"type": "string"
+					},
+					"P_RUN_MODE": {
+						"type": "string"
+					},
+					"P_STREM_ID": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "COMMON JOB"
+				},
+				"annotations": [],
+				"lastPublishTime": "2021-02-24T05:06:49Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/20_PCS_COMMON_START')]"
 			]
 		},
 		{

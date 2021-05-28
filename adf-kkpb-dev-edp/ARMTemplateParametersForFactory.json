@@ -4,57 +4,6 @@
 	"parameters": {
 		"factoryName": {
 			"value": "adf-kkpb-dev-edp"
-		},
-		"AzureDataLakeStorage1_accountKey": {
-			"value": ""
-		},
-		"link_adls_onprim_edp_accountKey": {
-			"value": ""
-		},
-		"link_dbw_edp_accessToken": {
-			"value": ""
-		},
-		"link_fs_kkpb_dev_edp_password": {
-			"value": ""
-		},
-		"link_func_edp_functionKey": {
-			"value": ""
-		},
-		"link_sqldb_kkpb_edp_connectionString": {
-			"value": ""
-		},
-		"link_st_kkpb_edp_accountKey": {
-			"value": ""
-		},
-		"link_syn_kkpb_edp_connectionString": {
-			"value": ""
-		},
-		"AzureDataLakeStorage1_properties_typeProperties_url": {
-			"value": "https://stkkpbdevedp.dfs.core.windows.net"
-		},
-		"link_adls_onprim_edp_properties_typeProperties_url": {
-			"value": "https://stkkpbdevedp.dfs.core.windows.net"
-		},
-		"link_fs_kkpb_dev_edp_properties_typeProperties_host": {
-			"value": "E:\\Landing"
-		},
-		"link_fs_kkpb_dev_edp_properties_typeProperties_userId": {
-			"value": "administrator"
-		},
-		"link_func_edp_properties_typeProperties_functionAppUrl": {
-			"value": "https://func-kkpb-test-edp.azurewebsites.net"
-		},
-		"link_kv_edp_properties_typeProperties_baseUrl": {
-			"value": "https://kv-kkpb-dev-edp.vault.azure.net/"
-		},
-		"link_spo_http_properties_typeProperties_url": {
-			"value": "https://kiatnakin365.sharepoint.com"
-		},
-		"link_st_kkpb_edp_properties_typeProperties_url": {
-			"value": "https://stkkpbdevedp.dfs.core.windows.net"
-		},
-		"shir-kkpb-edp_properties_typeProperties_linkedInfo_resourceId": {
-			"value": "/subscriptions/f3ef3afd-9903-4759-a715-dcd5523f3bbe/resourcegroups/rg-kkpb-test-edp/providers/Microsoft.DataFactory/factories/adf-kkpb-uat-edp/integrationruntimes/shir-kkpb-edp"
 		}
 	}
 }

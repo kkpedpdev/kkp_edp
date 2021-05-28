@@ -20,7 +20,7 @@
 			},
 			"P_DPDN_WAIT_SEC": {
 				"type": "int",
-				"value": 300
+				"value": 0
 			}
 		}
 	},

@@ -390,6 +390,23 @@
 									}
 								}
 							}
+						},
+						{
+							"name": "Set variable1_copy1",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "05_COMMON_RUN_PCS_GRP_BY PRIR",
+									"dependencyConditions": [
+										"Failed"
+									]
+								}
+							],
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "V_LOOP",
+								"value": "999"
+							}
 						}
 					],
 					"timeout": "7.00:00:00"

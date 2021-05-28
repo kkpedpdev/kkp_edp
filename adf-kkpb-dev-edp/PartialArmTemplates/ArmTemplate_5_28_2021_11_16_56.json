@@ -1,0 +1,197 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "adf-kkpb-dev-edp"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/10_COMMON_RUN_PCS_GRP')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": " ",
+				"activities": [
+					{
+						"name": "GET PROCESS LIST",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "SqlServerSource",
+								"sqlReaderStoredProcedureName": {
+									"value": "@concat(pipeline().globalParameters.P_GLBL_CNTL_SCHEMA,'.PROC_GET_PRCS_BY_GRP')",
+									"type": "Expression"
+								},
+								"storedProcedureParameters": {
+									"P_PRCS_GRP": {
+										"type": "String",
+										"value": {
+											"value": "@pipeline().parameters.P_PRCS_GRP",
+											"type": "Expression"
+										}
+									}
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "mssql_cntl_ds",
+								"type": "DatasetReference"
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "Until1",
+						"type": "Until",
+						"dependsOn": [
+							{
+								"activity": "GET PROCESS LIST",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"expression": {
+								"value": "@greaterOrEquals(INT(variables('V_LOOP')),activity('GET PROCESS LIST').output.count)",
+								"type": "Expression"
+							},
+							"activities": [
+								{
+									"name": "Set V_TMP",
+									"type": "SetVariable",
+									"dependsOn": [
+										{
+											"activity": "RUN COMMON PROCESS",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "V_TMP",
+										"value": {
+											"value": "@variables('V_LOOP')",
+											"type": "Expression"
+										}
+									}
+								},
+								{
+									"name": "Set V_LOOP",
+									"type": "SetVariable",
+									"dependsOn": [
+										{
+											"activity": "Set V_TMP",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "V_LOOP",
+										"value": {
+											"value": "@string(ADD(int(variables('V_TMP')),1))",
+											"type": "Expression"
+										}
+									}
+								},
+								{
+									"name": "Set MAX V_LOOP",
+									"type": "SetVariable",
+									"dependsOn": [
+										{
+											"activity": "RUN COMMON PROCESS",
+											"dependencyConditions": [
+												"Failed"
+											]
+										}
+									],
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "V_LOOP",
+										"value": "999"
+									}
+								},
+								{
+									"name": "RUN COMMON PROCESS",
+									"type": "ExecutePipeline",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "20_PCS_COMMON_START",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {
+											"P_PRCS_NM": {
+												"value": "@activity('GET PROCESS LIST').output.value[int(variables('V_LOOP'))].PRCS_NM",
+												"type": "Expression"
+											},
+											"P_RUN_MODE": {
+												"value": "@pipeline().parameters.P_RUN_MODE",
+												"type": "Expression"
+											},
+											"P_STREM_ID": {
+												"value": "@pipeline().parameters.P_STREM_ID",
+												"type": "Expression"
+											}
+										}
+									}
+								}
+							],
+							"timeout": "7.00:00:00"
+						}
+					}
+				],
+				"parameters": {
+					"P_PRCS_GRP": {
+						"type": "string"
+					},
+					"P_RUN_MODE": {
+						"type": "string"
+					},
+					"P_STREM_ID": {
+						"type": "string"
+					}
+				},
+				"variables": {
+					"V_LOOP": {
+						"type": "String",
+						"defaultValue": "0"
+					},
+					"V_TMP": {
+						"type": "String",
+						"defaultValue": "0"
+					}
+				},
+				"folder": {
+					"name": "COMMON JOB"
+				},
+				"annotations": [],
+				"lastPublishTime": "2021-02-24T05:06:49Z"
+			},
+			"dependsOn": []
+		}
+	]
+}

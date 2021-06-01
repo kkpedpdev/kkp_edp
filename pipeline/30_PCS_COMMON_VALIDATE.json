@@ -354,6 +354,12 @@
 						"dependencyConditions": [
 							"Failed"
 						]
+					},
+					{
+						"activity": "CHECK DNDP_FINAL",
+						"dependencyConditions": [
+							"Failed"
+						]
 					}
 				],
 				"policy": {

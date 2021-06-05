@@ -9399,7 +9399,7 @@
 										"type": "Expression"
 									},
 									"P_PATH": {
-										"value": "@concat(pipeline().parameters.P_PRCS_OBJ.PTH, '/',pipeline().parameters.P_PRCS_OBJ.CALC_DATA_DT)",
+										"value": "@concat(pipeline().parameters.P_PRCS_OBJ.PTH, '/')",
 										"type": "Expression"
 									}
 								}

@@ -2328,6 +2328,46 @@
 								"parameters": {}
 							}
 						}
+					},
+					{
+						"name": "Notebook1",
+						"type": "DatabricksNotebook",
+						"dependsOn": [
+							{
+								"activity": "ForEach1",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 1,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": {
+								"value": "@concat('/', toUpper(pipeline().globalParameters.P_GLBL_ENV)  , pipeline().parameters.P_PRCS_OBJ.ADB_NM)",
+								"type": "Expression"
+							},
+							"baseParameters": {
+								"PARAMS": {
+									"value": "@pipeline().parameters.P_PRCS_OBJ.ADB_PARM",
+									"type": "Expression"
+								},
+								"ENV": {
+									"value": "@pipeline().globalParameters.P_GLBL_ENV",
+									"type": "Expression"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "link_dbw_edp",
+							"type": "LinkedServiceReference"
+						}
 					}
 				],
 				"parameters": {

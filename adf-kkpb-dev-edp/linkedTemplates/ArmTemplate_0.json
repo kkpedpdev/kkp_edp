@@ -7,10 +7,6 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "adf-kkpb-dev-edp"
 		},
-		"link_dbw_edp_accessToken": {
-			"type": "secureString",
-			"metadata": "Secure string for 'accessToken' of 'link_dbw_edp'"
-		},
 		"link_syn_kkpb_edp_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'link_syn_kkpb_edp'"
@@ -41,7 +37,7 @@
 		},
 		"link_kv_edp_properties_typeProperties_baseUrl": {
 			"type": "string",
-			"defaultValue": "https://kv-kkpb-dev-edp.vault.azure.net/"
+			"defaultValue": "https://kv-kkpb-uat-edp.vault.azure.net/"
 		},
 		"shir-kkpb-edp_properties_typeProperties_linkedInfo_resourceId": {
 			"type": "string",
@@ -80,25 +76,6 @@
 		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
 	},
 	"resources": [
-		{
-			"name": "[concat(parameters('factoryName'), '/link_dbw_edp')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"description": "   ",
-				"annotations": [],
-				"type": "AzureDatabricks",
-				"typeProperties": {
-					"domain": "https://adb-2489353948312455.15.azuredatabricks.net/",
-					"accessToken": {
-						"type": "SecureString",
-						"value": "[parameters('link_dbw_edp_accessToken')]"
-					},
-					"existingClusterId": "0324-063910-filet728"
-				}
-			},
-			"dependsOn": []
-		},
 		{
 			"name": "[concat(parameters('factoryName'), '/link_kv_edp')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
@@ -151,69 +128,6 @@
 				"typeProperties": {}
 			},
 			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/40_PCS_COMMON_TYPE3')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"description": "Transform via databricks ",
-				"activities": [
-					{
-						"name": "Notebook1",
-						"description": "  ",
-						"type": "DatabricksNotebook",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"notebookPath": {
-								"value": "@concat('/', toUpper(pipeline().globalParameters.P_GLBL_ENV)  , pipeline().parameters.P_PRCS_OBJ.ADB_NM)",
-								"type": "Expression"
-							},
-							"baseParameters": {
-								"PARAMS": {
-									"value": "@pipeline().parameters.P_PRCS_OBJ.ADB_PARM",
-									"type": "Expression"
-								},
-								"ENV": {
-									"value": "@pipeline().globalParameters.P_GLBL_ENV",
-									"type": "Expression"
-								}
-							}
-						},
-						"linkedServiceName": {
-							"referenceName": "link_dbw_edp",
-							"type": "LinkedServiceReference"
-						}
-					}
-				],
-				"parameters": {
-					"P_LD_ID": {
-						"type": "string"
-					},
-					"P_PRCS_NM": {
-						"type": "string"
-					},
-					"P_PRCS_OBJ": {
-						"type": "object"
-					}
-				},
-				"folder": {
-					"name": "COMMON JOB"
-				},
-				"annotations": [],
-				"lastPublishTime": "2021-02-24T06:46:02Z"
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/link_dbw_edp')]"
-			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/Hello1')]",
@@ -329,168 +243,6 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/RIB_EXT')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Notebook2",
-						"type": "DatabricksNotebook",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"notebookPath": "/00_Common/edp/adf/dbn-gen-script-rib",
-							"baseParameters": {
-								"PARAMS": {
-									"value": "@pipeline().parameters.PARAMS",
-									"type": "Expression"
-								}
-							}
-						},
-						"linkedServiceName": {
-							"referenceName": "link_dbw_edp",
-							"type": "LinkedServiceReference"
-						}
-					},
-					{
-						"name": "Stored procedure1",
-						"type": "SqlServerStoredProcedure",
-						"dependsOn": [
-							{
-								"activity": "Notebook2",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"storedProcedureName": "[[dbo].[CREATE_EXTERNAL_TABLE]",
-							"storedProcedureParameters": {
-								"SQL": {
-									"value": {
-										"value": "@activity('Notebook2').output.runOutput",
-										"type": "Expression"
-									},
-									"type": "String"
-								}
-							}
-						},
-						"linkedServiceName": {
-							"referenceName": "link_syn_kkpb_edp",
-							"type": "LinkedServiceReference"
-						}
-					}
-				],
-				"parameters": {
-					"PARAMS": {
-						"type": "string"
-					}
-				},
-				"folder": {
-					"name": "TEST"
-				},
-				"annotations": [],
-				"lastPublishTime": "2021-02-24T05:06:42Z"
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/link_dbw_edp')]",
-				"[concat(variables('factoryId'), '/linkedServices/link_syn_kkpb_edp')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/TEST_JDBC')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Notebook1",
-						"type": "DatabricksNotebook",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"notebookPath": "/Users/pran.piya@kkpfg.com/TEST/TEST ADF SYN"
-						},
-						"linkedServiceName": {
-							"referenceName": "link_dbw_edp",
-							"type": "LinkedServiceReference"
-						}
-					}
-				],
-				"folder": {
-					"name": "TEST"
-				},
-				"annotations": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/link_dbw_edp')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Test DBW')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Notebook1",
-						"type": "DatabricksNotebook",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"notebookPath": "/Users/pran@inteltion.com/tes",
-							"baseParameters": {
-								"Date": "20210115",
-								"Source": "kkp-kkpmobile-tracking-request"
-							}
-						},
-						"linkedServiceName": {
-							"referenceName": "link_dbw_edp",
-							"type": "LinkedServiceReference"
-						}
-					}
-				],
-				"folder": {
-					"name": "TEST"
-				},
-				"annotations": [],
-				"lastPublishTime": "2021-02-24T05:06:42Z"
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/link_dbw_edp')]"
-			]
-		},
-		{
 			"name": "[concat(parameters('factoryName'), '/AzureDataLakeStorage1')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
@@ -536,6 +288,31 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/integrationRuntimes/shir-onprim-kkbp-edp')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/link_dbw_edp')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "   ",
+				"annotations": [],
+				"type": "AzureDatabricks",
+				"typeProperties": {
+					"domain": "https://adb-2489353948312455.15.azuredatabricks.net/",
+					"accessToken": {
+						"type": "AzureKeyVaultSecret",
+						"store": {
+							"referenceName": "link_kv_edp",
+							"type": "LinkedServiceReference"
+						},
+						"secretName": "dbwkkpuatkey"
+					},
+					"existingClusterId": "0324-063910-filet728"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/link_kv_edp')]"
 			]
 		},
 		{
@@ -991,6 +768,231 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/link_func_edp')]",
 				"[concat(variables('factoryId'), '/linkedServices/link_sqldb_kkpb_edp')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/40_PCS_COMMON_TYPE3')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Transform via databricks ",
+				"activities": [
+					{
+						"name": "Notebook1",
+						"description": "  ",
+						"type": "DatabricksNotebook",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": {
+								"value": "@concat('/', toUpper(pipeline().globalParameters.P_GLBL_ENV)  , pipeline().parameters.P_PRCS_OBJ.ADB_NM)",
+								"type": "Expression"
+							},
+							"baseParameters": {
+								"PARAMS": {
+									"value": "@pipeline().parameters.P_PRCS_OBJ.ADB_PARM",
+									"type": "Expression"
+								},
+								"ENV": {
+									"value": "@pipeline().globalParameters.P_GLBL_ENV",
+									"type": "Expression"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "link_dbw_edp",
+							"type": "LinkedServiceReference"
+						}
+					}
+				],
+				"parameters": {
+					"P_LD_ID": {
+						"type": "string"
+					},
+					"P_PRCS_NM": {
+						"type": "string"
+					},
+					"P_PRCS_OBJ": {
+						"type": "object"
+					}
+				},
+				"folder": {
+					"name": "COMMON JOB"
+				},
+				"annotations": [],
+				"lastPublishTime": "2021-02-24T06:46:02Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/link_dbw_edp')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/RIB_EXT')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Notebook2",
+						"type": "DatabricksNotebook",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": "/00_Common/edp/adf/dbn-gen-script-rib",
+							"baseParameters": {
+								"PARAMS": {
+									"value": "@pipeline().parameters.PARAMS",
+									"type": "Expression"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "link_dbw_edp",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Stored procedure1",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "Notebook2",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[dbo].[CREATE_EXTERNAL_TABLE]",
+							"storedProcedureParameters": {
+								"SQL": {
+									"value": {
+										"value": "@activity('Notebook2').output.runOutput",
+										"type": "Expression"
+									},
+									"type": "String"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "link_syn_kkpb_edp",
+							"type": "LinkedServiceReference"
+						}
+					}
+				],
+				"parameters": {
+					"PARAMS": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "TEST"
+				},
+				"annotations": [],
+				"lastPublishTime": "2021-02-24T05:06:42Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/link_dbw_edp')]",
+				"[concat(variables('factoryId'), '/linkedServices/link_syn_kkpb_edp')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/TEST_JDBC')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Notebook1",
+						"type": "DatabricksNotebook",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": "/Users/pran.piya@kkpfg.com/TEST/TEST ADF SYN"
+						},
+						"linkedServiceName": {
+							"referenceName": "link_dbw_edp",
+							"type": "LinkedServiceReference"
+						}
+					}
+				],
+				"folder": {
+					"name": "TEST"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/link_dbw_edp')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Test DBW')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Notebook1",
+						"type": "DatabricksNotebook",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": "/Users/pran@inteltion.com/tes",
+							"baseParameters": {
+								"Date": "20210115",
+								"Source": "kkp-kkpmobile-tracking-request"
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "link_dbw_edp",
+							"type": "LinkedServiceReference"
+						}
+					}
+				],
+				"folder": {
+					"name": "TEST"
+				},
+				"annotations": [],
+				"lastPublishTime": "2021-02-24T05:06:42Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/link_dbw_edp')]"
 			]
 		}
 	]

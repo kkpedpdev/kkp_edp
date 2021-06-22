@@ -15,10 +15,6 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'accountKey' of 'link_adls_onprim_edp'"
 		},
-		"link_dbw_edp_accessToken": {
-			"type": "secureString",
-			"metadata": "Secure string for 'accessToken' of 'link_dbw_edp'"
-		},
 		"link_fs_kkpb_dev_edp_password": {
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'link_fs_kkpb_dev_edp'"
@@ -61,7 +57,7 @@
 		},
 		"link_kv_edp_properties_typeProperties_baseUrl": {
 			"type": "string",
-			"defaultValue": "https://kv-kkpb-dev-edp.vault.azure.net/"
+			"defaultValue": "https://kv-kkpb-uat-edp.vault.azure.net/"
 		},
 		"link_spo_http_properties_typeProperties_url": {
 			"type": "string",
@@ -101,9 +97,6 @@
 				"parameters": {
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
-					},
-					"link_dbw_edp_accessToken": {
-						"value": "[parameters('link_dbw_edp_accessToken')]"
 					},
 					"link_syn_kkpb_edp_connectionString": {
 						"value": "[parameters('link_syn_kkpb_edp_connectionString')]"

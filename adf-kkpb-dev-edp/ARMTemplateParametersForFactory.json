@@ -11,9 +11,6 @@
 		"link_adls_onprim_edp_accountKey": {
 			"value": ""
 		},
-		"link_dbw_edp_accessToken": {
-			"value": ""
-		},
 		"link_fs_kkpb_dev_edp_password": {
 			"value": ""
 		},
@@ -45,7 +42,7 @@
 			"value": "https://func-kkpb-test-edp.azurewebsites.net"
 		},
 		"link_kv_edp_properties_typeProperties_baseUrl": {
-			"value": "https://kv-kkpb-dev-edp.vault.azure.net/"
+			"value": "https://kv-kkpb-uat-edp.vault.azure.net/"
 		},
 		"link_spo_http_properties_typeProperties_url": {
 			"value": "https://kiatnakin365.sharepoint.com"

@@ -8,6 +8,9 @@
 		"AzureDataLakeStorage1_accountKey": {
 			"value": ""
 		},
+		"FileServer1_password": {
+			"value": ""
+		},
 		"link_adls_onprim_edp_accountKey": {
 			"value": ""
 		},
@@ -28,6 +31,12 @@
 		},
 		"AzureDataLakeStorage1_properties_typeProperties_url": {
 			"value": "https://stkkpbdevedp.dfs.core.windows.net"
+		},
+		"FileServer1_properties_typeProperties_host": {
+			"value": "\\\\SHIRSRVP01B.kiatnakinbank.com\\NFS\\DATA\\OUT"
+		},
+		"FileServer1_properties_typeProperties_userId": {
+			"value": "administrator"
 		},
 		"link_adls_onprim_edp_properties_typeProperties_url": {
 			"value": "https://stkkpbdevedp.dfs.core.windows.net"

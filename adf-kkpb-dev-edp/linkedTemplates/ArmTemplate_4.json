@@ -13,6 +13,105 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('factoryName'), '/MAIN_BATCH_DEBUGGER')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "EDP_SET",
+						"type": "ExecutePipeline",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "00_STREAM_COMMON_DB",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"P_STREM_NM": "EDP_SET",
+								"P_RUN_MODE": "F"
+							}
+						}
+					},
+					{
+						"name": "EDP_BANK",
+						"type": "ExecutePipeline",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "00_STREAM_COMMON_DB",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"P_STREM_NM": "EDP_BANK",
+								"P_RUN_MODE": "F"
+							}
+						}
+					},
+					{
+						"name": "EDP_DLT",
+						"type": "ExecutePipeline",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "00_STREAM_COMMON_DB",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"P_STREM_NM": "EDP_DLT",
+								"P_RUN_MODE": "F"
+							}
+						}
+					},
+					{
+						"name": "EDP_BOT",
+						"type": "ExecutePipeline",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "00_STREAM_COMMON_DB",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"P_STREM_NM": "EDP_BOT",
+								"P_RUN_MODE": "F"
+							}
+						}
+					},
+					{
+						"name": "EDP_TIDE",
+						"type": "ExecutePipeline",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "00_STREAM_COMMON_DB",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"P_STREM_NM": "EDP_TIDE",
+								"P_RUN_MODE": "F"
+							}
+						}
+					}
+				],
+				"folder": {
+					"name": "BATCH"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/RUN_INITIAL_LOOP')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -208,7 +307,9 @@
 					}
 				}
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/MAIN_BATCH_DEBUGGER')]"
+			]
 		}
 	]
 }

@@ -151,7 +151,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"notebookPath": {
-						"value": "@concat('/', toUpper(pipeline().globalParameters.P_GLBL_ENV)  , '/00_Common/edp/adf/dbn-adf-preprocessing-wildcard')",
+						"value": "@concat('/', toUpper(pipeline().globalParameters.P_GLBL_ENV)  , '/00_Common/edp/adf/dbn-adf-preprocessing-wildcard-spark')",
 						"type": "Expression"
 					},
 					"baseParameters": {

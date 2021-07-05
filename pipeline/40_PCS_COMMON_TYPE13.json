@@ -23,7 +23,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"dataset": {
-						"referenceName": "bin_onprim_ds",
+						"referenceName": "onprim_bin_ds",
 						"type": "DatasetReference",
 						"parameters": {
 							"P_PATH": {

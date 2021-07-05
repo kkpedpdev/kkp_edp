@@ -7955,7 +7955,7 @@
 						"userProperties": [],
 						"typeProperties": {
 							"dataset": {
-								"referenceName": "bin_onprim_ds",
+								"referenceName": "onprim_bin_ds",
 								"type": "DatasetReference",
 								"parameters": {
 									"P_PATH": {
@@ -8183,9 +8183,10 @@
 				"annotations": []
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/bin_onprim_ds')]",
+				"[concat(variables('factoryId'), '/datasets/onprim_bin_ds')]",
 				"[concat(variables('factoryId'), '/datasets/mssql_cntl_ds')]",
 				"[concat(variables('factoryId'), '/linkedServices/link_dbw_edp')]",
+				"[concat(variables('factoryId'), '/datasets/bin_onprim_ds')]",
 				"[concat(variables('factoryId'), '/datasets/bin_blob_ds')]"
 			]
 		},
